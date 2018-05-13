@@ -52,11 +52,21 @@ namespace NP.IoCy
         }
     }
 
-    class ResolvingSingletonCell : ResolvingSingletonCellBase<object>, IResolvingCell
+    interface IResolvingSingletonCell : IResolvingCell
+    {
+        IEnumerable<object> GetAllObjs();
+    }
+
+    class ResolvingSingletonCell : ResolvingSingletonCellBase<object>, IResolvingSingletonCell
     {
         public ResolvingSingletonCell(object obj)
         {
             _obj = obj;
+        }
+
+        public IEnumerable<object> GetAllObjs()
+        {
+            return new[] { _obj };
         }
 
         public override string ToString()
@@ -66,7 +76,7 @@ namespace NP.IoCy
     }
 
 
-    class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<List<object>>, IResolvingCell
+    class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<List<object>>, IResolvingSingletonCell
     {
         public ResolvingSingletonMultiCell()
         {
@@ -86,6 +96,11 @@ namespace NP.IoCy
         object IResolvingCellBase<object>.GetObj(out bool isComposed)
         {
             return GetObj(out isComposed);
+        }
+
+        public IEnumerable<object> GetAllObjs()
+        {
+            return _obj;
         }
     }
 
@@ -408,28 +423,23 @@ namespace NP.IoCy
             AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingSingletonCell(resolvingObj));
         }
 
-        private void MapSingletonImpl(Type typeToResolve, Type resolvingObjType, object resolutionKey = null)
+        private void MapSingletonTypeImpl(Type typeToResolve, Type resolvingObjType, object resolutionKey = null)
         {
             object resolvingObj = Activator.CreateInstance(resolvingObjType);
 
-            MapSingletonObjImpl(typeToResolve, resolvingObjType, resolutionKey);
-        }
-
-        public void MapSingleton<TResolving>(Type typeToResolve, TResolving resolvingObj, object resolutionKey = null)
-        {
             MapSingletonObjImpl(typeToResolve, resolvingObj, resolutionKey);
         }
 
         public void MapSingleton<TToResolve, TResolving>(TResolving resolvingObj, object resolutionKey = null)
             where TResolving : TToResolve
         {
-            MapSingleton(typeof(TToResolve), resolvingObj, resolutionKey);
+            MapSingletonObjImpl(typeof(TToResolve), resolvingObj, resolutionKey);
         }
 
         public void MapSingleton<TToResolve, TResolving>(object resolutionKey = null)
             where TResolving : TToResolve
         {
-            MapSingletonObjImpl(typeof(TToResolve), typeof(TResolving), resolutionKey);
+            MapSingletonTypeImpl(typeof(TToResolve), typeof(TResolving), resolutionKey);
         }
 
         public void MapFactory<TResolving>(Type typeToResolve, Func<TResolving> resolvingFactory, object resolutionKey = null)
@@ -525,12 +535,15 @@ namespace NP.IoCy
         {
             foreach(IResolvingCell resolvingCell in this._typeMap.Values)
             {
-                ResolvingSingletonCell singletonCell =
-                    resolvingCell as ResolvingSingletonCell;
+                IResolvingSingletonCell singletonCell =
+                    resolvingCell as IResolvingSingletonCell;
 
                 if (singletonCell != null)
                 {
-                    ComposeObject(singletonCell.GetObj(out bool isComposed));
+                    foreach(object obj in singletonCell.GetAllObjs())
+                    {
+                        ComposeObject(obj);
+                    }
                 }
             }
         }

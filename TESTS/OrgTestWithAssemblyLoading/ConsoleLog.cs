@@ -1,7 +1,7 @@
-﻿using OrgTestWithAssemblyLoading.Interfaces;
+﻿using AssemblyLoadingTest.Interfaces;
 using System;
 
-namespace OrgTestWithAssemblyLoading
+namespace AssemblyLoadingTest
 {
     public class ConsoleLog : ILog
     {

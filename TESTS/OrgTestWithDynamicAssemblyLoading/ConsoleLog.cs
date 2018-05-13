@@ -1,7 +1,7 @@
-﻿using OrgTestWithDynamicAssemblyLoading.Interfaces;
+﻿using DynamicAssemblyLoadingTest.Interfaces;
 using System;
 
-namespace OrgTestWithDynamicAssemblyLoading
+namespace DynamicAssemblyLoadingTest
 {
     public class ConsoleLog : ILog
     {

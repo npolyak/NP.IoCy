@@ -1,8 +1,8 @@
 ﻿using NP.IoCy;
-using OrganizationTest.Implementations;
-using OrganizationTest.Interfaces;
+using BootstrappingTest.Implementations;
+using BootstrappingTest.Interfaces;
 
-namespace OrganizationTest
+namespace BootstrappingTest
 {
     class Program
     {
@@ -11,14 +11,14 @@ namespace OrganizationTest
             // create container
             IoCContainer container = new IoCContainer();
 
-            #region BOOTSTRAPING
+            #region BOOTSTRAPPING
             // bootstrap container 
             // (map the types)
             container.Map<IPerson, Person>();
             container.Map<IAddress, Address>();
             container.Map<IOrg, Org>();
             container.MapSingleton<ILog, FileLog>();
-            #endregion BOOTSTRAPING
+            #endregion BOOTSTRAPPING
 
             // after CompleteConfiguration
             // you cannot bootstrap any new types in the container.

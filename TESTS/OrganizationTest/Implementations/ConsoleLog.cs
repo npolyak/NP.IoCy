@@ -1,11 +1,7 @@
-﻿using OrganizationTest.Interfaces;
+﻿using BootstrappingTest.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OrganizationTest.Implementations
+namespace BootstrappingTest.Implementations
 {
     public class ConsoleLog : ILog
     {

@@ -1,7 +1,7 @@
 ﻿using NP.IoCy.Attributes;
-using OrgTestWithDynamicAssemblyLoading.Interfaces;
+using DynamicAssemblyLoadingTest.Interfaces;
 
-namespace OrgTestWithDynamicAssemblyLoading.Implementations
+namespace DynamicAssemblyLoadingTest.Implementations
 {
     [Implements]
     public class Person : IPerson

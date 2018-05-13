@@ -1,4 +1,4 @@
-﻿namespace OrganizationTest.Interfaces
+﻿namespace BootstrappingTest.Interfaces
 {
     public interface IAddress
     {

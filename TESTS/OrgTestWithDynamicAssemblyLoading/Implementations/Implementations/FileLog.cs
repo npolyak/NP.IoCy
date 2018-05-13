@@ -1,8 +1,8 @@
 ﻿using NP.IoCy.Attributes;
-using OrgTestWithDynamicAssemblyLoading.Interfaces;
+using DynamicAssemblyLoadingTest.Interfaces;
 using System.IO;
 
-namespace OrgTestWithDynamicAssemblyLoading.Implementations
+namespace DynamicAssemblyLoadingTest.Implementations
 {
     [Implements]
     public class FileLog : ILog

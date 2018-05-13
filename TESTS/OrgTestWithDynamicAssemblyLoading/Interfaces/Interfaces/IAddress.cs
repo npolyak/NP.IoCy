@@ -1,4 +1,4 @@
-﻿namespace OrgTestWithDynamicAssemblyLoading.Interfaces
+﻿namespace DynamicAssemblyLoadingTest.Interfaces
 {
     public interface IAddress
     {

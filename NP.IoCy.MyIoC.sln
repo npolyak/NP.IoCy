@@ -7,19 +7,19 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NP.IoCy", "NP.IoCy.csproj",
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TESTS", "TESTS", "{376E306D-4442-4C1B-BCE5-F4FCBDA8AA6C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrganizationTest", "TESTS\OrganizationTest\OrganizationTest.csproj", "{BE0CFF1C-7B1A-4A5B-9085-082539C7188F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BootstrappingTest", "TESTS\OrganizationTest\BootstrappingTest.csproj", "{BE0CFF1C-7B1A-4A5B-9085-082539C7188F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OrgTestWithAssemblyLoading", "OrgTestWithAssemblyLoading", "{A083C02F-C20B-48E9-AE94-FFEFD1640518}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AssemblyLoadingTest", "AssemblyLoadingTest", "{A083C02F-C20B-48E9-AE94-FFEFD1640518}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrgTestWithAssemblyLoading", "TESTS\OrgTestWithAssemblyLoading\OrgTestWithAssemblyLoading.csproj", "{7EF349F2-526F-4F51-A5EC-1EEDB3B8EF77}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyLoadingTest", "TESTS\OrgTestWithAssemblyLoading\AssemblyLoadingTest.csproj", "{7EF349F2-526F-4F51-A5EC-1EEDB3B8EF77}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "TESTS\OrgTestWithAssemblyLoading\Interfaces\Interfaces\Interfaces.csproj", "{49691A38-0265-477E-99BC-80FDDB445253}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Implementations", "TESTS\OrgTestWithAssemblyLoading\Implementations\Implementations\Implementations.csproj", "{F203018E-FB2D-4102-BD59-F1A439C5BDB6}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "OrgTestWithDynamicAssemblyLoading", "OrgTestWithDynamicAssemblyLoading", "{BF87F7E0-7D28-4727-A903-98A83FAFE519}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DynamicAssemblyLoadingTest", "DynamicAssemblyLoadingTest", "{BF87F7E0-7D28-4727-A903-98A83FAFE519}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrgTestWithDynamicAssemblyLoading", "TESTS\OrgTestWithDynamicAssemblyLoading\OrgTestWithDynamicAssemblyLoading.csproj", "{4EA90ACC-CC3B-4BDC-8056-85B796791C8D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicAssemblyLoadingTest", "TESTS\OrgTestWithDynamicAssemblyLoading\DynamicAssemblyLoadingTest.csproj", "{4EA90ACC-CC3B-4BDC-8056-85B796791C8D}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "TESTS\OrgTestWithDynamicAssemblyLoading\Interfaces\Interfaces\Interfaces.csproj", "{ECFC3A60-9527-47C6-818B-0E87A8F5415E}"
 EndProject

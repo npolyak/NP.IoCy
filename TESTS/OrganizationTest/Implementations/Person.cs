@@ -1,12 +1,7 @@
 ﻿using NP.IoCy.Attributes;
-using OrganizationTest.Interfaces;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BootstrappingTest.Interfaces;
 
-namespace OrganizationTest.Implementations
+namespace BootstrappingTest.Implementations
 {
     public class Person : IPerson
     {

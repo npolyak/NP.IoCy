@@ -2,7 +2,7 @@
 using OrgTestWithAssemblyLoading.Interfaces;
 using System.IO;
 
-namespace OrgTestWithAssemblyLoading.Implementations
+namespace AssemblyLoadingTest.Implementations
 {
     [Implements]
     public class FileLog : ILog

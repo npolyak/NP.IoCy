@@ -1,7 +1,7 @@
 ﻿using NP.IoCy.Attributes;
 using OrgTestWithAssemblyLoading.Interfaces;
 
-namespace OrgTestWithAssemblyLoading.Implementations
+namespace AssemblyLoadingTest.Implementations
 {
     [Implements]
     public class Address : IAddress

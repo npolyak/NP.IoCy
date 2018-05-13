@@ -1,12 +1,7 @@
-﻿using OrganizationTest.Interfaces;
-using System;
-using System.Collections.Generic;
+﻿using BootstrappingTest.Interfaces;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace OrganizationTest.Implementations
+namespace BootstrappingTest.Implementations
 {
     public class FileLog : ILog
     {

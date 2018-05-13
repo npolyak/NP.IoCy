@@ -1,7 +1,7 @@
 ﻿using NP.IoCy;
-using OrgTestWithDynamicAssemblyLoading.Interfaces;
+using DynamicAssemblyLoadingTest.Interfaces;
 
-namespace OrgTestWithDynamicAssemblyLoading
+namespace DynamicAssemblyLoadingTest
 {
     class Program
     {
