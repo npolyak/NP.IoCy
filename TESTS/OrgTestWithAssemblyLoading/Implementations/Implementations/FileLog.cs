@@ -1,5 +1,5 @@
 ﻿using NP.IoCy.Attributes;
-using OrgTestWithAssemblyLoading.Interfaces;
+using AssemblyLoadingTest.Interfaces;
 using System.IO;
 
 namespace AssemblyLoadingTest.Implementations
