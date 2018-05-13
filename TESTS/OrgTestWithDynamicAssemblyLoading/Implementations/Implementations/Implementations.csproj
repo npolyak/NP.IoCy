@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{983ACD27-CD73-4F53-9E52-8F31436CA9A2}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>MyIoCContainerTest</RootNamespace>
-    <AssemblyName>MyIoCContainerTest</AssemblyName>
+    <ProjectGuid>{3CA25F9C-469F-443F-BDA5-911D25D58FDE}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>Implementations</RootNamespace>
+    <AssemblyName>Implementations</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -42,13 +40,24 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="IoCContainer.cs" />
-    <Compile Include="Program.cs" />
+    <Compile Include="Address.cs" />
+    <Compile Include="FileLog.cs" />
+    <Compile Include="Org.cs" />
+    <Compile Include="Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReflectionUtils.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <ProjectReference Include="..\..\..\..\NP.IoCy.csproj">
+      <Project>{983ACD27-CD73-4F53-9E52-8F31436CA9A2}</Project>
+      <Name>NP.IoCy</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Interfaces\Interfaces\Interfaces.csproj">
+      <Project>{ecfc3a60-9527-47c6-818b-0e87a8f5415e}</Project>
+      <Name>Interfaces</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)\TESTS\OrgTestWithDynamicAssemblyLoading\bin\$(Configuration)\Plugins\" /R /Y /I</PostBuildEvent>
+  </PropertyGroup>
 </Project>

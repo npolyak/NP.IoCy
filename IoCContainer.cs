@@ -1,137 +1,648 @@
-﻿using System;
+﻿using NP.IoCy.Attributes;
+using NP.IoCy.Utils;
+using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Reflection;
+using System.Text.RegularExpressions;
 
-namespace MyIoCContainerTest
+namespace NP.IoCy
 {
-    class TypeMapCell
+    interface IResolvingCellBase<T>
     {
-        public Type BaseType { get; set; }
+        T GetObj(out bool isComposed);
+    }
 
-        public List<Type> TargetTypes { get; } = new List<Type>();
+    interface IResolvingCell : IResolvingCellBase<object>
+    {
+    }
 
-        public Type GetTargetType() =>
-            TargetTypes.LastOrDefault();
+    class ResolvingTypeCell : IResolvingCell
+    {
+        Type _type;
+
+        public object GetObj(out bool isComposed)
+        {
+            isComposed = false;
+            return Activator.CreateInstance(_type);
+        }
+
+        public ResolvingTypeCell(Type type)
+        {
+            _type = type;
+        }
+
+        public override string ToString()
+        {
+            return $"Type:{_type.Name}";
+        }
+    }
+
+    class ResolvingSingletonCellBase<T> : IResolvingCellBase<T>
+    {
+        protected T _obj;
+
+        // the object is composed on the configuration completion stage,
+        // so, isComposed is set to true. 
+        public T GetObj(out bool isComposed)
+        {
+            isComposed = true;
+            return _obj;
+        }
+    }
+
+    class ResolvingSingletonCell : ResolvingSingletonCellBase<object>, IResolvingCell
+    {
+        public ResolvingSingletonCell(object obj)
+        {
+            _obj = obj;
+        }
+
+        public override string ToString()
+        {
+            return $"object:{_obj?.ToString()}";
+        }
+    }
+
+
+    class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<List<object>>, IResolvingCell
+    {
+        public ResolvingSingletonMultiCell()
+        {
+            _obj = new List<object>();
+        }
+
+        public override string ToString()
+        {
+            return $"objects:{string.Join(",", _obj)}";
+        }
+
+        public void Add(object item)
+        {
+            _obj.Add(item);
+        }
+
+        object IResolvingCellBase<object>.GetObj(out bool isComposed)
+        {
+            return GetObj(out isComposed);
+        }
+    }
+
+    class ResolvingFactoryMethodCell<T> : IResolvingCell
+    {
+        public Func<T> _factoryMethod;
+
+        public object GetObj(out bool isComposed)
+        {
+            isComposed = false;
+            return _factoryMethod();
+        }
+
+        public ResolvingFactoryMethodCell(Func<T> factoryMethod)
+        {
+            _factoryMethod = factoryMethod;
+        }
+
+        public override string ToString()
+        {
+            return "FactoryMethod";
+        }
+    }
+
+
+    class TypeToResolveKey
+    {
+        public Type TypeToResolve { get; }
+
+        // allows resolution by object 
+        // without this, a single type would always be 
+        // resolved in a single way. 
+        public object KeyObject { get; }
+
+        public TypeToResolveKey(Type typeToResolve, object keyObject)
+        {
+            this.TypeToResolve = typeToResolve;
+            this.KeyObject = keyObject;
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj is TypeToResolveKey target)
+            {
+                return this.TypeToResolve.ObjEquals(target.TypeToResolve) &&
+                       this.KeyObject.ObjEquals(target.KeyObject);
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        public override int GetHashCode()
+        {
+            return this.TypeToResolve.GetHashCode() ^ this.KeyObject.GetHashCodeExtension();
+        }
+
+        public override string ToString()
+        {
+            string result = $"{TypeToResolve.Name}";
+
+            if (KeyObject != null)
+            {
+                result += $": {KeyObject.ToStr()}";
+            }
+
+            return result;
+        }
+    }
+
+    static class TypeToResolveKeyUtils
+    {
+        public static TypeToResolveKey ToKey(this Type typeToResolve, object resolutionKey)
+        {
+            TypeToResolveKey typeToResolveKey = new TypeToResolveKey(typeToResolve, resolutionKey);
+
+            return typeToResolveKey;
+        }
     }
 
     public class IoCContainer
     {
-        Dictionary<Type, TypeMapCell> _typeMap = new Dictionary<Type, TypeMapCell>();
-
-        public void Register(Type baseType, Type targetType)
+        static IoCContainer()
         {
-            if (!targetType.SelfOrSuperTypeMatches(baseType))
-            {
-                throw new Exception($"Cannot assign type {targetType.Name} to {baseType.Name}");
-            }
-
-            if (!_typeMap.TryGetValue(baseType, out TypeMapCell typeMapCell))
-            {
-                typeMapCell = new TypeMapCell();
-            }
-
-            typeMapCell.TargetTypes.Add(targetType);
-            _typeMap[baseType] = typeMapCell;
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;  
         }
 
-        public void Unregister(Type baseType, Type targetType)
+        private static Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            if (_typeMap.TryGetValue(baseType, out TypeMapCell typeMapCell))
-            {
-                typeMapCell.TargetTypes.Remove(targetType);
+            return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.FullName == args.Name);
+        }
 
-                if (typeMapCell.TargetTypes.Count == 0)
+        private IoCContainer ParentContainer { get; set; }
+
+        Dictionary<TypeToResolveKey, IResolvingCell> _typeMap =
+            new Dictionary<TypeToResolveKey, IResolvingCell>();
+
+        public bool ConfigurationCompleted { get; private set; } = false;
+
+        private bool _isProtected;
+
+        public event Action ConfigurationCompletedEvent = null;
+
+        public IoCContainer(bool isProtected = true)
+        {
+            _isProtected = isProtected;
+        }
+
+        private IResolvingCell GetResolvingCellCurrentContainer(TypeToResolveKey typeToResolveKey)
+        {
+            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell resolvingCell))
+            {
+                return resolvingCell;
+            }
+
+            return null;
+        }
+
+        private IResolvingCell GetResolvingCell(TypeToResolveKey typeToResolveKey)
+        {
+            IResolvingCell resolvingCell = GetResolvingCellCurrentContainer(typeToResolveKey);
+
+            if (resolvingCell == null)
+            {
+                // give a chance to resolve the cell via the parent container. s
+                resolvingCell = ParentContainer?.GetResolvingCell(typeToResolveKey);
+            }
+
+            return resolvingCell;
+        }
+
+        void CheckTypeDerivation(Type typeToResolve, Type resolvingType)
+        {
+            if (!typeToResolve.IsAssignableFrom(resolvingType))
+            {
+                throw new Exception($"Resolving type '{resolvingType.FullName}' does not derive from type to resolve '{typeToResolve.FullName}'");
+            }
+        }
+
+        IResolvingCell AddCellUnprotected(TypeToResolveKey typeToResolveKey, IResolvingCell resolvingCell)
+        {
+            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell cell))
+            {
+                throw new Exception($"key {typeToResolveKey.ToString()} is already mapped to '{cell.ToString()}' cell.");
+            }
+
+            _typeMap[typeToResolveKey] = resolvingCell;
+
+            return resolvingCell;
+        }
+
+        IResolvingCell AddCellProtected(TypeToResolveKey typeToResolveKey, IResolvingCell resolvingCell)
+        {
+            if (ConfigurationCompleted)
+            {
+                throw new Exception($"cannot add key '{typeToResolveKey.ToString()}' mapped to '{resolvingCell.ToString()}' cell since configuration has already been completed.");
+            }
+
+            lock (_typeMap)
+            {
+                return AddCellUnprotected(typeToResolveKey, resolvingCell);
+            }
+        }
+
+        ResolvingSingletonMultiCell AddOrGetMultiCellBase(TypeToResolveKey typeToResolveKey, bool isProtected)
+        {
+            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell cell))
+            {
+                if (cell is ResolvingSingletonMultiCell multiCell)
                 {
-                    _typeMap.Remove(baseType);
-                }
-            }
-        }
-
-        public void Unregister(Type baseType)
-        {
-            _typeMap.Remove(baseType);
-        }
-
-        public void Register<TBase, TTarget>()
-            where TTarget : TBase
-        {
-            Register(typeof(TBase), typeof(TTarget));
-        }
-
-        public void Unregister<TBase, TTarget>()
-        {
-            Unregister(typeof(TBase), typeof(TTarget));
-        }
-
-        public void Unregister<TBase>() =>
-            Unregister(typeof(TBase));
-
-        public TResult GetTargetTypeImpl<TBase, TResult>(Func<IEnumerable<Type>, TResult> resultGetter)
-        {
-            Type baseType = typeof(TBase);
-
-            if (baseType.IsConstructedGenericType)
-            {
-                baseType = baseType.GetGenericTypeDefinition();
-            }
-
-            if (_typeMap.TryGetValue(baseType, out TypeMapCell cell))
-            {
-                return resultGetter(cell.TargetTypes);
-            }
-
-            return default(TResult);
-        }
-
-
-        public Type GetTargetType<TBase>() =>
-            GetTargetTypeImpl<TBase, Type>(targetTypes => targetTypes.Last());
-
-        public IEnumerable<Type> GetAllTargetTypes<TBase>() =>
-            GetTargetTypeImpl<TBase, IEnumerable<Type>>(targetTypes => targetTypes);
-
-        public TBase GetTargetObj<TBase>(bool force = false, params object[] args)
-        {
-            Type targetType = GetTargetType<TBase>();
-
-            if (targetType == null)
-            {
-                if (force)
-                {
-                    targetType = typeof(TBase);
+                    return multiCell;
                 }
                 else
                 {
-                    return default(TBase);
+                    throw new Exception($"IoCy Programming Error: key {typeToResolveKey.ToStr()} is already mapped to a not-multi cell");
                 }
             }
             else
             {
+                if (isProtected && ConfigurationCompleted)
+                {
+                    throw new Exception($"cannot add key '{typeToResolveKey.ToString()}'  multicell since configuration has already been completed.");
+                }
 
+                ResolvingSingletonMultiCell multiCell = new ResolvingSingletonMultiCell();
+                _typeMap.Add(typeToResolveKey, multiCell);
+
+                return multiCell;
             }
-
-            return (TBase) Activator.CreateInstance(targetType, args);
         }
 
-        public IEnumerable<TBase> GetAllTargetObjs<TBase>()
+        ResolvingSingletonMultiCell AddOrGetMultiCellUnprotected(TypeToResolveKey typeToResolveKey)
         {
-            IEnumerable<Type> allTargetTypes = GetAllTargetTypes<TBase>();
+            return AddOrGetMultiCellBase(typeToResolveKey, false);
+        }
 
-            IList<TBase> results = new List<TBase>();
-
-            if (allTargetTypes == null)
-                return results;
-
-            foreach(Type type in allTargetTypes)
+        ResolvingSingletonMultiCell AddOrGetMultiCellProtected(TypeToResolveKey typeToResolveKey)
+        {
+            lock (_typeMap)
             {
-                TBase obj = (TBase)Activator.CreateInstance(type);
+                return AddOrGetMultiCellBase(typeToResolveKey, true);
+            }
+        }
 
-                results.Add(obj);
+        private IResolvingCell AddCell(TypeToResolveKey typeToResolveKey, IResolvingCell resolvingCell)
+        {
+            if (_isProtected)
+            {
+                return AddCellProtected(typeToResolveKey, resolvingCell);
+            }
+            else
+            {
+                return AddCellUnprotected(typeToResolveKey, resolvingCell);
+            }
+        }
+
+        private object ResolveCurrentObj(TypeToResolveKey typeToResolveKey, out bool isComposed)
+        {
+            IResolvingCell resolvingCell = GetResolvingCell(typeToResolveKey);
+            
+            return resolvingCell.GetObj(out isComposed);
+        }
+
+        private object ResolveCurrentObj(Type typeToResolve, out bool isComposed, object resolutionKey = null)
+        {
+            return ResolveCurrentObj(typeToResolve.ToKey(resolutionKey), out isComposed);
+        }
+
+        public void MapType(Type typeToResolve, Type resolvingType, object resolutionKey = null)
+        {
+            CheckTypeDerivation(typeToResolve, resolvingType);
+            AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingTypeCell(resolvingType));
+        }
+
+        void AddObjToMultiCellUnprotected(ResolvingSingletonMultiCell multiCell, object resolvingObj)
+        {
+            multiCell.Add(resolvingObj);
+        }
+
+        void AddObjToMultiCellProtected(ResolvingSingletonMultiCell multiCell, object resolvingObj)
+        {
+            lock (multiCell)
+            {
+                AddObjToMultiCellUnprotected(multiCell, resolvingObj);
+            }
+        }
+
+        public void MapMultiPartObj(Type typeToResolve, object resolvingObj, object resolutionKey = null)
+        {
+            TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+
+            if (_isProtected && ConfigurationCompleted)
+            {
+                throw new Exception($"Cannot add another object to a multicell with key '{typeToResolveKey.ToStr()}' after Configuration has been Completed");
             }
 
-            return results;
+            CheckTypeDerivation(typeToResolve, resolvingObj.GetType());
+
+            ResolvingSingletonMultiCell multiCell = null;
+
+            if(_isProtected)
+            {
+                multiCell = AddOrGetMultiCellProtected(typeToResolveKey);
+            }
+            else
+            {
+                multiCell = AddOrGetMultiCellUnprotected(typeToResolveKey);
+            }
+
+            if (!_isProtected)
+            {
+                ComposeObject(resolvingObj);
+            }
+
+            if (_isProtected)
+            {
+                AddObjToMultiCellProtected(multiCell, resolvingObj);
+            }
+            else
+            {
+                AddObjToMultiCellUnprotected(multiCell, resolvingObj);
+            }
+        }
+
+        public void MapMultiPartObj<TToResolve>(object resolvingObj, object resolutionKey = null)
+        {
+            MapMultiPartObj(typeof(TToResolve), resolvingObj, resolutionKey);
+        }
+
+        public void MapMultiType(Type typeToResolve, Type resolvingType, object resolutionKey = null)
+        {
+            object resolvingObj = Activator.CreateInstance(resolvingType);
+
+            MapMultiPartObj(typeToResolve, resolvingObj, resolutionKey);
+        }
+
+        public void MapMultiType<TToResolve, TResolving>(object resolutionKey = null)
+        {
+            MapMultiType(typeof(TToResolve), typeof(TResolving), resolutionKey);
+        }
+
+
+        public void Map<TToResolve, TResolving>(object resolutionKey = null)
+            where TResolving : TToResolve
+        {
+            MapType(typeof(TToResolve), typeof(TResolving), resolutionKey);
+        }
+
+
+        private void MapSingletonObjImpl(Type typeToResolve, object resolvingObj, object resolutionKey = null)
+        {
+            CheckTypeDerivation(typeToResolve, resolvingObj.GetType());
+
+            if (!_isProtected)
+            {
+                ComposeObject(resolvingObj);
+            }
+
+            AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingSingletonCell(resolvingObj));
+        }
+
+        private void MapSingletonImpl(Type typeToResolve, Type resolvingObjType, object resolutionKey = null)
+        {
+            object resolvingObj = Activator.CreateInstance(resolvingObjType);
+
+            MapSingletonObjImpl(typeToResolve, resolvingObjType, resolutionKey);
+        }
+
+        public void MapSingleton<TResolving>(Type typeToResolve, TResolving resolvingObj, object resolutionKey = null)
+        {
+            MapSingletonObjImpl(typeToResolve, resolvingObj, resolutionKey);
+        }
+
+        public void MapSingleton<TToResolve, TResolving>(TResolving resolvingObj, object resolutionKey = null)
+            where TResolving : TToResolve
+        {
+            MapSingleton(typeof(TToResolve), resolvingObj, resolutionKey);
+        }
+
+        public void MapSingleton<TToResolve, TResolving>(object resolutionKey = null)
+            where TResolving : TToResolve
+        {
+            MapSingletonObjImpl(typeof(TToResolve), typeof(TResolving), resolutionKey);
+        }
+
+        public void MapFactory<TResolving>(Type typeToResolve, Func<TResolving> resolvingFactory, object resolutionKey = null)
+        {
+            CheckTypeDerivation(typeToResolve, typeof(TResolving));
+            AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingFactoryMethodCell<TResolving>(resolvingFactory));
+        }
+
+        public void MapFactory<TToResolve, TResolving>(Func<TResolving> resolvingFactory, object resolutionKey = null)
+            where TResolving : TToResolve
+        {
+            MapFactory(typeof(TToResolve), resolvingFactory, resolutionKey);
+        }
+
+        private TypeToResolveKey GetTypeToResolveKey(PropertyInfo propInfo)
+        {
+            PartAttribute partAttr = 
+                propInfo.GetCustomAttribute<PartAttribute>();
+
+            if (partAttr == null)
+                return null;
+
+            return propInfo.PropertyType.ToKey(partAttr.PartKey);
+        }
+
+        internal void ComposeObject(object obj)
+        {
+            Type objType = obj.GetType();
+
+            foreach (PropertyInfo propInfo in objType.GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+            {
+                if (propInfo.SetMethod == null)
+                    continue;
+
+                TypeToResolveKey propTypeToResolveKey = GetTypeToResolveKey(propInfo);
+
+                if (propTypeToResolveKey == null)
+                {
+                    continue;
+                }
+
+                object subObj = Resolve(propTypeToResolveKey);
+
+                propInfo.SetMethod.Invoke(obj, new[] { subObj });
+            }
+        }
+
+        private object Resolve(TypeToResolveKey typeToResolveKey)
+        {
+            bool isComposed;
+            object resolvingObj =
+                ResolveCurrentObj
+                (
+                    typeToResolveKey,
+                    out isComposed);
+
+            if (!isComposed)
+            {
+                ComposeObject(resolvingObj);
+            }
+
+            return resolvingObj;
+        }
+
+
+        private object ResolveImpl<TToResolve>(object resolutionKey)
+        {
+            Type typeToResolve = typeof(TToResolve);
+
+            TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+
+            if (_isProtected && (!ConfigurationCompleted))
+            {
+                throw new Exception($"IoCy Programming Error: Cannot call Resolve method since the container is protected and configuration is not completed. TypeToResolveKey is {typeToResolveKey.ToString()}");
+            }
+
+            object result = Resolve(typeToResolveKey);
+
+            return result;
+        }
+
+        public TToResolve Resolve<TToResolve>(object resolutionKey = null)
+        {
+            return (TToResolve) ResolveImpl<TToResolve>(resolutionKey);
+        }
+
+        public IEnumerable<TToResolve> MultiResolve<TToResolve>(object resolutionKey = null)
+        {
+            return (ResolveImpl<TToResolve>(resolutionKey) as IEnumerable<object>)?.Cast<TToResolve>();
+        }
+
+        private void ComposeAllSingletonObjects()
+        {
+            foreach(IResolvingCell resolvingCell in this._typeMap.Values)
+            {
+                ResolvingSingletonCell singletonCell =
+                    resolvingCell as ResolvingSingletonCell;
+
+                if (singletonCell != null)
+                {
+                    ComposeObject(singletonCell.GetObj(out bool isComposed));
+                }
+            }
+        }
+
+        // before calling this method you cannot resolve any objects
+        // from the container. 
+        // after calling this method, you cannot modify 
+        // the container any more.
+        public void CompleteConfiguration()
+        {
+            if (!_isProtected)
+            {
+                throw new Exception($"Should not call CompletedConfiguration on unprotected container");
+            }
+
+            ComposeAllSingletonObjects();
+
+            ConfigurationCompleted = true;
+
+            ConfigurationCompletedEvent?.Invoke();
+        }
+
+        public IoCContainer CreateChild(bool isProtected = true)
+        {
+            IoCContainer container = new IoCContainer(isProtected);
+
+            container.ParentContainer = this;
+
+            return container;
+        }
+
+        public void InjectAssembly(Assembly assembly)
+        {
+            foreach(Type resolvingType in assembly.GetTypes())
+            {
+                ImplementsAttribute implementsAttribute =
+                    resolvingType.GetCustomAttribute<ImplementsAttribute>();
+
+                if (implementsAttribute == null)
+                    continue;
+
+                if (implementsAttribute.TypeToResolve == null)
+                {
+                    implementsAttribute.TypeToResolve =
+                        resolvingType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {resolvingType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
+                }
+
+                Type typeToResolve = implementsAttribute.TypeToResolve;
+                object partKeyObj = implementsAttribute.PartKey;
+                bool isSingleton = implementsAttribute.IsSingleton;
+
+                if (!implementsAttribute.IsMulti)
+                {
+                    if (isSingleton)
+                    {
+                        this.MapSingletonObjImpl(typeToResolve, resolvingType, partKeyObj);
+                    }
+                    else
+                    {
+                        this.MapType(typeToResolve, resolvingType, partKeyObj);
+                    }
+                }
+                else
+                {
+                    this.MapMultiType(typeToResolve, resolvingType, partKeyObj);
+                }
+            }
+        }
+
+        public void InjectDynamicAssemblyByFullPath(string assemblyPath)
+        {
+            if (!File.Exists(assemblyPath))
+                throw new Exception($"There is no assembly at path '{assemblyPath}'");
+
+            string absoluteAssemblyPath = Path.GetFullPath(assemblyPath);
+
+            Assembly.ReflectionOnlyLoadFrom(absoluteAssemblyPath);
+
+            Assembly loadedAssembly = Assembly.LoadFile(absoluteAssemblyPath);
+
+            InjectAssembly(loadedAssembly);
+        }
+
+
+        public void InjectPluginsFromFolder
+        (
+            string assemblyFolderPath,
+            Regex matchingFileName = null
+        )
+        {
+            if (!Directory.Exists(assemblyFolderPath))
+                throw new Exception($"There is no folder at path '{assemblyFolderPath}'");
+
+            foreach (string filePath in Directory.GetFiles(assemblyFolderPath))
+            {
+                if (!filePath.ToLower().EndsWith(".dll"))
+                    continue;
+
+                if (matchingFileName?.IsMatch(filePath) != false)
+                {
+                    string absoluteAssemblyPath = Path.GetFullPath(filePath);
+
+                    Assembly assembly = Assembly.LoadFile(absoluteAssemblyPath);
+
+                    PluginAttribute pluginAttribute = assembly.GetCustomAttribute<PluginAttribute>();
+
+                    if (pluginAttribute != null)
+                    {
+                        InjectAssembly(assembly);
+                    }
+                }
+            }
         }
     }
 }

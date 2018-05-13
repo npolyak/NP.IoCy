@@ -4,3 +4,26 @@
 
 /.vs/MyIoCContainerTest/v15
 /obj/Debug
+/.vs
+/bin/Debug
+/TESTS/OrganizationTest/bin/Debug
+/TESTS/OrgTestWithAssemblyLoading/bin/Debug
+/TESTS/OrgTestWithAssemblyLoading/Implementations/Implementations/bin/Debug
+/TESTS/OrgTestWithAssemblyLoading/Implementations/Implementations/obj/Debug
+/TESTS/OrgTestWithAssemblyLoading/Interfaces/Interfaces/bin/Debug
+/TESTS/OrgTestWithAssemblyLoading/Interfaces/Interfaces/obj/Debug
+/TESTS/OrgTestWithAssemblyLoading/obj/Debug
+/TESTS/OrgTestWithDynamicAssemblyLoading/bin/Debug
+/TESTS/OrgTestWithDynamicAssemblyLoading/Implementations/Implementations/bin/Debug
+/TESTS/OrgTestWithDynamicAssemblyLoading/Implementations/Implementations/obj/Debug
+/TESTS/OrgTestWithDynamicAssemblyLoading/Interfaces/Interfaces/bin/Debug
+/TESTS/OrgTestWithDynamicAssemblyLoading/Interfaces/Interfaces/obj/Debug
+/TESTS/OrgTestWithDynamicAssemblyLoading/obj/Debug
+/TESTS/PluginsTest/bin/Debug
+/TESTS/PluginsTest/Interfaces/bin/Debug
+/TESTS/PluginsTest/Interfaces/obj/Debug
+/TESTS/PluginsTest/obj/Debug
+/TESTS/PluginsTest/Plugin1/bin/Debug
+/TESTS/PluginsTest/Plugin1/obj/Debug
+/TESTS/PluginsTest/Plugin2/bin/Debug
+/TESTS/PluginsTest/Plugin2/obj/Debug
