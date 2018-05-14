@@ -49,7 +49,6 @@
     <Compile Include="Attributes\MultiImplementsAttribute.cs" />
     <Compile Include="Attributes\MultiPart.cs" />
     <Compile Include="Attributes\PartAttribute.cs" />
-    <Compile Include="Attributes\PluginAttribute.cs" />
     <Compile Include="IoCContainer.cs" />
     <Compile Include="Utils\ReflectionUtils.cs" />
     <Compile Include="Utils\ObjUtils.cs" />

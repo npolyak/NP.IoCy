@@ -50,9 +50,10 @@ namespace DynamicAssemblyLoadingTest
 
 
             // replace mapping to ILog to ConsoleLog in the child container. 
-            IoCContainer childContainer = container.CreateChild(false);
+            IoCContainer childContainer = container.CreateChild();
 
             childContainer.Map<ILog, ConsoleLog>();
+            childContainer.CompleteConfiguration();
 
             // for an uprotected child container, we do not need to call
             // CompleteConfiguration

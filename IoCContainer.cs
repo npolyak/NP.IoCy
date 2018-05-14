@@ -695,12 +695,7 @@ namespace NP.IoCy
 
                     Assembly assembly = Assembly.LoadFile(absoluteAssemblyPath);
 
-                    PluginAttribute pluginAttribute = assembly.GetCustomAttribute<PluginAttribute>();
-
-                    if (pluginAttribute != null)
-                    {
-                        InjectAssembly(assembly);
-                    }
+                    InjectAssembly(assembly);
                 }
             }
         }
