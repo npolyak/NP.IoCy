@@ -55,7 +55,7 @@ namespace NP.IoCy
 
     interface IResolvingSingletonCell : IResolvingCell
     {
-        IEnumerable<object> GetAllObjs();
+        IList GetAllObjs();
     }
 
     class ResolvingSingletonCell : ResolvingSingletonCellBase<object>, IResolvingSingletonCell
@@ -65,7 +65,7 @@ namespace NP.IoCy
             _obj = obj;
         }
 
-        public IEnumerable<object> GetAllObjs()
+        public IList GetAllObjs()
         {
             return new[] { _obj };
         }
@@ -77,11 +77,11 @@ namespace NP.IoCy
     }
 
 
-    class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<List<object>>, IResolvingSingletonCell
+    class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<IList>, IResolvingSingletonCell
     {
-        public ResolvingSingletonMultiCell()
+        public ResolvingSingletonMultiCell(Type itemType)
         {
-            _obj = new List<object>();
+            _obj = (IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType));
         }
 
         public override string ToString()
@@ -99,7 +99,7 @@ namespace NP.IoCy
             return GetObj(out isComposed);
         }
 
-        public IEnumerable<object> GetAllObjs()
+        public IList GetAllObjs()
         {
             return _obj;
         }
@@ -290,7 +290,7 @@ namespace NP.IoCy
                     throw new Exception($"cannot add key '{typeToResolveKey.ToString()}'  multicell since configuration has already been completed.");
                 }
 
-                ResolvingSingletonMultiCell multiCell = new ResolvingSingletonMultiCell();
+                ResolvingSingletonMultiCell multiCell = new ResolvingSingletonMultiCell(typeToResolveKey.TypeToResolve);
                 _typeMap.Add(typeToResolveKey, multiCell);
 
                 return multiCell;
@@ -557,18 +557,9 @@ namespace NP.IoCy
 
         private IEnumerable MultiResolve(TypeToResolveKey typeToResolveKey)
         {
-            IEnumerable<object> result = ResolveImpl(typeToResolveKey) as IEnumerable<object>;
+            IEnumerable result = ResolveImpl(typeToResolveKey) as IEnumerable;
 
-            Type itemType = typeToResolveKey.TypeToResolve;
-
-            IList l = (IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(typeToResolveKey.TypeToResolve));
-
-            foreach(object obj in result)
-            {
-                l.Add(obj);
-            }
-
-            return l;
+            return result;
         }
 
         public IEnumerable<TToResolve> MultiResolve<TToResolve>(object resolutionKey = null)
