@@ -27,3 +27,17 @@
 /TESTS/PluginsTest/Plugin1/obj/Debug
 /TESTS/PluginsTest/Plugin2/bin/Debug
 /TESTS/PluginsTest/Plugin2/obj/Debug
+/TESTS/AssemblyLoadingTest/bin/Debug
+/TESTS/AssemblyLoadingTest/Implementations/Implementations/bin/Debug
+/TESTS/AssemblyLoadingTest/Implementations/Implementations/obj/Debug
+/TESTS/AssemblyLoadingTest/Interfaces/Interfaces/bin/Debug
+/TESTS/AssemblyLoadingTest/Interfaces/Interfaces/obj/Debug
+/TESTS/AssemblyLoadingTest/obj/Debug
+/TESTS/BootstrappingTest/bin/Debug
+/TESTS/BootstrappingTest/obj/Debug
+/TESTS/DynamicAssemblyLoadingTest/bin/Debug
+/TESTS/DynamicAssemblyLoadingTest/Implementations/Implementations/bin/Debug
+/TESTS/DynamicAssemblyLoadingTest/Implementations/Implementations/obj/Debug
+/TESTS/DynamicAssemblyLoadingTest/Interfaces/Interfaces/bin/Debug
+/TESTS/DynamicAssemblyLoadingTest/Interfaces/Interfaces/obj/Debug
+/TESTS/DynamicAssemblyLoadingTest/obj/Debug
