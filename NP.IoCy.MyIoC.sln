@@ -35,6 +35,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin1", "TESTS\PluginsTes
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin2", "TESTS\PluginsTest\Plugin2\Plugin2.csproj", "{933F6B98-092A-4540-9481-DEE357FA0088}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MultyPartBootstrappingTest", "TESTS\MultyPartBootstrappingTest\MultyPartBootstrappingTest.csproj", "{FA0F3FD4-07A5-4EAC-8440-38C661E9C890}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{933F6B98-092A-4540-9481-DEE357FA0088}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{933F6B98-092A-4540-9481-DEE357FA0088}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{933F6B98-092A-4540-9481-DEE357FA0088}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FA0F3FD4-07A5-4EAC-8440-38C661E9C890}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FA0F3FD4-07A5-4EAC-8440-38C661E9C890}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FA0F3FD4-07A5-4EAC-8440-38C661E9C890}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FA0F3FD4-07A5-4EAC-8440-38C661E9C890}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -108,6 +114,7 @@ Global
 		{AA8DEE03-B72D-4993-93E7-731C17DFABA9} = {0753F009-5A30-48D5-BBD5-5D75CE60A0DB}
 		{C5ED0289-F0BB-47CE-8518-D0BE6BA674DA} = {0753F009-5A30-48D5-BBD5-5D75CE60A0DB}
 		{933F6B98-092A-4540-9481-DEE357FA0088} = {0753F009-5A30-48D5-BBD5-5D75CE60A0DB}
+		{FA0F3FD4-07A5-4EAC-8440-38C661E9C890} = {376E306D-4442-4C1B-BCE5-F4FCBDA8AA6C}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F1AF82F1-CF42-48F3-9072-3B8E002C2B8D}

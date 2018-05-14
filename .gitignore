@@ -41,3 +41,5 @@
 /TESTS/DynamicAssemblyLoadingTest/Interfaces/Interfaces/bin/Debug
 /TESTS/DynamicAssemblyLoadingTest/Interfaces/Interfaces/obj/Debug
 /TESTS/DynamicAssemblyLoadingTest/obj/Debug
+/TESTS/MultyPartBootstrappingTest/bin/Debug
+/TESTS/MultyPartBootstrappingTest/obj/Debug

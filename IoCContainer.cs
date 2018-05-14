@@ -1,6 +1,7 @@
 ﻿using NP.IoCy.Attributes;
 using NP.IoCy.Utils;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -135,8 +136,11 @@ namespace NP.IoCy
         // resolved in a single way. 
         public object KeyObject { get; }
 
-        public TypeToResolveKey(Type typeToResolve, object keyObject)
+        public bool IsMulti { get; }
+
+        public TypeToResolveKey(Type typeToResolve, object keyObject, bool isMulti = false)
         {
+            this.IsMulti = isMulti;
             this.TypeToResolve = typeToResolve;
             this.KeyObject = keyObject;
         }
@@ -174,9 +178,9 @@ namespace NP.IoCy
 
     static class TypeToResolveKeyUtils
     {
-        public static TypeToResolveKey ToKey(this Type typeToResolve, object resolutionKey)
+        public static TypeToResolveKey ToKey(this Type typeToResolve, object resolutionKey, bool isMulti = false)
         {
-            TypeToResolveKey typeToResolveKey = new TypeToResolveKey(typeToResolve, resolutionKey);
+            TypeToResolveKey typeToResolveKey = new TypeToResolveKey(typeToResolve, resolutionKey, isMulti);
 
             return typeToResolveKey;
         }
@@ -462,7 +466,14 @@ namespace NP.IoCy
             if (partAttr == null)
                 return null;
 
-            return propInfo.PropertyType.ToKey(partAttr.PartKey);
+            if (!partAttr.IsMulti)
+            {
+                return propInfo.PropertyType.ToKey(partAttr.PartKey);
+            }
+            else
+            {
+                return propInfo.PropertyType.GetGenericArguments().First().ToKey(partAttr.PartKey, true);
+            }
         }
 
         internal void ComposeObject(object obj)
@@ -481,7 +492,16 @@ namespace NP.IoCy
                     continue;
                 }
 
-                object subObj = Resolve(propTypeToResolveKey);
+                object subObj;
+                  
+                if (!propTypeToResolveKey.IsMulti)
+                {
+                    subObj = Resolve(propTypeToResolveKey);
+                }
+                else
+                {
+                    subObj = MultiResolve(propTypeToResolveKey);
+                }
 
                 propInfo.SetMethod.Invoke(obj, new[] { subObj });
             }
@@ -504,13 +524,8 @@ namespace NP.IoCy
             return resolvingObj;
         }
 
-
-        private object ResolveImpl<TToResolve>(object resolutionKey)
+        private object ResolveImpl(TypeToResolveKey typeToResolveKey)
         {
-            Type typeToResolve = typeof(TToResolve);
-
-            TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
-
             if (_isProtected && (!ConfigurationCompleted))
             {
                 throw new Exception($"IoCy Programming Error: Cannot call Resolve method since the container is protected and configuration is not completed. TypeToResolveKey is {typeToResolveKey.ToString()}");
@@ -521,14 +536,44 @@ namespace NP.IoCy
             return result;
         }
 
+        private object ResolveImpl(Type typeToResolve, object resolutionKey)
+        {
+            TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+
+            return ResolveImpl(typeToResolveKey);
+        }
+
+        private object ResolveImpl<TToResolve>(object resolutionKey)
+        {
+            Type typeToResolve = typeof(TToResolve);
+
+            return ResolveImpl(typeToResolve, resolutionKey);
+        }
+
         public TToResolve Resolve<TToResolve>(object resolutionKey = null)
         {
             return (TToResolve) ResolveImpl<TToResolve>(resolutionKey);
         }
 
+        private IEnumerable MultiResolve(TypeToResolveKey typeToResolveKey)
+        {
+            IEnumerable<object> result = ResolveImpl(typeToResolveKey) as IEnumerable<object>;
+
+            Type itemType = typeToResolveKey.TypeToResolve;
+
+            IList l = (IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(typeToResolveKey.TypeToResolve));
+
+            foreach(object obj in result)
+            {
+                l.Add(obj);
+            }
+
+            return l;
+        }
+
         public IEnumerable<TToResolve> MultiResolve<TToResolve>(object resolutionKey = null)
         {
-            return (ResolveImpl<TToResolve>(resolutionKey) as IEnumerable<object>)?.Cast<TToResolve>();
+            return MultiResolve(typeof(TToResolve).ToKey(resolutionKey))?.Cast<TToResolve>();
         }
 
         private void ComposeAllSingletonObjects()
