@@ -22,7 +22,7 @@ namespace AssemblyLoadingTest
             // create container
             IoCContainer container = new IoCContainer();
 
-            container.InjectAssembly(typeof(Implementations.Org).Assembly);
+            container.InjectAssembly(typeof(AssemblyLoadingTest.Implementations.Org).Assembly);
 
             // after CompleteConfiguration
             // you cannot bootstrap any new types in the container.
