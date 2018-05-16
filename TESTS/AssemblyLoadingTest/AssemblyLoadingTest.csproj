@@ -58,7 +58,7 @@
       <Project>{f203018e-fb2d-4102-bd59-f1a439c5bdb6}</Project>
       <Name>Implementations</Name>
     </ProjectReference>
-    <ProjectReference Include="Interfaces\Interfaces\Interfaces.csproj">
+    <ProjectReference Include="Interfaces\Interfaces.csproj">
       <Project>{49691a38-0265-477e-99bc-80fddb445253}</Project>
       <Name>Interfaces</Name>
     </ProjectReference>

@@ -45,3 +45,7 @@
 /TESTS/MultyPartBootstrappingTest/obj/Debug
 /TESTS/AssemblyLoadingTest/Implementations/bin/Debug
 /TESTS/AssemblyLoadingTest/Implementations/obj/Debug
+*.dll
+*.pdb
+*.cache
+/TESTS/AssemblyLoadingTest/Interfaces/obj/Debug
