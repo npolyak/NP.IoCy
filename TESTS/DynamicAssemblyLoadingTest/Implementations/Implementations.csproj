@@ -47,11 +47,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\NP.IoCy.csproj">
+    <ProjectReference Include="..\..\..\NP.IoCy.csproj">
       <Project>{983ACD27-CD73-4F53-9E52-8F31436CA9A2}</Project>
       <Name>NP.IoCy</Name>
     </ProjectReference>
-    <ProjectReference Include="..\..\Interfaces\Interfaces\Interfaces.csproj">
+    <ProjectReference Include="..\Interfaces\Interfaces.csproj">
       <Project>{ecfc3a60-9527-47c6-818b-0e87a8f5415e}</Project>
       <Name>Interfaces</Name>
     </ProjectReference>

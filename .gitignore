@@ -49,3 +49,5 @@
 *.pdb
 *.cache
 /TESTS/AssemblyLoadingTest/Interfaces/obj/Debug
+/TESTS/DynamicAssemblyLoadingTest/Implementations/obj/Debug
+/TESTS/DynamicAssemblyLoadingTest/Interfaces/obj/Debug
