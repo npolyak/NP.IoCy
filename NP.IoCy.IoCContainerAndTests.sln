@@ -16,12 +16,19 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DynamicAssemblyLoadingTest", "DynamicAssemblyLoadingTest", "{BF87F7E0-7D28-4727-A903-98A83FAFE519}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DynamicAssemblyLoadingTest", "TESTS\DynamicAssemblyLoadingTest\DynamicAssemblyLoadingTest.csproj", "{4EA90ACC-CC3B-4BDC-8056-85B796791C8D}"
+	ProjectSection(ProjectDependencies) = postProject
+		{3CA25F9C-469F-443F-BDA5-911D25D58FDE} = {3CA25F9C-469F-443F-BDA5-911D25D58FDE}
+	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PluginsTest", "PluginsTest", "{0753F009-5A30-48D5-BBD5-5D75CE60A0DB}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "TESTS\PluginsTest\Interfaces\Interfaces.csproj", "{FAF644AE-7D8B-4EEA-AD7F-B14C766B9486}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PluginsTest", "TESTS\PluginsTest\PluginsTest.csproj", "{AA8DEE03-B72D-4993-93E7-731C17DFABA9}"
+	ProjectSection(ProjectDependencies) = postProject
+		{C5ED0289-F0BB-47CE-8518-D0BE6BA674DA} = {C5ED0289-F0BB-47CE-8518-D0BE6BA674DA}
+		{933F6B98-092A-4540-9481-DEE357FA0088} = {933F6B98-092A-4540-9481-DEE357FA0088}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugin1", "TESTS\PluginsTest\Plugin1\Plugin1.csproj", "{C5ED0289-F0BB-47CE-8518-D0BE6BA674DA}"
 EndProject
