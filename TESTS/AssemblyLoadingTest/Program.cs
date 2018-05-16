@@ -11,6 +11,7 @@
 
 using NP.IoCy;
 using AssemblyLoadingTest.Interfaces;
+using System;
 
 namespace AssemblyLoadingTest
 {
@@ -73,6 +74,8 @@ namespace AssemblyLoadingTest
 
             // send org data to console instead of a file.
             orgWithConsoleLog.LogOrgInfo();
+
+            Console.ReadKey();
         }
     }
 }

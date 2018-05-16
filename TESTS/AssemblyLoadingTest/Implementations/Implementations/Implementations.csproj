@@ -7,8 +7,8 @@
     <ProjectGuid>{F203018E-FB2D-4102-BD59-F1A439C5BDB6}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Implementations</RootNamespace>
-    <AssemblyName>Implementations</AssemblyName>
+    <RootNamespace>AssemblyLoading.TestImplementations</RootNamespace>
+    <AssemblyName>AssemblyLoadingTest.Implementations</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>

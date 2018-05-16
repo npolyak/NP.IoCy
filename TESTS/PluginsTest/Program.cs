@@ -1,4 +1,4 @@
-﻿using Interfaces;
+﻿using PluginsTest.Interfaces;
 using NP.IoCy;
 // (c) Nick Polyak 2018 - http://awebpros.com/
 // License: Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.html)
@@ -12,6 +12,7 @@ using NP.IoCy;
 // products that use it.
 
 using System.Collections.Generic;
+using System;
 
 namespace PluginsTest
 {
@@ -31,6 +32,8 @@ namespace PluginsTest
             {
                 plugin.PrintMessage();
             }
+
+            Console.ReadKey();
         }
     }
 }

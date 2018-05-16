@@ -12,6 +12,7 @@
 using NP.IoCy;
 using MultyPartBootstrappingTest.Implementations;
 using MultyPartBootstrappingTest.Interfaces;
+using System;
 
 namespace MultyPartBootstrappingTest
 {
@@ -56,6 +57,8 @@ namespace MultyPartBootstrappingTest
             // Create file MyLogFile.txt in the same folder as the executable
             // and write department store info in it;
             org.LogOrgInfo();
+
+            Console.ReadKey();
         }
     }
 }

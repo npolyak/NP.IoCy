@@ -7,8 +7,8 @@
     <ProjectGuid>{933F6B98-092A-4540-9481-DEE357FA0088}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Plugin2</RootNamespace>
-    <AssemblyName>Plugin2</AssemblyName>
+    <RootNamespace>PluginsTest.Plugin2</RootNamespace>
+    <AssemblyName>PluginsTest.Plugin2</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -55,6 +55,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)TESTS\PluginsTest\bin\$(Configuration)\Plugins\" /R /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetDir)PluginsTest.$(ProjectName).dll" "$(SolutionDir)TESTS\PluginsTest\bin\$(Configuration)\Plugins\" /R /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

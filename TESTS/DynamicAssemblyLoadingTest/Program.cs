@@ -11,6 +11,7 @@
 
 using NP.IoCy;
 using DynamicAssemblyLoadingTest.Interfaces;
+using System;
 
 namespace DynamicAssemblyLoadingTest
 {
@@ -21,7 +22,7 @@ namespace DynamicAssemblyLoadingTest
             // create container
             IoCContainer container = new IoCContainer();
 
-            container.InjectDynamicAssemblyByFullPath("Plugins\\Implementations.dll");
+            container.InjectDynamicAssemblyByFullPath("Plugins\\DynamicAssemblyLoadingTest.Implementations.dll");
 
             // after CompleteConfiguration
             // you cannot bootstrap any new types in the container.
@@ -73,6 +74,8 @@ namespace DynamicAssemblyLoadingTest
 
             // send org data to console instead of a file.
             orgWithConsoleLog.LogOrgInfo();
+
+            Console.ReadKey();
         }
     }
 }

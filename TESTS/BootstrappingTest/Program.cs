@@ -12,6 +12,7 @@
 using NP.IoCy;
 using BootstrappingTest.Implementations;
 using BootstrappingTest.Interfaces;
+using System;
 
 namespace BootstrappingTest
 {
@@ -81,6 +82,8 @@ namespace BootstrappingTest
 
             // send org data to console instead of a file.
             orgWithConsoleLog.LogOrgInfo();
+
+            Console.ReadKey();
         }
     }
 }

@@ -9,7 +9,7 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-namespace Interfaces
+namespace PluginsTest.Interfaces
 {
     public interface IPlugin
     {

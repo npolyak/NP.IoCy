@@ -7,8 +7,8 @@
     <ProjectGuid>{3CA25F9C-469F-443F-BDA5-911D25D58FDE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Implementations</RootNamespace>
-    <AssemblyName>Implementations</AssemblyName>
+    <RootNamespace>DynamicAssemblyLoadingTest.Implementations</RootNamespace>
+    <AssemblyName>DynamicAssemblyLoadingTest.Implementations</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -58,6 +58,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetDir)$(ProjectName).dll" "$(SolutionDir)\TESTS\DynamicAssemblyLoadingTest\bin\$(Configuration)\Plugins\" /R /Y /I</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetDir)DynamicAssemblyLoadingTest.$(ProjectName).dll" "$(SolutionDir)\TESTS\DynamicAssemblyLoadingTest\bin\$(Configuration)\Plugins\" /R /Y /I</PostBuildEvent>
   </PropertyGroup>
 </Project>

@@ -6,8 +6,8 @@
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
     <ProjectGuid>{FAF644AE-7D8B-4EEA-AD7F-B14C766B9486}</ProjectGuid>
     <OutputType>Library</OutputType>
-    <RootNamespace>Interfaces</RootNamespace>
-    <AssemblyName>Interfaces</AssemblyName>
+    <RootNamespace>PluginsTest.Interfaces</RootNamespace>
+    <AssemblyName>PluginsTest.Interfaces</AssemblyName>
     <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>

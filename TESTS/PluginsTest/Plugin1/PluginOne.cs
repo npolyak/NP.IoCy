@@ -9,11 +9,11 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using Interfaces;
+using PluginsTest.Interfaces;
 using NP.IoCy.Attributes;
 using System;
 
-namespace Plugin1
+namespace PluginsTest.Plugin1
 {
     [MultiImplements]
     public class PluginOne : IPlugin
