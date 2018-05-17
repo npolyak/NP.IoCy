@@ -51,3 +51,5 @@
 /TESTS/AssemblyLoadingTest/Interfaces/obj/Debug
 /TESTS/DynamicAssemblyLoadingTest/Implementations/obj/Debug
 /TESTS/DynamicAssemblyLoadingTest/Interfaces/obj/Debug
+/TESTS/DynamicAssemblyLoadingTest/MyLogFile.txt
+/TESTS/DynamicAssemblyLoadingTest/Implementations/bin/Debug/NP.IoCy.dll.config

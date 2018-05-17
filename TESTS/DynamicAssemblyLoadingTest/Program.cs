@@ -10,8 +10,10 @@
 // products that use it.
 
 using NP.IoCy;
+using NP.IoCy.Utils;
 using DynamicAssemblyLoadingTest.Interfaces;
 using System;
+using System.IO;
 
 namespace DynamicAssemblyLoadingTest
 {
@@ -22,7 +24,13 @@ namespace DynamicAssemblyLoadingTest
             // create container
             IoCContainer container = new IoCContainer();
 
-            container.InjectDynamicAssemblyByFullPath("Plugins\\DynamicAssemblyLoadingTest.Implementations.dll");
+            container
+                .InjectDynamicAssemblyByFullPath
+                (
+                    Path.Combine
+                    (
+                        ReflectionUtils.GetCurrentExecutablePath(), 
+                        "Plugins\\DynamicAssemblyLoadingTest.Implementations.dll"));
 
             // after CompleteConfiguration
             // you cannot bootstrap any new types in the container.
