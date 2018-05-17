@@ -28,6 +28,7 @@ namespace NP.IoCy
 
     interface IResolvingCell : IResolvingCellBase<object>
     {
+        IResolvingCell Copy();
     }
 
     class ResolvingTypeCell : IResolvingCell
@@ -48,6 +49,11 @@ namespace NP.IoCy
         public override string ToString()
         {
             return $"Type:{_type.Name}";
+        }
+
+        public IResolvingCell Copy()
+        {
+            return new ResolvingTypeCell(_type);
         }
     }
 
@@ -76,6 +82,11 @@ namespace NP.IoCy
             _obj = obj;
         }
 
+        public IResolvingCell Copy()
+        {
+            return new ResolvingSingletonCell(_obj);
+        }
+
         public IList GetAllObjs()
         {
             return new[] { _obj };
@@ -90,9 +101,11 @@ namespace NP.IoCy
 
     class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<IList>, IResolvingSingletonCell
     {
+        Type _itemType;
         public ResolvingSingletonMultiCell(Type itemType)
         {
-            _obj = (IList) Activator.CreateInstance(typeof(List<>).MakeGenericType(itemType));
+            _itemType = itemType;
+            _obj = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(_itemType));
         }
 
         public override string ToString()
@@ -114,6 +127,18 @@ namespace NP.IoCy
         {
             return _obj;
         }
+
+        public IResolvingCell Copy()
+        {
+            ResolvingSingletonMultiCell result = new ResolvingSingletonMultiCell(_itemType);
+
+            foreach (object item in _obj)
+            {
+                result.Add(item);
+            }
+
+            return result;
+        }
     }
 
     class ResolvingFactoryMethodCell<T> : IResolvingCell
@@ -134,6 +159,11 @@ namespace NP.IoCy
         public override string ToString()
         {
             return "FactoryMethod";
+        }
+
+        public IResolvingCell Copy()
+        {
+            return new ResolvingFactoryMethodCell<T>(_factoryMethod);
         }
     }
 
@@ -201,7 +231,7 @@ namespace NP.IoCy
     {
         static IoCContainer()
         {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;  
+            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
         }
 
         private static Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
@@ -336,7 +366,7 @@ namespace NP.IoCy
         private object ResolveCurrentObj(TypeToResolveKey typeToResolveKey, out bool isComposed)
         {
             IResolvingCell resolvingCell = GetResolvingCell(typeToResolveKey);
-            
+
             return resolvingCell.GetObj(out isComposed);
         }
 
@@ -471,7 +501,7 @@ namespace NP.IoCy
 
         private TypeToResolveKey GetTypeToResolveKey(PropertyInfo propInfo)
         {
-            PartAttribute partAttr = 
+            PartAttribute partAttr =
                 propInfo.GetCustomAttribute<PartAttribute>();
 
             if (partAttr == null)
@@ -504,7 +534,7 @@ namespace NP.IoCy
                 }
 
                 object subObj;
-                  
+
                 if (!propTypeToResolveKey.IsMulti)
                 {
                     subObj = Resolve(propTypeToResolveKey);
@@ -611,6 +641,58 @@ namespace NP.IoCy
             ConfigurationCompleted = true;
 
             ConfigurationCompletedEvent?.Invoke();
+        }
+
+        private void ModifyContainer(Action modificationAction, string errorMessage)
+        {
+            if (_isProtected)
+            {
+                if (ConfigurationCompleted)
+                {
+                    throw new Exception(errorMessage);
+                }
+                else
+                {
+                    lock (_typeMap)
+                    {
+                        modificationAction();
+                    }
+                }
+            }
+            else
+            {
+                modificationAction();
+            }
+        }
+
+        public void Remove(Type typeToResolve, object resolutionKey)
+        {
+            TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+
+            string errorMessage =
+                $"IoCy Programming Error: cannot remove key '{typeToResolveKey.ToString()}' since configuration has already been completed.";
+
+            ModifyContainer(() => _typeMap.Remove(typeToResolveKey), errorMessage);
+        }
+
+        private void MergeInImpl(IoCContainer anotherIoCContainer)
+        {
+            foreach (KeyValuePair<TypeToResolveKey, IResolvingCell> kvp in anotherIoCContainer._typeMap)
+            {
+                TypeToResolveKey typeToResolveKey = kvp.Key;
+
+                IResolvingCell valCopy = kvp.Value.Copy();
+
+                AddCellProtected(typeToResolveKey, valCopy);
+            }
+        }
+
+        public void MergeIn(IoCContainer anotherIoCContainer)
+        {
+            string errorMessage =
+                  "IoCy Programming Error: modify the container since configuration has already been completed.";
+
+            ModifyContainer(() => MergeInImpl(anotherIoCContainer), errorMessage);
         }
 
         public IoCContainer CreateChild(bool isProtected = true)
