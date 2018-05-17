@@ -14,6 +14,7 @@ using NP.IoCy;
 using System.Collections.Generic;
 using System;
 using System.IO;
+using NP.IoCy.Utils;
 
 namespace PluginsTest
 {
@@ -23,10 +24,7 @@ namespace PluginsTest
         {
             IoCContainer container = new IoCContainer();
 
-            string currentExecutablePath =
-                typeof(Program).Assembly.Location;
-
-            container.InjectPluginsFromFolder(Path.Combine(Path.GetDirectoryName(currentExecutablePath),"Plugins"));
+            container.InjectPluginsFromFolder(Path.Combine(ReflectionUtils.GetCurrentExecutablePath(), "Plugins"));
 
             container.CompleteConfiguration();
 

@@ -10,7 +10,9 @@
 // products that use it.
 
 using System;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 
 namespace NP.IoCy.Utils
 {
@@ -26,6 +28,14 @@ namespace NP.IoCy.Utils
             }
 
             return result;
+        }
+
+        public static string GetCurrentExecutablePath()
+        {
+            string currentExecutablePath =
+                Assembly.GetEntryAssembly().Location;
+
+            return Path.GetDirectoryName(currentExecutablePath);
         }
     }
 }
