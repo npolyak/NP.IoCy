@@ -367,6 +367,12 @@ namespace NP.IoCy
         {
             IResolvingCell resolvingCell = GetResolvingCell(typeToResolveKey);
 
+            if (resolvingCell == null)
+            {
+                isComposed = true;
+                return null;
+            }
+
             return resolvingCell.GetObj(out isComposed);
         }
 
