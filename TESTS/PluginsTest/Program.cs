@@ -30,18 +30,11 @@ namespace PluginsTest
 
             IEnumerable<IPlugin> plugins = container.MultiResolve<IPlugin>();
 
-            if (plugins == null)
+            foreach (IPlugin plugin in plugins)
             {
-                Console.WriteLine("No plugins discovered");
+                plugin.PrintMessage();  
             }
-            else
-            {
-                foreach (IPlugin plugin in plugins)
-                {
-                    plugin.PrintMessage();
-                }
-            }
-
+            
             Console.ReadKey();
         }
     }

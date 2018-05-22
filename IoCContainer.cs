@@ -611,7 +611,13 @@ namespace NP.IoCy
 
         public IEnumerable<TToResolve> MultiResolve<TToResolve>(object resolutionKey = null)
         {
-            return MultiResolve(typeof(TToResolve).ToKey(resolutionKey))?.Cast<TToResolve>();
+            IEnumerable<TToResolve> result =
+                MultiResolve(typeof(TToResolve).ToKey(resolutionKey))?.Cast<TToResolve>();
+
+            if (result == null)
+                result = Enumerable.Empty<TToResolve>();
+
+            return result;
         }
 
         private void ComposeAllSingletonObjects()
