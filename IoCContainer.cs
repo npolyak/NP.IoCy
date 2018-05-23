@@ -620,6 +620,12 @@ namespace NP.IoCy
             return result;
         }
 
+        public IEnumerable<TResult> MultiResolve<TToResolve, TResult>(object resolutionKey = null)
+            where TResult : TToResolve
+        {
+            return MultiResolve<TToResolve>().Where(item => item is TResult).Cast<TResult>();
+        }
+
         private void ComposeAllSingletonObjects()
         {
             foreach(IResolvingCell resolvingCell in this._typeMap.Values)
