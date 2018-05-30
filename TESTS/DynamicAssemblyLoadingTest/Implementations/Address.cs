@@ -9,7 +9,7 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.IoCy.Attributes;
+using NP.Utilities.Attributes;
 using DynamicAssemblyLoadingTest.Interfaces;
 
 namespace DynamicAssemblyLoadingTest.Implementations

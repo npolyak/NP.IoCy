@@ -53,6 +53,10 @@
       <Project>{983ACD27-CD73-4F53-9E52-8F31436CA9A2}</Project>
       <Name>NP.IoCy</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\NP.Utilities\NP.Utilities.csproj">
+      <Project>{503d6544-570d-4e07-9101-0f574624cb49}</Project>
+      <Name>NP.Utilities</Name>
+    </ProjectReference>
     <ProjectReference Include="Interfaces\Interfaces.csproj">
       <Project>{faf644ae-7d8b-4eea-ad7f-b14c766b9486}</Project>
       <Name>Interfaces</Name>

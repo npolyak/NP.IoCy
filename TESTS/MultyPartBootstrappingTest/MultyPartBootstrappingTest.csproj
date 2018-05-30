@@ -62,6 +62,10 @@
       <Project>{983acd27-cd73-4f53-9e52-8f31436ca9a2}</Project>
       <Name>NP.IoCy</Name>
     </ProjectReference>
+    <ProjectReference Include="..\..\NP.Utilities\NP.Utilities.csproj">
+      <Project>{503d6544-570d-4e07-9101-0f574624cb49}</Project>
+      <Name>NP.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

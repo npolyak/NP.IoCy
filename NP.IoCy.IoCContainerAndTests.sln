@@ -44,6 +44,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "TESTS\Dynamic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Implementations", "TESTS\DynamicAssemblyLoadingTest\Implementations\Implementations.csproj", "{3CA25F9C-469F-443F-BDA5-911D25D58FDE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NP.Utilities", "NP.Utilities\NP.Utilities.csproj", "{503D6544-570D-4E07-9101-0F574624CB49}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -102,6 +104,10 @@ Global
 		{3CA25F9C-469F-443F-BDA5-911D25D58FDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CA25F9C-469F-443F-BDA5-911D25D58FDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CA25F9C-469F-443F-BDA5-911D25D58FDE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{503D6544-570D-4E07-9101-0F574624CB49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{503D6544-570D-4E07-9101-0F574624CB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{503D6544-570D-4E07-9101-0F574624CB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{503D6544-570D-4E07-9101-0F574624CB49}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

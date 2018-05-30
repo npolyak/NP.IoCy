@@ -45,17 +45,17 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Attributes\ImplementsAttribute.cs" />
-    <Compile Include="Attributes\MultiImplementsAttribute.cs" />
-    <Compile Include="Attributes\MultiPart.cs" />
-    <Compile Include="Attributes\PartAttribute.cs" />
     <Compile Include="IoCContainer.cs" />
-    <Compile Include="Utils\ReflectionUtils.cs" />
-    <Compile Include="Utils\ObjUtils.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="NP.Utilities\NP.Utilities.csproj">
+      <Project>{503d6544-570d-4e07-9101-0f574624cb49}</Project>
+      <Name>NP.Utilities</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

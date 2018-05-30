@@ -10,7 +10,7 @@
 // products that use it.
 
 using NP.IoCy;
-using NP.IoCy.Utils;
+using NP.Utilities;
 using DynamicAssemblyLoadingTest.Interfaces;
 using System;
 using System.IO;

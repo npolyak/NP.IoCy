@@ -14,7 +14,7 @@ using NP.IoCy;
 using System.Collections.Generic;
 using System;
 using System.IO;
-using NP.IoCy.Utils;
+using NP.Utilities;
 
 namespace PluginsTest
 {

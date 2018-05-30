@@ -10,7 +10,7 @@
 // products that use it.
 
 using PluginsTest.Interfaces;
-using NP.IoCy.Attributes;
+using NP.Utilities.Attributes;
 using System;
 
 namespace PluginsTest.Plugin2

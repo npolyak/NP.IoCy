@@ -9,8 +9,8 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.IoCy.Attributes;
-using NP.IoCy.Utils;
+using NP.Utilities.Attributes;
+using NP.Utilities;
 using System;
 using System.Collections;
 using System.Collections.Generic;

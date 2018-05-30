@@ -1,4 +1,4 @@
-﻿using NP.IoCy.Attributes;
+﻿using NP.Utilities.Attributes;
 // (c) Nick Polyak 2018 - http://awebpros.com/
 // License: Apache License 2.0 (http://www.apache.org/licenses/LICENSE-2.0.html)
 //
