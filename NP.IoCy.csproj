@@ -52,7 +52,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="NP.Utilities\NP.Utilities.csproj">
+    <ProjectReference Include="$(SolutionDir)\NP.Utilities\NP.Utilities.csproj">
       <Project>{503d6544-570d-4e07-9101-0f574624cb49}</Project>
       <Name>NP.Utilities</Name>
     </ProjectReference>
