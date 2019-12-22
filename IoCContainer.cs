@@ -23,7 +23,7 @@ namespace NP.IoCy
 {
     interface IResolvingCellBase<T>
     {
-        T GetObj(out bool isComposed);
+        T GetObj(IoCContainer container, out bool isComposed);
     }
 
     interface IResolvingCell : IResolvingCellBase<object>
@@ -35,10 +35,10 @@ namespace NP.IoCy
     {
         Type _type;
 
-        public object GetObj(out bool isComposed)
+        public object GetObj(IoCContainer container, out bool isComposed)
         {
             isComposed = false;
-            return Activator.CreateInstance(_type);
+            return container.ConstructObject(_type);
         }
 
         public ResolvingTypeCell(Type type)
@@ -63,7 +63,7 @@ namespace NP.IoCy
 
         // the object is composed on the configuration completion stage,
         // so, isComposed is set to true. 
-        public T GetObj(out bool isComposed)
+        public T GetObj(IoCContainer container, out bool isComposed)
         {
             isComposed = true;
             return _obj;
@@ -118,9 +118,9 @@ namespace NP.IoCy
             _obj.Add(item);
         }
 
-        object IResolvingCellBase<object>.GetObj(out bool isComposed)
+        object IResolvingCellBase<object>.GetObj(IoCContainer container, out bool isComposed)
         {
-            return GetObj(out isComposed);
+            return GetObj(container, out isComposed);
         }
 
         public IList GetAllObjs()
@@ -145,7 +145,7 @@ namespace NP.IoCy
     {
         public Func<T> _factoryMethod;
 
-        public object GetObj(out bool isComposed)
+        public object GetObj(IoCContainer container, out bool isComposed)
         {
             isComposed = false;
             return _factoryMethod();
@@ -231,7 +231,7 @@ namespace NP.IoCy
     {
         static IoCContainer()
         {
-            AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
+            //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
         }
 
         private static Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
@@ -250,9 +250,16 @@ namespace NP.IoCy
 
         public event Action ConfigurationCompletedEvent = null;
 
-        public IoCContainer(bool isProtected = true)
+        private Func<Type, object> DefaultResolver { get; }
+
+        public IoCContainer
+        (
+            bool isProtected = true, 
+            Func<Type, object> defaultResolver = null
+        )
         {
             _isProtected = isProtected;
+            DefaultResolver = defaultResolver;
         }
 
         private IResolvingCell GetResolvingCellCurrentContainer(TypeToResolveKey typeToResolveKey)
@@ -370,10 +377,10 @@ namespace NP.IoCy
             if (resolvingCell == null)
             {
                 isComposed = true;
-                return null;
+                return DefaultResolver?.Invoke(typeToResolveKey.TypeToResolve);
             }
 
-            return resolvingCell.GetObj(out isComposed);
+            return resolvingCell.GetObj(this, out isComposed);
         }
 
         private object ResolveCurrentObj(Type typeToResolve, out bool isComposed, object resolutionKey = null)
@@ -444,7 +451,7 @@ namespace NP.IoCy
 
         public void MapMultiType(Type typeToResolve, Type resolvingType, object resolutionKey = null)
         {
-            object resolvingObj = Activator.CreateInstance(resolvingType);
+            object resolvingObj = ConstructObject(resolvingType);
 
             MapMultiPartObj(typeToResolve, resolvingObj, resolutionKey);
         }
@@ -476,7 +483,7 @@ namespace NP.IoCy
 
         private void MapSingletonTypeImpl(Type typeToResolve, Type resolvingObjType, object resolutionKey = null)
         {
-            object resolvingObj = Activator.CreateInstance(resolvingObjType);
+            object resolvingObj = ConstructObject(resolvingObjType);
 
             MapSingletonObjImpl(typeToResolve, resolvingObj, resolutionKey);
         }
@@ -505,21 +512,56 @@ namespace NP.IoCy
             MapFactory(typeof(TToResolve), resolvingFactory, resolutionKey);
         }
 
-        private TypeToResolveKey GetTypeToResolveKey(PropertyInfo propInfo)
+        private TypeToResolveKey GetTypeToResolveKey
+        (
+            ICustomAttributeProvider propOrParam,
+            Type propOrParamType,
+            bool returnNullIfNoPartAttr = true)
         {
             PartAttribute partAttr =
-                propInfo.GetCustomAttribute<PartAttribute>();
+                propOrParam.GetAttr<PartAttribute>();
 
             if (partAttr == null)
-                return null;
+            {
+                if (returnNullIfNoPartAttr)
+                {
+                    return null;
+                }
+                else
+                {
+                    partAttr = new PartAttribute();
+                }
+            }
 
             if (!partAttr.IsMulti)
             {
-                return propInfo.PropertyType.ToKey(partAttr.PartKey);
+                return propOrParamType.ToKey(partAttr.PartKey);
             }
             else
             {
-                return propInfo.PropertyType.GetGenericArguments().First().ToKey(partAttr.PartKey, true);
+                return propOrParamType.GetGenericArguments().First().ToKey(partAttr.PartKey, true);
+            }
+        }
+
+        private TypeToResolveKey GetTypeToResolveKey(PropertyInfo propInfo)
+        {
+            return GetTypeToResolveKey(propInfo, propInfo.PropertyType);
+        }
+
+        private TypeToResolveKey GetTypeToResolveKey(ParameterInfo paramInfo)
+        {
+            return GetTypeToResolveKey(paramInfo, paramInfo.ParameterType, false);
+        }
+
+        private object ResolveKey(TypeToResolveKey key)
+        {
+            if (!key.IsMulti)
+            {
+                return Resolve(key);
+            }
+            else
+            {
+                return MultiResolve(key);
             }
         }
 
@@ -539,19 +581,39 @@ namespace NP.IoCy
                     continue;
                 }
 
-                object subObj;
-
-                if (!propTypeToResolveKey.IsMulti)
-                {
-                    subObj = Resolve(propTypeToResolveKey);
-                }
-                else
-                {
-                    subObj = MultiResolve(propTypeToResolveKey);
-                }
+                object subObj = ResolveKey(propTypeToResolveKey);
 
                 propInfo.SetMethod.Invoke(obj, new[] { subObj });
             }
+        }
+
+        internal IEnumerable<object> GetConstructorParamValues(ConstructorInfo constructorInfo)
+        {
+            foreach(var paramInfo in constructorInfo.GetParameters())
+            {
+                TypeToResolveKey propTypeToResolveKey = GetTypeToResolveKey(paramInfo);
+
+                if (propTypeToResolveKey == null)
+                {
+                    yield return null;
+                }
+
+                yield return ResolveKey(propTypeToResolveKey);
+            }
+        }
+
+        internal object ConstructObject(Type type)
+        {
+            ConstructorInfo constructorInfo =
+                type.GetConstructors()
+                    .FirstOrDefault(constr => constr.ContainsAttr<CompositeConstructorAttribute>());
+
+            if (constructorInfo == null)
+            {
+                return Activator.CreateInstance(type);
+            }
+
+            return Activator.CreateInstance(type, GetConstructorParamValues(constructorInfo).ToArray());
         }
 
         private object Resolve(TypeToResolveKey typeToResolveKey)
@@ -583,7 +645,7 @@ namespace NP.IoCy
             return result;
         }
 
-        private object ResolveImpl(Type typeToResolve, object resolutionKey)
+        public object Resolve(Type typeToResolve, object resolutionKey = null)
         {
             TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
 
@@ -594,7 +656,7 @@ namespace NP.IoCy
         {
             Type typeToResolve = typeof(TToResolve);
 
-            return ResolveImpl(typeToResolve, resolutionKey);
+            return Resolve(typeToResolve, resolutionKey);
         }
 
         public TToResolve Resolve<TToResolve>(object resolutionKey = null)
@@ -767,7 +829,7 @@ namespace NP.IoCy
 
             string absoluteAssemblyPath = Path.GetFullPath(assemblyPath);
 
-            Assembly.ReflectionOnlyLoadFrom(absoluteAssemblyPath);
+            //Assembly.ReflectionOnlyLoadFrom(absoluteAssemblyPath);
 
             Assembly loadedAssembly = Assembly.LoadFile(absoluteAssemblyPath);
 
