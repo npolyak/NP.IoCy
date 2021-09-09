@@ -1,66 +1,48 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{AA8DEE03-B72D-4993-93E7-731C17DFABA9}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>PluginsTest</RootNamespace>
-    <AssemblyName>PluginsTest</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFramework>net5.0</TargetFramework>
+    <Version>0.90.00</Version>
+    <Authors>Nick Polyak</Authors>
+    <Company>AWebPros</Company>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
+    <Compile Remove="Interfaces\bin\**" />
+    <Compile Remove="Interfaces\obj\**" />
+    <Compile Remove="Plugin1\bin\**" />
+    <Compile Remove="Plugin1\obj\**" />
+    <Compile Remove="Plugin2\bin\**" />
+    <Compile Remove="Plugin2\obj\**" />
+    <EmbeddedResource Remove="Interfaces\bin\**" />
+    <EmbeddedResource Remove="Interfaces\obj\**" />
+    <EmbeddedResource Remove="Plugin1\bin\**" />
+    <EmbeddedResource Remove="Plugin1\obj\**" />
+    <EmbeddedResource Remove="Plugin2\bin\**" />
+    <EmbeddedResource Remove="Plugin2\obj\**" />
+    <None Remove="Interfaces\bin\**" />
+    <None Remove="Interfaces\obj\**" />
+    <None Remove="Plugin1\bin\**" />
+    <None Remove="Plugin1\obj\**" />
+    <None Remove="Plugin2\bin\**" />
+    <None Remove="Plugin2\obj\**" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Remove="Interfaces\IPlugin.cs" />
+    <Compile Remove="Plugin1\PluginOne.cs" />
+    <Compile Remove="Plugin2\PluginTwo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="App.config" />
+    <ProjectReference Include="..\..\src\NP.IoCy.csproj" />
+    <ProjectReference Include="..\..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
+    <ProjectReference Include="Interfaces\Interfaces.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\NP.IoCy.csproj">
-      <Project>{983ACD27-CD73-4F53-9E52-8F31436CA9A2}</Project>
-      <Name>NP.IoCy</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NP.Utilities\NP.Utilities.csproj">
-      <Project>{503d6544-570d-4e07-9101-0f574624cb49}</Project>
-      <Name>NP.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="Interfaces\Interfaces.csproj">
-      <Project>{faf644ae-7d8b-4eea-ad7f-b14c766b9486}</Project>
-      <Name>Interfaces</Name>
-    </ProjectReference>
+    <Folder Include="Interfaces\" />
+    <Folder Include="Plugin1\" />
+    <Folder Include="Plugin2\" />
   </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

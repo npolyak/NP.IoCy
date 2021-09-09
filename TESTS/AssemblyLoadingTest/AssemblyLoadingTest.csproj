@@ -1,71 +1,29 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
-  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
-  <PropertyGroup>
-    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
-    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{7EF349F2-526F-4F51-A5EC-1EEDB3B8EF77}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>AssemblyLoadingTest</RootNamespace>
-    <AssemblyName>AssemblyLoadingTest</AssemblyName>
-    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
-    <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+﻿<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net5.0</TargetFramework>
+        <Version>0.90.0</Version>
+        <Authors>Nick Polyak</Authors>
+        <Company>AWebPros</Company>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugSymbols>true</DebugSymbols>
-    <DebugType>full</DebugType>
-    <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
-    <DebugType>pdbonly</DebugType>
-    <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <ErrorReport>prompt</ErrorReport>
-    <WarningLevel>4</WarningLevel>
-  </PropertyGroup>
-  <ItemGroup>
-    <Reference Include="System" />
-    <Reference Include="System.Core" />
-    <Reference Include="System.Xml.Linq" />
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="Microsoft.CSharp" />
-    <Reference Include="System.Data" />
-    <Reference Include="System.Net.Http" />
-    <Reference Include="System.Xml" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Include="ConsoleLog.cs" />
-    <Compile Include="Program.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\NP.IoCy.csproj">
-      <Project>{983acd27-cd73-4f53-9e52-8f31436ca9a2}</Project>
-      <Name>NP.IoCy</Name>
-    </ProjectReference>
-    <ProjectReference Include="..\..\NP.Utilities\NP.Utilities.csproj">
-      <Project>{503d6544-570d-4e07-9101-0f574624cb49}</Project>
-      <Name>NP.Utilities</Name>
-    </ProjectReference>
-    <ProjectReference Include="Implementations\Implementations.csproj">
-      <Project>{f203018e-fb2d-4102-bd59-f1a439c5bdb6}</Project>
-      <Name>Implementations</Name>
-    </ProjectReference>
-    <ProjectReference Include="Interfaces\Interfaces.csproj">
-      <Project>{49691a38-0265-477e-99bc-80fddb445253}</Project>
-      <Name>Interfaces</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+    <ItemGroup>
+      <Compile Remove="Implementations\bin\**" />
+      <Compile Remove="Implementations\obj\**" />
+      <Compile Remove="Interfaces\bin\**" />
+      <Compile Remove="Interfaces\obj\**" />
+      <EmbeddedResource Remove="Implementations\bin\**" />
+      <EmbeddedResource Remove="Implementations\obj\**" />
+      <EmbeddedResource Remove="Interfaces\bin\**" />
+      <EmbeddedResource Remove="Interfaces\obj\**" />
+      <None Remove="Implementations\bin\**" />
+      <None Remove="Implementations\obj\**" />
+      <None Remove="Interfaces\bin\**" />
+      <None Remove="Interfaces\obj\**" />
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\NP.IoCy.csproj" />
+      <ProjectReference Include="..\..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
+    </ItemGroup>
 </Project>
+ 

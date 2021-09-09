@@ -8,4 +8,11 @@
     <Nullable>enable</Nullable>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
+  <ItemGroup>
+      <None Remove="LICENSE" />
+      <None Remove="README.md" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
+  </ItemGroup>
 </Project>

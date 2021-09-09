@@ -20,7 +20,7 @@ namespace PluginsTest.Plugin1
     {
         public void PrintMessage()
         {
-            Console.WriteLine("I am PluginOne");
+            Console.WriteLine("I am PluginOne!!!");
         }
     }
 }

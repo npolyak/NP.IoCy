@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27004.2009
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31624.102
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NP.IoCy", "NP.IoCy.csproj", "{983ACD27-CD73-4F53-9E52-8F31436CA9A2}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NP.IoCy", "src\NP.IoCy.csproj", "{983ACD27-CD73-4F53-9E52-8F31436CA9A2}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "TESTS", "TESTS", "{376E306D-4442-4C1B-BCE5-F4FCBDA8AA6C}"
 EndProject
@@ -11,7 +11,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BootstrappingTest", "TESTS\
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "AssemblyLoadingTest", "AssemblyLoadingTest", "{A083C02F-C20B-48E9-AE94-FFEFD1640518}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AssemblyLoadingTest", "TESTS\AssemblyLoadingTest\AssemblyLoadingTest.csproj", "{7EF349F2-526F-4F51-A5EC-1EEDB3B8EF77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AssemblyLoadingTest", "TESTS\AssemblyLoadingTest\AssemblyLoadingTest.csproj", "{7EF349F2-526F-4F51-A5EC-1EEDB3B8EF77}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DynamicAssemblyLoadingTest", "DynamicAssemblyLoadingTest", "{BF87F7E0-7D28-4727-A903-98A83FAFE519}"
 EndProject
@@ -44,7 +44,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interfaces", "TESTS\Dynamic
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Implementations", "TESTS\DynamicAssemblyLoadingTest\Implementations\Implementations.csproj", "{3CA25F9C-469F-443F-BDA5-911D25D58FDE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NP.Utilities", "NP.Utilities\NP.Utilities.csproj", "{503D6544-570D-4E07-9101-0F574624CB49}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{CAA4EDA1-E908-42A0-9434-CBF858B10C01}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NP.Utilities", "SubModules\NP.Utilities\src\NP.Utilities.csproj", "{88BBCEC9-CC70-450B-91D2-A319A6F77513}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -104,10 +106,10 @@ Global
 		{3CA25F9C-469F-443F-BDA5-911D25D58FDE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3CA25F9C-469F-443F-BDA5-911D25D58FDE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3CA25F9C-469F-443F-BDA5-911D25D58FDE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{503D6544-570D-4E07-9101-0F574624CB49}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{503D6544-570D-4E07-9101-0F574624CB49}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{503D6544-570D-4E07-9101-0F574624CB49}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{503D6544-570D-4E07-9101-0F574624CB49}.Release|Any CPU.Build.0 = Release|Any CPU
+		{88BBCEC9-CC70-450B-91D2-A319A6F77513}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{88BBCEC9-CC70-450B-91D2-A319A6F77513}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{88BBCEC9-CC70-450B-91D2-A319A6F77513}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{88BBCEC9-CC70-450B-91D2-A319A6F77513}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -128,6 +130,7 @@ Global
 		{49691A38-0265-477E-99BC-80FDDB445253} = {A083C02F-C20B-48E9-AE94-FFEFD1640518}
 		{ECFC3A60-9527-47C6-818B-0E87A8F5415E} = {BF87F7E0-7D28-4727-A903-98A83FAFE519}
 		{3CA25F9C-469F-443F-BDA5-911D25D58FDE} = {BF87F7E0-7D28-4727-A903-98A83FAFE519}
+		{88BBCEC9-CC70-450B-91D2-A319A6F77513} = {CAA4EDA1-E908-42A0-9434-CBF858B10C01}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {F1AF82F1-CF42-48F3-9072-3B8E002C2B8D}

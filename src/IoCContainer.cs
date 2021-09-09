@@ -23,7 +23,7 @@ namespace NP.IoCy
 {
     interface IResolvingCellBase<T>
     {
-        T GetObj(IoCContainer container, out bool isComposed);
+        T? GetObj(IoCContainer container, out bool isComposed);
     }
 
     interface IResolvingCell : IResolvingCellBase<object>
@@ -59,11 +59,11 @@ namespace NP.IoCy
 
     class ResolvingSingletonCellBase<T> : IResolvingCellBase<T>
     {
-        protected T _obj;
+        protected T? _obj;
 
         // the object is composed on the configuration completion stage,
         // so, isComposed is set to true. 
-        public T GetObj(IoCContainer container, out bool isComposed)
+        public T? GetObj(IoCContainer container, out bool isComposed)
         {
             isComposed = true;
             return _obj;
@@ -77,7 +77,7 @@ namespace NP.IoCy
 
     class ResolvingSingletonCell : ResolvingSingletonCellBase<object>, IResolvingSingletonCell
     {
-        public ResolvingSingletonCell(object obj)
+        public ResolvingSingletonCell(object? obj)
         {
             _obj = obj;
         }
@@ -105,7 +105,7 @@ namespace NP.IoCy
         public ResolvingSingletonMultiCell(Type itemType)
         {
             _itemType = itemType;
-            _obj = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(_itemType));
+            _obj = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(_itemType))!;
         }
 
         public override string ToString()
@@ -115,24 +115,24 @@ namespace NP.IoCy
 
         public void Add(object item)
         {
-            _obj.Add(item);
+            _obj!.Add(item);
         }
 
         object IResolvingCellBase<object>.GetObj(IoCContainer container, out bool isComposed)
         {
-            return GetObj(container, out isComposed);
+            return GetObj(container, out isComposed)!;
         }
 
         public IList GetAllObjs()
         {
-            return _obj;
+            return _obj!;
         }
 
         public IResolvingCell Copy()
         {
             ResolvingSingletonMultiCell result = new ResolvingSingletonMultiCell(_itemType);
 
-            foreach (object item in _obj)
+            foreach (object item in _obj!)
             {
                 result.Add(item);
             }
@@ -145,10 +145,10 @@ namespace NP.IoCy
     {
         public Func<T> _factoryMethod;
 
-        public object GetObj(IoCContainer container, out bool isComposed)
+        public object? GetObj(IoCContainer container, out bool isComposed)
         {
             isComposed = false;
-            return _factoryMethod();
+            return _factoryMethod.Invoke();
         }
 
         public ResolvingFactoryMethodCell(Func<T> factoryMethod)
@@ -175,18 +175,18 @@ namespace NP.IoCy
         // allows resolution by object 
         // without this, a single type would always be 
         // resolved in a single way. 
-        public object KeyObject { get; }
+        public object? KeyObject { get; }
 
         public bool IsMulti { get; }
 
-        public TypeToResolveKey(Type typeToResolve, object keyObject, bool isMulti = false)
+        public TypeToResolveKey(Type typeToResolve, object? keyObject, bool isMulti = false)
         {
             this.IsMulti = isMulti;
             this.TypeToResolve = typeToResolve;
             this.KeyObject = keyObject;
         }
 
-        public override bool Equals(object obj)
+        public override bool Equals(object? obj)
         {
             if (obj is TypeToResolveKey target)
             {
@@ -219,7 +219,7 @@ namespace NP.IoCy
 
     static class TypeToResolveKeyUtils
     {
-        public static TypeToResolveKey ToKey(this Type typeToResolve, object resolutionKey, bool isMulti = false)
+        public static TypeToResolveKey ToKey(this Type typeToResolve, object? resolutionKey, bool isMulti = false)
         {
             TypeToResolveKey typeToResolveKey = new TypeToResolveKey(typeToResolve, resolutionKey, isMulti);
 
@@ -236,10 +236,10 @@ namespace NP.IoCy
 
         private static Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
         {
-            return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.FullName == args.Name);
+            return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.FullName == args.Name)!;
         }
 
-        private IoCContainer ParentContainer { get; set; }
+        private IoCContainer? ParentContainer { get; set; }
 
         Dictionary<TypeToResolveKey, IResolvingCell> _typeMap =
             new Dictionary<TypeToResolveKey, IResolvingCell>();
@@ -248,23 +248,23 @@ namespace NP.IoCy
 
         private bool _isProtected;
 
-        public event Action ConfigurationCompletedEvent = null;
+        public event Action? ConfigurationCompletedEvent = null;
 
-        private Func<Type, object> DefaultResolver { get; }
+        private Func<Type, object>? DefaultResolver { get; }
 
         public IoCContainer
         (
             bool isProtected = true, 
-            Func<Type, object> defaultResolver = null
+            Func<Type, object> defaultResolver = null!
         )
         {
             _isProtected = isProtected;
             DefaultResolver = defaultResolver;
         }
 
-        private IResolvingCell GetResolvingCellCurrentContainer(TypeToResolveKey typeToResolveKey)
+        private IResolvingCell? GetResolvingCellCurrentContainer(TypeToResolveKey typeToResolveKey)
         {
-            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell resolvingCell))
+            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell? resolvingCell))
             {
                 return resolvingCell;
             }
@@ -274,12 +274,12 @@ namespace NP.IoCy
 
         private IResolvingCell GetResolvingCell(TypeToResolveKey typeToResolveKey)
         {
-            IResolvingCell resolvingCell = GetResolvingCellCurrentContainer(typeToResolveKey);
+            IResolvingCell resolvingCell = GetResolvingCellCurrentContainer(typeToResolveKey)!;
 
             if (resolvingCell == null)
             {
                 // give a chance to resolve the cell via the parent container. s
-                resolvingCell = ParentContainer?.GetResolvingCell(typeToResolveKey);
+                resolvingCell = ParentContainer?.GetResolvingCell(typeToResolveKey)!;
             }
 
             return resolvingCell;
@@ -295,7 +295,7 @@ namespace NP.IoCy
 
         IResolvingCell AddCellUnprotected(TypeToResolveKey typeToResolveKey, IResolvingCell resolvingCell)
         {
-            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell cell))
+            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell? cell))
             {
                 throw new Exception($"key {typeToResolveKey.ToString()} is already mapped to '{cell.ToString()}' cell.");
             }
@@ -320,7 +320,7 @@ namespace NP.IoCy
 
         ResolvingSingletonMultiCell AddOrGetMultiCellBase(TypeToResolveKey typeToResolveKey, bool isProtected)
         {
-            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell cell))
+            if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell? cell))
             {
                 if (cell is ResolvingSingletonMultiCell multiCell)
                 {
@@ -377,21 +377,21 @@ namespace NP.IoCy
             if (resolvingCell == null)
             {
                 isComposed = true;
-                return DefaultResolver?.Invoke(typeToResolveKey.TypeToResolve);
+                return DefaultResolver?.Invoke(typeToResolveKey.TypeToResolve)!;
             }
 
-            return resolvingCell.GetObj(this, out isComposed);
+            return resolvingCell.GetObj(this, out isComposed)!;
         }
 
-        private object ResolveCurrentObj(Type typeToResolve, out bool isComposed, object resolutionKey = null)
+        private object ResolveCurrentObj(Type typeToResolve, out bool isComposed, object? resolutionKey = null)
         {
             return ResolveCurrentObj(typeToResolve.ToKey(resolutionKey), out isComposed);
         }
 
-        public void MapType(Type typeToResolve, Type resolvingType, object resolutionKey = null)
+        public void MapType(Type typeToResolve, Type resolvingType, object? resolutionKey = null)
         {
             CheckTypeDerivation(typeToResolve, resolvingType);
-            AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingTypeCell(resolvingType));
+            AddCell(typeToResolve.ToKey(resolutionKey!), new ResolvingTypeCell(resolvingType));
         }
 
         void AddObjToMultiCellUnprotected(ResolvingSingletonMultiCell multiCell, object resolvingObj)
@@ -407,7 +407,7 @@ namespace NP.IoCy
             }
         }
 
-        public void MapMultiPartObj(Type typeToResolve, object resolvingObj, object resolutionKey = null)
+        public void MapMultiPartObj(Type typeToResolve, object resolvingObj, object? resolutionKey = null)
         {
             TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
 
@@ -418,7 +418,7 @@ namespace NP.IoCy
 
             CheckTypeDerivation(typeToResolve, resolvingObj.GetType());
 
-            ResolvingSingletonMultiCell multiCell = null;
+            ResolvingSingletonMultiCell? multiCell = null;
 
             if(_isProtected)
             {
@@ -444,32 +444,32 @@ namespace NP.IoCy
             }
         }
 
-        public void MapMultiPartObj<TToResolve>(object resolvingObj, object resolutionKey = null)
+        public void MapMultiPartObj<TToResolve>(object resolvingObj, object? resolutionKey = null)
         {
             MapMultiPartObj(typeof(TToResolve), resolvingObj, resolutionKey);
         }
 
-        public void MapMultiType(Type typeToResolve, Type resolvingType, object resolutionKey = null)
+        public void MapMultiType(Type typeToResolve, Type resolvingType, object? resolutionKey = null)
         {
             object resolvingObj = ConstructObject(resolvingType);
 
             MapMultiPartObj(typeToResolve, resolvingObj, resolutionKey);
         }
 
-        public void MapMultiType<TToResolve, TResolving>(object resolutionKey = null)
+        public void MapMultiType<TToResolve, TResolving>(object? resolutionKey = null)
         {
             MapMultiType(typeof(TToResolve), typeof(TResolving), resolutionKey);
         }
 
 
-        public void Map<TToResolve, TResolving>(object resolutionKey = null)
+        public void Map<TToResolve, TResolving>(object? resolutionKey = null)
             where TResolving : TToResolve
         {
             MapType(typeof(TToResolve), typeof(TResolving), resolutionKey);
         }
 
 
-        private void MapSingletonObjImpl(Type typeToResolve, object resolvingObj, object resolutionKey = null)
+        private void MapSingletonObjImpl(Type typeToResolve, object resolvingObj, object? resolutionKey = null)
         {
             CheckTypeDerivation(typeToResolve, resolvingObj.GetType());
 
@@ -481,38 +481,38 @@ namespace NP.IoCy
             AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingSingletonCell(resolvingObj));
         }
 
-        private void MapSingletonTypeImpl(Type typeToResolve, Type resolvingObjType, object resolutionKey = null)
+        private void MapSingletonTypeImpl(Type typeToResolve, Type resolvingObjType, object? resolutionKey = null)
         {
             object resolvingObj = ConstructObject(resolvingObjType);
 
             MapSingletonObjImpl(typeToResolve, resolvingObj, resolutionKey);
         }
 
-        public void MapSingleton<TToResolve, TResolving>(TResolving resolvingObj, object resolutionKey = null)
+        public void MapSingleton<TToResolve, TResolving>(TResolving resolvingObj, object? resolutionKey = null)
             where TResolving : TToResolve
         {
-            MapSingletonObjImpl(typeof(TToResolve), resolvingObj, resolutionKey);
+            MapSingletonObjImpl(typeof(TToResolve), resolvingObj!, resolutionKey);
         }
 
-        public void MapSingleton<TToResolve, TResolving>(object resolutionKey = null)
+        public void MapSingleton<TToResolve, TResolving>(object? resolutionKey = null)
             where TResolving : TToResolve
         {
             MapSingletonTypeImpl(typeof(TToResolve), typeof(TResolving), resolutionKey);
         }
 
-        public void MapFactory<TResolving>(Type typeToResolve, Func<TResolving> resolvingFactory, object resolutionKey = null)
+        public void MapFactory<TResolving>(Type typeToResolve, Func<TResolving> resolvingFactory, object? resolutionKey = null)
         {
             CheckTypeDerivation(typeToResolve, typeof(TResolving));
             AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingFactoryMethodCell<TResolving>(resolvingFactory));
         }
 
-        public void MapFactory<TToResolve, TResolving>(Func<TResolving> resolvingFactory, object resolutionKey = null)
+        public void MapFactory<TToResolve, TResolving>(Func<TResolving> resolvingFactory, object? resolutionKey = null)
             where TResolving : TToResolve
         {
             MapFactory(typeof(TToResolve), resolvingFactory, resolutionKey);
         }
 
-        private TypeToResolveKey GetTypeToResolveKey
+        private TypeToResolveKey? GetTypeToResolveKey
         (
             ICustomAttributeProvider propOrParam,
             Type propOrParamType,
@@ -543,17 +543,17 @@ namespace NP.IoCy
             }
         }
 
-        private TypeToResolveKey GetTypeToResolveKey(PropertyInfo propInfo)
+        private TypeToResolveKey? GetTypeToResolveKey(PropertyInfo propInfo)
         {
             return GetTypeToResolveKey(propInfo, propInfo.PropertyType);
         }
 
-        private TypeToResolveKey GetTypeToResolveKey(ParameterInfo paramInfo)
+        private TypeToResolveKey? GetTypeToResolveKey(ParameterInfo paramInfo)
         {
             return GetTypeToResolveKey(paramInfo, paramInfo.ParameterType, false);
         }
 
-        private object ResolveKey(TypeToResolveKey key)
+        private object? ResolveKey(TypeToResolveKey key)
         {
             if (!key.IsMulti)
             {
@@ -574,31 +574,31 @@ namespace NP.IoCy
                 if (propInfo.SetMethod == null)
                     continue;
 
-                TypeToResolveKey propTypeToResolveKey = GetTypeToResolveKey(propInfo);
+                TypeToResolveKey? propTypeToResolveKey = GetTypeToResolveKey(propInfo);
 
                 if (propTypeToResolveKey == null)
                 {
                     continue;
                 }
 
-                object subObj = ResolveKey(propTypeToResolveKey);
+                object? subObj = ResolveKey(propTypeToResolveKey);
 
                 propInfo.SetMethod.Invoke(obj, new[] { subObj });
             }
         }
 
-        internal IEnumerable<object> GetConstructorParamValues(ConstructorInfo constructorInfo)
+        internal IEnumerable<object?> GetConstructorParamValues(ConstructorInfo constructorInfo)
         {
             foreach(var paramInfo in constructorInfo.GetParameters())
             {
-                TypeToResolveKey propTypeToResolveKey = GetTypeToResolveKey(paramInfo);
+                TypeToResolveKey? propTypeToResolveKey = GetTypeToResolveKey(paramInfo);
 
                 if (propTypeToResolveKey == null)
                 {
                     yield return null;
                 }
 
-                yield return ResolveKey(propTypeToResolveKey);
+                yield return ResolveKey(propTypeToResolveKey!);
             }
         }
 
@@ -606,14 +606,14 @@ namespace NP.IoCy
         {
             ConstructorInfo constructorInfo =
                 type.GetConstructors()
-                    .FirstOrDefault(constr => constr.ContainsAttr<CompositeConstructorAttribute>());
+                    .FirstOrDefault(constr => constr.ContainsAttr<CompositeConstructorAttribute>())!;
 
             if (constructorInfo == null)
             {
-                return Activator.CreateInstance(type);
+                return Activator.CreateInstance(type)!;
             }
 
-            return Activator.CreateInstance(type, GetConstructorParamValues(constructorInfo).ToArray());
+            return Activator.CreateInstance(type, GetConstructorParamValues(constructorInfo).ToArray())!;
         }
 
         private object Resolve(TypeToResolveKey typeToResolveKey)
@@ -645,36 +645,36 @@ namespace NP.IoCy
             return result;
         }
 
-        public object Resolve(Type typeToResolve, object resolutionKey = null)
+        public object Resolve(Type typeToResolve, object? resolutionKey = null)
         {
             TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
 
             return ResolveImpl(typeToResolveKey);
         }
 
-        private object ResolveImpl<TToResolve>(object resolutionKey)
+        private object ResolveImpl<TToResolve>(object? resolutionKey)
         {
             Type typeToResolve = typeof(TToResolve);
 
             return Resolve(typeToResolve, resolutionKey);
         }
 
-        public TToResolve Resolve<TToResolve>(object resolutionKey = null)
+        public TToResolve Resolve<TToResolve>(object? resolutionKey = null)
         {
             return (TToResolve) ResolveImpl<TToResolve>(resolutionKey);
         }
 
-        private IEnumerable MultiResolve(TypeToResolveKey typeToResolveKey)
+        private IEnumerable? MultiResolve(TypeToResolveKey typeToResolveKey)
         {
-            IEnumerable result = ResolveImpl(typeToResolveKey) as IEnumerable;
+            IEnumerable? result = ResolveImpl(typeToResolveKey) as IEnumerable;
 
             return result;
         }
 
-        public IEnumerable<TToResolve> MultiResolve<TToResolve>(object resolutionKey = null)
+        public IEnumerable<TToResolve> MultiResolve<TToResolve>(object? resolutionKey = null)
         {
             IEnumerable<TToResolve> result =
-                MultiResolve(typeof(TToResolve).ToKey(resolutionKey))?.Cast<TToResolve>();
+                MultiResolve(typeof(TToResolve).ToKey(resolutionKey))?.Cast<TToResolve>()!;
 
             if (result == null)
                 result = Enumerable.Empty<TToResolve>();
@@ -682,7 +682,7 @@ namespace NP.IoCy
             return result;
         }
 
-        public IEnumerable<TResult> MultiResolve<TToResolve, TResult>(object resolutionKey = null)
+        public IEnumerable<TResult> MultiResolve<TToResolve, TResult>(object? resolutionKey = null)
             where TResult : TToResolve
         {
             return MultiResolve<TToResolve>().Where(item => item is TResult).Cast<TResult>();
@@ -692,7 +692,7 @@ namespace NP.IoCy
         {
             foreach(IResolvingCell resolvingCell in this._typeMap.Values)
             {
-                IResolvingSingletonCell singletonCell =
+                IResolvingSingletonCell? singletonCell =
                     resolvingCell as IResolvingSingletonCell;
 
                 if (singletonCell != null)
@@ -789,7 +789,7 @@ namespace NP.IoCy
             foreach(Type resolvingType in assembly.GetTypes())
             {
                 ImplementsAttribute implementsAttribute =
-                    resolvingType.GetCustomAttribute<ImplementsAttribute>();
+                    resolvingType.GetCustomAttribute<ImplementsAttribute>()!;
 
                 if (implementsAttribute == null)
                     continue;
@@ -840,7 +840,7 @@ namespace NP.IoCy
         public void InjectPluginsFromFolder
         (
             string assemblyFolderPath,
-            Regex matchingFileName = null
+            Regex? matchingFileName = null
         )
         {
             if (!Directory.Exists(assemblyFolderPath))
