@@ -13,6 +13,6 @@
       <None Remove="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
+    <ProjectReference Include="$(SolutionDir)..\..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
   </ItemGroup>
 </Project>
