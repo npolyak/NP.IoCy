@@ -18,6 +18,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text.RegularExpressions;
+using NP.Utilities.BasicInterfaces;
 
 namespace NP.IoCy
 {
@@ -227,7 +228,7 @@ namespace NP.IoCy
         }
     }
 
-    public class IoCContainer
+    public class IoCContainer : IObjectComposer
     {
         static IoCContainer()
         {
@@ -565,11 +566,16 @@ namespace NP.IoCy
             }
         }
 
-        internal void ComposeObject(object obj)
+        public void ComposeObject(object obj, bool ifCompositionNotNull = false)
         {
             Type objType = obj.GetType();
 
-            foreach (PropertyInfo propInfo in objType.GetProperties(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public))
+            foreach (PropertyInfo propInfo in 
+                        objType.GetProperties
+                        (
+                            BindingFlags.Instance | 
+                            BindingFlags.NonPublic | 
+                            BindingFlags.Public))
             {
                 if (propInfo.SetMethod == null)
                     continue;
@@ -583,7 +589,10 @@ namespace NP.IoCy
 
                 object? subObj = ResolveKey(propTypeToResolveKey);
 
-                propInfo.SetMethod.Invoke(obj, new[] { subObj });
+                if ((!ifCompositionNotNull) || (subObj != null))
+                {
+                    propInfo.SetMethod.Invoke(obj, new[] { subObj });
+                }
             }
         }
 
@@ -770,7 +779,7 @@ namespace NP.IoCy
         public void MergeIn(IoCContainer anotherIoCContainer)
         {
             string errorMessage =
-                  "IoCy Programming Error: modify the container since configuration has already been completed.";
+                  "IoCy Programming Error: cannot modify the container since configuration has already been completed.";
 
             ModifyContainer(() => MergeInImpl(anotherIoCContainer), errorMessage);
         }
