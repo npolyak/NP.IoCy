@@ -24,6 +24,7 @@ namespace NP.IoCy
 {
     interface IResolvingCellBase<T>
     {
+        bool IfCompositionNotNull { get; set; }
         T? GetObj(IoCContainer container, out bool isComposed);
     }
 
@@ -35,6 +36,8 @@ namespace NP.IoCy
     class ResolvingTypeCell : IResolvingCell
     {
         Type _type;
+
+        public bool IfCompositionNotNull { get; set; } = false;
 
         public object GetObj(IoCContainer container, out bool isComposed)
         {
@@ -61,6 +64,8 @@ namespace NP.IoCy
     class ResolvingSingletonCellBase<T> : IResolvingCellBase<T>
     {
         protected T? _obj;
+
+        public bool IfCompositionNotNull { get; set; } = false;
 
         // the object is composed on the configuration completion stage,
         // so, isComposed is set to true. 
@@ -144,6 +149,8 @@ namespace NP.IoCy
 
     class ResolvingFactoryMethodCell<T> : IResolvingCell
     {
+        public bool IfCompositionNotNull { get; set; } = false;
+
         public Func<T> _factoryMethod;
 
         public object? GetObj(IoCContainer container, out bool isComposed)
@@ -371,20 +378,20 @@ namespace NP.IoCy
             }
         }
 
-        private object ResolveCurrentObj(TypeToResolveKey typeToResolveKey, out bool isComposed)
+        private (object, bool) ResolveCurrentObj(TypeToResolveKey typeToResolveKey, out bool isComposed)
         {
             IResolvingCell resolvingCell = GetResolvingCell(typeToResolveKey);
 
             if (resolvingCell == null)
             {
                 isComposed = true;
-                return DefaultResolver?.Invoke(typeToResolveKey.TypeToResolve)!;
+                return (DefaultResolver?.Invoke(typeToResolveKey.TypeToResolve)!, false);
             }
 
-            return resolvingCell.GetObj(this, out isComposed)!;
+            return (resolvingCell.GetObj(this, out isComposed)!, resolvingCell.IfCompositionNotNull);
         }
 
-        private object ResolveCurrentObj(Type typeToResolve, out bool isComposed, object? resolutionKey = null)
+        private (object, bool) ResolveCurrentObj(Type typeToResolve, out bool isComposed, object? resolutionKey = null)
         {
             return ResolveCurrentObj(typeToResolve.ToKey(resolutionKey), out isComposed);
         }
@@ -432,7 +439,7 @@ namespace NP.IoCy
 
             if (!_isProtected)
             {
-                ComposeObject(resolvingObj);
+                ComposeObject(resolvingObj, multiCell.IfCompositionNotNull);
             }
 
             if (_isProtected)
@@ -470,35 +477,55 @@ namespace NP.IoCy
         }
 
 
-        private void MapSingletonObjImpl(Type typeToResolve, object resolvingObj, object? resolutionKey = null)
+        private void MapSingletonObjImpl
+        (
+            Type typeToResolve, 
+            object resolvingObj, 
+            object? resolutionKey = null,
+            bool ifCompositionNotNull = false)
         {
             CheckTypeDerivation(typeToResolve, resolvingObj.GetType());
 
             if (!_isProtected)
             {
-                ComposeObject(resolvingObj);
+                ComposeObject(resolvingObj, ifCompositionNotNull);
             }
 
-            AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingSingletonCell(resolvingObj));
+            AddCell
+            (
+                typeToResolve.ToKey(resolutionKey), 
+                new ResolvingSingletonCell(resolvingObj) { IfCompositionNotNull = ifCompositionNotNull });
         }
 
-        private void MapSingletonTypeImpl(Type typeToResolve, Type resolvingObjType, object? resolutionKey = null)
+        private void MapSingletonTypeImpl
+        (
+            Type typeToResolve, 
+            Type resolvingObjType, 
+            object? resolutionKey = null,
+            bool ifCompositionNotNull = false)
         {
             object resolvingObj = ConstructObject(resolvingObjType);
 
-            MapSingletonObjImpl(typeToResolve, resolvingObj, resolutionKey);
+            MapSingletonObjImpl(typeToResolve, resolvingObj, resolutionKey, ifCompositionNotNull);
         }
 
-        public void MapSingleton<TToResolve, TResolving>(TResolving resolvingObj, object? resolutionKey = null)
+        public void MapSingleton<TToResolve, TResolving>
+        (
+            TResolving resolvingObj, 
+            object? resolutionKey = null, 
+            bool ifCompositionNotNull = false)
             where TResolving : TToResolve
         {
-            MapSingletonObjImpl(typeof(TToResolve), resolvingObj!, resolutionKey);
+            MapSingletonObjImpl(typeof(TToResolve), resolvingObj!, resolutionKey, ifCompositionNotNull);
         }
 
-        public void MapSingleton<TToResolve, TResolving>(object? resolutionKey = null)
+        public void MapSingleton<TToResolve, TResolving>
+        (
+            object? resolutionKey = null, 
+            bool ifCompositionNotNull = false)
             where TResolving : TToResolve
         {
-            MapSingletonTypeImpl(typeof(TToResolve), typeof(TResolving), resolutionKey);
+            MapSingletonTypeImpl(typeof(TToResolve), typeof(TResolving), resolutionKey, ifCompositionNotNull);
         }
 
         public void MapFactory<TResolving>(Type typeToResolve, Func<TResolving> resolvingFactory, object? resolutionKey = null)
@@ -628,7 +655,7 @@ namespace NP.IoCy
         private object Resolve(TypeToResolveKey typeToResolveKey)
         {
             bool isComposed;
-            object resolvingObj =
+            (object resolvingObj, bool ifCompositionNotNull) =
                 ResolveCurrentObj
                 (
                     typeToResolveKey,
@@ -636,7 +663,7 @@ namespace NP.IoCy
 
             if (!isComposed)
             {
-                ComposeObject(resolvingObj);
+                ComposeObject(resolvingObj, ifCompositionNotNull);
             }
 
             return resolvingObj;
@@ -708,7 +735,7 @@ namespace NP.IoCy
                 {
                     foreach(object obj in singletonCell.GetAllObjs())
                     {
-                        ComposeObject(obj);
+                        ComposeObject(obj, singletonCell.IfCompositionNotNull);
                     }
                 }
             }
