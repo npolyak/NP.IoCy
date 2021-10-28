@@ -10,6 +10,8 @@
   </PropertyGroup>
   <ItemGroup>
       <None Remove="LICENSE" />
+      <None Remove="*.nupkg" />
+      <None Remove="*.nuspec" />
       <None Remove="README.md" />
   </ItemGroup>
   <ItemGroup>
