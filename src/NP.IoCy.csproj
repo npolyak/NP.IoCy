@@ -2,7 +2,6 @@
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
     <PackageId>NP.IoCy</PackageId>
-    <Version>1.0.4</Version>
     <Authors>Nick Polyak</Authors>
     <Company>AWebPros</Company>
     <Nullable>enable</Nullable>
