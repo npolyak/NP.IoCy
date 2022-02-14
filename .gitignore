@@ -70,3 +70,6 @@
 /TESTS/PluginsTest/obj
 /TESTS/PluginsTest/Plugin1/obj
 /TESTS/PluginsTest/Plugin2/obj
+/src/.vs/NP.IoCy.IoCContainerAndTests
+/src/Solution/.vs/NP.IoCy.IoCContainerAndTests
+/TESTS/BootstrappingTest/.vs/BootstrappingTest
