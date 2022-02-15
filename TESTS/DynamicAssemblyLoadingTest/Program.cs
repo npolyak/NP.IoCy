@@ -15,6 +15,8 @@ using DynamicAssemblyLoadingTest.Interfaces;
 using System;
 using System.IO;
 
+using ILog = DynamicAssemblyLoadingTest.Interfaces.ILog;
+
 namespace DynamicAssemblyLoadingTest
 {
     class Program

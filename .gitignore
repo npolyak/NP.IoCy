@@ -76,3 +76,6 @@
 /TESTS/BootstrappingSingletonTest/.vs
 /TESTS/BootstrappingSingletonTest/bin/Debug/net5.0
 /TESTS/BootstrappingSingletonTest/obj
+/TESTS/AssemblyLoadingTest/.vs/AssemblyLoadingTest/v16
+/TESTS/AssemblyLoadingTest/.vs/AssemblyLoadingTest/DesignTimeBuild
+/TESTS/DynamicAssemblyLoadingTest/.vs/DynamicAssemblyLoadingTest

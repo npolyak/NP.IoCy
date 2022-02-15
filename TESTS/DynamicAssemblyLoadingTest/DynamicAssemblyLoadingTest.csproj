@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <Version>0.90.00</Version>
     <Authors>Nick Polyak</Authors>
@@ -11,18 +11,12 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Implementations\bin\**" />
-    <Compile Remove="Implementations\obj\**" />
-    <Compile Remove="Interfaces\bin\**" />
-    <Compile Remove="Interfaces\obj\**" />
-    <EmbeddedResource Remove="Implementations\bin\**" />
-    <EmbeddedResource Remove="Implementations\obj\**" />
-    <EmbeddedResource Remove="Interfaces\bin\**" />
-    <EmbeddedResource Remove="Interfaces\obj\**" />
-    <None Remove="Implementations\bin\**" />
-    <None Remove="Implementations\obj\**" />
-    <None Remove="Interfaces\bin\**" />
-    <None Remove="Interfaces\obj\**" />
+    <Compile Remove="Implementations\**" />
+    <Compile Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Implementations\**" />
+    <EmbeddedResource Remove="Interfaces\**" />
+    <None Remove="Implementations\**" />
+    <None Remove="Interfaces\**" />
   </ItemGroup>
   <ItemGroup>
     <None Remove="MyLogFile.txt" />
@@ -30,5 +24,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\NP.IoCy.csproj" />
     <ProjectReference Include="..\..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
+    <ProjectReference Include="Interfaces\Interfaces.csproj" />
   </ItemGroup>
 </Project>

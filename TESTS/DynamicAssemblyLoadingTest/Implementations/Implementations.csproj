@@ -6,6 +6,7 @@
     <Authors>Nick Polyak</Authors>
     <Company>AWebPros</Company>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <AssemblyName>DynamicAssemblyLoadingTest.Implementations</AssemblyName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
     <DefineConstants>DEBUG;TRACE</DefineConstants>
@@ -14,4 +15,7 @@
     <ProjectReference Include="..\..\..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
     <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
   </ItemGroup>
+	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
+		<Exec Command="xcopy &quot;$(OutDir)DynamicAssemblyLoadingTest.$(ProjectName).dll&quot; &quot;$(SolutionDir)\bin\$(Configuration)\net5.0\Plugins\&quot; /R /Y /I" />
+	</Target>
 </Project>
