@@ -73,3 +73,6 @@
 /src/.vs/NP.IoCy.IoCContainerAndTests
 /src/Solution/.vs/NP.IoCy.IoCContainerAndTests
 /TESTS/BootstrappingTest/.vs/BootstrappingTest
+/TESTS/BootstrappingSingletonTest/.vs
+/TESTS/BootstrappingSingletonTest/bin/Debug/net5.0
+/TESTS/BootstrappingSingletonTest/obj

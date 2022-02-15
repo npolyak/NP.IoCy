@@ -24,6 +24,8 @@ namespace NP.IoCy
 {
     interface IResolvingCellBase<T>
     {
+        object CellContainerId { get; }
+
         bool IfCompositionNotNull { get; set; }
         T? GetObj(IoCContainer container, out bool isComposed);
     }
@@ -37,6 +39,8 @@ namespace NP.IoCy
     {
         Type _type;
 
+        public object CellContainerId { get; }
+
         public bool IfCompositionNotNull { get; set; } = false;
 
         public object GetObj(IoCContainer container, out bool isComposed)
@@ -45,9 +49,10 @@ namespace NP.IoCy
             return container.ConstructObject(_type);
         }
 
-        public ResolvingTypeCell(Type type)
+        public ResolvingTypeCell(Type type, object cellContainerId)
         {
             _type = type;
+            CellContainerId = cellContainerId;
         }
 
         public override string ToString()
@@ -57,12 +62,14 @@ namespace NP.IoCy
 
         public IResolvingCell Copy()
         {
-            return new ResolvingTypeCell(_type);
+            return new ResolvingTypeCell(_type, CellContainerId);
         }
     }
 
     class ResolvingSingletonCellBase<T> : IResolvingCellBase<T>
     {
+        public object CellContainerId { get; }
+
         protected T? _obj;
 
         public bool IfCompositionNotNull { get; set; } = false;
@@ -74,6 +81,11 @@ namespace NP.IoCy
             isComposed = true;
             return _obj;
         }
+
+        public ResolvingSingletonCellBase(object cellContainerId)
+        {
+            CellContainerId = cellContainerId;
+        }
     }
 
     interface IResolvingSingletonCell : IResolvingCell
@@ -83,14 +95,14 @@ namespace NP.IoCy
 
     class ResolvingSingletonCell : ResolvingSingletonCellBase<object>, IResolvingSingletonCell
     {
-        public ResolvingSingletonCell(object? obj)
+        public ResolvingSingletonCell(object? obj, object cellContainerId) : base(cellContainerId)
         {
             _obj = obj;
         }
 
         public IResolvingCell Copy()
         {
-            return new ResolvingSingletonCell(_obj);
+            return new ResolvingSingletonCell(_obj, CellContainerId);
         }
 
         public IList GetAllObjs()
@@ -108,7 +120,7 @@ namespace NP.IoCy
     class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<IList>, IResolvingSingletonCell
     {
         Type _itemType;
-        public ResolvingSingletonMultiCell(Type itemType)
+        public ResolvingSingletonMultiCell(Type itemType, object cellContainerId) : base(cellContainerId)
         {
             _itemType = itemType;
             _obj = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(_itemType))!;
@@ -136,7 +148,7 @@ namespace NP.IoCy
 
         public IResolvingCell Copy()
         {
-            ResolvingSingletonMultiCell result = new ResolvingSingletonMultiCell(_itemType);
+            ResolvingSingletonMultiCell result = new ResolvingSingletonMultiCell(_itemType, CellContainerId);
 
             foreach (object item in _obj!)
             {
@@ -149,6 +161,8 @@ namespace NP.IoCy
 
     class ResolvingFactoryMethodCell<T> : IResolvingCell
     {
+        public object CellContainerId { get; }
+
         public bool IfCompositionNotNull { get; set; } = false;
 
         public Func<T> _factoryMethod;
@@ -159,9 +173,11 @@ namespace NP.IoCy
             return _factoryMethod.Invoke();
         }
 
-        public ResolvingFactoryMethodCell(Func<T> factoryMethod)
+        public ResolvingFactoryMethodCell(Func<T> factoryMethod, object cellContainerId)
         {
             _factoryMethod = factoryMethod;
+
+            CellContainerId = cellContainerId;
         }
 
         public override string ToString()
@@ -171,7 +187,7 @@ namespace NP.IoCy
 
         public IResolvingCell Copy()
         {
-            return new ResolvingFactoryMethodCell<T>(_factoryMethod);
+            return new ResolvingFactoryMethodCell<T>(_factoryMethod, CellContainerId);
         }
     }
 
@@ -237,6 +253,8 @@ namespace NP.IoCy
 
     public class IoCContainer : IObjectComposer
     {
+        public static int CurrentContainerId { get; private set; }
+
         static IoCContainer()
         {
             //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
@@ -246,6 +264,8 @@ namespace NP.IoCy
         {
             return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.FullName == args.Name)!;
         }
+
+        public object ContainerId { get; private set; }
 
         private IoCContainer? ParentContainer { get; set; }
 
@@ -263,11 +283,15 @@ namespace NP.IoCy
         public IoCContainer
         (
             bool isProtected = true, 
-            Func<Type, object> defaultResolver = null!
+            Func<Type, object> defaultResolver = null!,
+            object? containerId = null
         )
         {
             _isProtected = isProtected;
             DefaultResolver = defaultResolver;
+
+            CurrentContainerId++;
+            ContainerId = containerId ?? CurrentContainerId;
         }
 
         private IResolvingCell? GetResolvingCellCurrentContainer(TypeToResolveKey typeToResolveKey)
@@ -284,12 +308,6 @@ namespace NP.IoCy
         {
             IResolvingCell resolvingCell = GetResolvingCellCurrentContainer(typeToResolveKey)!;
 
-            if (resolvingCell == null)
-            {
-                // give a chance to resolve the cell via the parent container. s
-                resolvingCell = ParentContainer?.GetResolvingCell(typeToResolveKey)!;
-            }
-
             return resolvingCell;
         }
 
@@ -301,11 +319,19 @@ namespace NP.IoCy
             }
         }
 
+        private bool IsOwnContainerId(object containerId)
+        {
+            return containerId.ObjEquals(ContainerId);
+        }
+
         IResolvingCell AddCellUnprotected(TypeToResolveKey typeToResolveKey, IResolvingCell resolvingCell)
         {
             if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell? cell))
             {
-                throw new Exception($"key {typeToResolveKey.ToString()} is already mapped to '{cell.ToString()}' cell.");
+                if (IsOwnContainerId(cell.CellContainerId))
+                {
+                    throw new Exception($"key {typeToResolveKey.ToString()} is already mapped to '{cell.ToString()}' cell.");
+                }
             }
 
             _typeMap[typeToResolveKey] = resolvingCell;
@@ -346,7 +372,7 @@ namespace NP.IoCy
                     throw new Exception($"cannot add key '{typeToResolveKey.ToString()}'  multicell since configuration has already been completed.");
                 }
 
-                ResolvingSingletonMultiCell multiCell = new ResolvingSingletonMultiCell(typeToResolveKey.TypeToResolve);
+                ResolvingSingletonMultiCell multiCell = new ResolvingSingletonMultiCell(typeToResolveKey.TypeToResolve, ContainerId);
                 _typeMap.Add(typeToResolveKey, multiCell);
 
                 return multiCell;
@@ -399,7 +425,7 @@ namespace NP.IoCy
         public void MapType(Type typeToResolve, Type resolvingType, object? resolutionKey = null)
         {
             CheckTypeDerivation(typeToResolve, resolvingType);
-            AddCell(typeToResolve.ToKey(resolutionKey!), new ResolvingTypeCell(resolvingType));
+            AddCell(typeToResolve.ToKey(resolutionKey!), new ResolvingTypeCell(resolvingType, ContainerId));
         }
 
         void AddObjToMultiCellUnprotected(ResolvingSingletonMultiCell multiCell, object resolvingObj)
@@ -494,7 +520,7 @@ namespace NP.IoCy
             AddCell
             (
                 typeToResolve.ToKey(resolutionKey), 
-                new ResolvingSingletonCell(resolvingObj) { IfCompositionNotNull = ifCompositionNotNull });
+                new ResolvingSingletonCell(resolvingObj, ContainerId) { IfCompositionNotNull = ifCompositionNotNull });
         }
 
         private void MapSingletonTypeImpl
@@ -531,7 +557,10 @@ namespace NP.IoCy
         public void MapFactory<TResolving>(Type typeToResolve, Func<TResolving> resolvingFactory, object? resolutionKey = null)
         {
             CheckTypeDerivation(typeToResolve, typeof(TResolving));
-            AddCell(typeToResolve.ToKey(resolutionKey), new ResolvingFactoryMethodCell<TResolving>(resolvingFactory));
+            AddCell
+            (
+                typeToResolve.ToKey(resolutionKey), 
+                new ResolvingFactoryMethodCell<TResolving>(resolvingFactory, ContainerId));
         }
 
         public void MapFactory<TToResolve, TResolving>(Func<TResolving> resolvingFactory, object? resolutionKey = null)
@@ -816,6 +845,8 @@ namespace NP.IoCy
             IoCContainer container = new IoCContainer(isProtected);
 
             container.ParentContainer = this;
+
+            container.MergeIn(this);
 
             return container;
         }
