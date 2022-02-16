@@ -11,38 +11,22 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Interfaces\bin\**" />
-    <Compile Remove="Interfaces\obj\**" />
-    <Compile Remove="Plugin1\bin\**" />
-    <Compile Remove="Plugin1\obj\**" />
-    <Compile Remove="Plugin2\bin\**" />
-    <Compile Remove="Plugin2\obj\**" />
-    <EmbeddedResource Remove="Interfaces\bin\**" />
-    <EmbeddedResource Remove="Interfaces\obj\**" />
-    <EmbeddedResource Remove="Plugin1\bin\**" />
-    <EmbeddedResource Remove="Plugin1\obj\**" />
-    <EmbeddedResource Remove="Plugin2\bin\**" />
-    <EmbeddedResource Remove="Plugin2\obj\**" />
-    <None Remove="Interfaces\bin\**" />
-    <None Remove="Interfaces\obj\**" />
-    <None Remove="Plugin1\bin\**" />
-    <None Remove="Plugin1\obj\**" />
-    <None Remove="Plugin2\bin\**" />
-    <None Remove="Plugin2\obj\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Compile Remove="Interfaces\IPlugin.cs" />
-    <Compile Remove="Plugin1\PluginOne.cs" />
-    <Compile Remove="Plugin2\PluginTwo.cs" />
+    <Compile Remove="Interfaces\**" />
+    <Compile Remove="Plugin1\**" />
+    <Compile Remove="Plugin2\**" />
+    <Compile Remove="TESTS\**" />
+    <EmbeddedResource Remove="Interfaces\**" />
+    <EmbeddedResource Remove="Plugin1\**" />
+    <EmbeddedResource Remove="Plugin2\**" />
+    <EmbeddedResource Remove="TESTS\**" />
+    <None Remove="Interfaces\**" />
+    <None Remove="Plugin1\**" />
+    <None Remove="Plugin2\**" />
+    <None Remove="TESTS\**" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\NP.IoCy.csproj" />
     <ProjectReference Include="..\..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
     <ProjectReference Include="Interfaces\Interfaces.csproj" />
-  </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Interfaces\" />
-    <Folder Include="Plugin1\" />
-    <Folder Include="Plugin2\" />
   </ItemGroup>
 </Project>
