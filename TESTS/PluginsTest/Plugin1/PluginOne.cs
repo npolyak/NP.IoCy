@@ -15,7 +15,7 @@ using System;
 
 namespace PluginsTest.Plugin1
 {
-    [MultiImplements]
+    [MultiImplements(typeof(IPlugin))]
     public class PluginOne : IPlugin
     {
         public void PrintMessage()
