@@ -61,14 +61,16 @@ namespace BootstrappingTest
             // replace mapping to ILog to ConsoleLog in the child container. 
             IoCContainer childContainer = container.CreateChild();
 
+            ConsoleLog consoleLog = new ConsoleLog();
             // change the mapping of ILog to ConsoleLog (instead of FileLog)
-            childContainer.Map<ILog, ConsoleLog>();
+            childContainer.MapSingleton<ILog, ConsoleLog>(consoleLog);
 
             // complete child container configuration
             childContainer.CompleteConfiguration();
 
             // resolve org from the childContainer.
             IOrg orgWithConsoleLog = childContainer.Resolve<IOrg>();
+            orgWithConsoleLog = childContainer.Resolve<IOrg>();
 
 
             #region Set Child Org Data

@@ -16,6 +16,11 @@ namespace BootstrappingTest.Implementations
 {
     public class ConsoleLog : ILog
     {
+        public ConsoleLog()
+        {
+
+        }
+
         public void WriteLog(string info)
         {
             Console.WriteLine(info);

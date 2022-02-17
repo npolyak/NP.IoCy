@@ -22,8 +22,17 @@ using NP.Utilities.BasicInterfaces;
 
 namespace NP.IoCy
 {
+    enum ResolvingCellType
+    {
+        Common,
+        Singleton,
+        Multi
+    }
+
     interface IResolvingCellBase<T>
     {
+        ResolvingCellType CellType { get; }
+
         object CellContainerId { get; }
 
         bool IfCompositionNotNull { get; set; }
@@ -38,6 +47,8 @@ namespace NP.IoCy
     class ResolvingTypeCell : IResolvingCell
     {
         Type _type;
+
+        public ResolvingCellType CellType => ResolvingCellType.Common;
 
         public object CellContainerId { get; }
 
@@ -66,8 +77,10 @@ namespace NP.IoCy
         }
     }
 
-    class ResolvingSingletonCellBase<T> : IResolvingCellBase<T>
+    abstract class ResolvingSingletonCellBase<T> : IResolvingCellBase<T>
     {
+        public abstract ResolvingCellType CellType { get; }
+
         public object CellContainerId { get; }
 
         protected T? _obj;
@@ -95,6 +108,8 @@ namespace NP.IoCy
 
     class ResolvingSingletonCell : ResolvingSingletonCellBase<object>, IResolvingSingletonCell
     {
+        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
+
         public ResolvingSingletonCell(object? obj, object cellContainerId) : base(cellContainerId)
         {
             _obj = obj;
@@ -119,6 +134,8 @@ namespace NP.IoCy
 
     class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<IList>, IResolvingSingletonCell
     {
+        public override ResolvingCellType CellType => ResolvingCellType.Multi;
+
         Type _itemType;
         public ResolvingSingletonMultiCell(Type itemType, object cellContainerId) : base(cellContainerId)
         {
@@ -161,6 +178,8 @@ namespace NP.IoCy
 
     class ResolvingFactoryMethodCell<T> : IResolvingCell
     {
+        public ResolvingCellType CellType => ResolvingCellType.Common;
+
         public object CellContainerId { get; }
 
         public bool IfCompositionNotNull { get; set; } = false;
@@ -331,6 +350,10 @@ namespace NP.IoCy
                 if (IsOwnContainerId(cell.CellContainerId))
                 {
                     throw new Exception($"key {typeToResolveKey.ToString()} is already mapped to '{cell.ToString()}' cell.");
+                }
+                else
+                {
+
                 }
             }
 

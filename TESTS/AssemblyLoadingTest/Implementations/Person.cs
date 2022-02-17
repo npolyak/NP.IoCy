@@ -14,7 +14,7 @@ using AssemblyLoadingTest.Interfaces;
 
 namespace AssemblyLoadingTest.Implementations
 {
-    [Implements]
+    [Implements(typeof(IPerson))]
     public class Person : IPerson
     {
         public string PersonName { get; set; }
