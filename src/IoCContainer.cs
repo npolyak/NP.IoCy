@@ -613,6 +613,8 @@ namespace NP.IoCy
                 }
             }
 
+            Type realPropOrParamType = partAttr.PartType ?? propOrParamType;
+
             if (!partAttr.IsMulti)
             {
                 return propOrParamType.ToKey(partAttr.PartKey);
@@ -874,41 +876,46 @@ namespace NP.IoCy
             return container;
         }
 
-        public void InjectAssembly(Assembly assembly)
+        public void InjectType(Type resolvingType)
         {
-            foreach(Type resolvingType in assembly.GetTypes())
+            ImplementsAttribute implementsAttribute =
+                   resolvingType.GetCustomAttribute<ImplementsAttribute>()!;
+
+            if (implementsAttribute == null)
+                return;
+
+            if (implementsAttribute.TypeToResolve == null)
             {
-                ImplementsAttribute implementsAttribute =
-                    resolvingType.GetCustomAttribute<ImplementsAttribute>()!;
+                implementsAttribute.TypeToResolve =
+                    resolvingType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {resolvingType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
+            }
 
-                if (implementsAttribute == null)
-                    continue;
+            Type typeToResolve = implementsAttribute.TypeToResolve;
+            object partKeyObj = implementsAttribute.PartKey;
+            bool isSingleton = implementsAttribute.IsSingleton;
 
-                if (implementsAttribute.TypeToResolve == null)
+            if (!implementsAttribute.IsMulti)
+            {
+                if (isSingleton)
                 {
-                    implementsAttribute.TypeToResolve =
-                        resolvingType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {resolvingType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
-                }
-
-                Type typeToResolve = implementsAttribute.TypeToResolve;
-                object partKeyObj = implementsAttribute.PartKey;
-                bool isSingleton = implementsAttribute.IsSingleton;
-
-                if (!implementsAttribute.IsMulti)
-                {
-                    if (isSingleton)
-                    {
-                        this.MapSingletonObjImpl(typeToResolve, resolvingType, partKeyObj);
-                    }
-                    else
-                    {
-                        this.MapType(typeToResolve, resolvingType, partKeyObj);
-                    }
+                    this.MapSingletonTypeImpl(typeToResolve, resolvingType, partKeyObj);
                 }
                 else
                 {
-                    this.MapMultiType(typeToResolve, resolvingType, partKeyObj);
+                    this.MapType(typeToResolve, resolvingType, partKeyObj);
                 }
+            }
+            else
+            {
+                this.MapMultiType(typeToResolve, resolvingType, partKeyObj);
+            }
+        }
+
+        public void InjectAssembly(Assembly assembly)
+        {
+            foreach(Type resolvingType in assembly.GetExportedTypes())
+            {
+               InjectType(resolvingType);
             }
         }
 
