@@ -959,6 +959,9 @@ namespace NP.IoCy
             }
         }
 
+        // loads and injects assemblies that match the rejex 
+        // from all direct sub-folders of folder specified
+        // by baseFolderPath argument.
         public void InjectPluginsFromSubFolders
         (
             string baseFolderPath, 
