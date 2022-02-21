@@ -958,5 +958,20 @@ namespace NP.IoCy
                 }
             }
         }
+
+        public void InjectPluginsFromSubFolders
+        (
+            string baseFolderPath, 
+            Regex? matchingFileName = null)
+        {
+            foreach(string folderPath in Directory.GetDirectories(baseFolderPath))
+            {
+                if (folderPath == "." || folderPath.StartsWith("..")) 
+                {
+                    continue;
+                }
+                InjectPluginsFromFolder(folderPath, matchingFileName);
+            }
+        }
     }
 }
