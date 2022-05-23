@@ -22,249 +22,11 @@ using NP.Utilities.BasicInterfaces;
 
 namespace NP.IoCy
 {
-    enum ResolvingCellType
-    {
-        Common,
-        Singleton,
-        Multi
-    }
-
-    interface IResolvingCellBase<T>
-    {
-        ResolvingCellType CellType { get; }
-
-        object CellContainerId { get; }
-
-        bool IfCompositionNotNull { get; set; }
-        T? GetObj(IoCContainer container, out bool isComposed);
-    }
-
-    interface IResolvingCell : IResolvingCellBase<object>
-    {
-        IResolvingCell Copy();
-    }
-
-    class ResolvingTypeCell : IResolvingCell
-    {
-        Type _type;
-
-        public ResolvingCellType CellType => ResolvingCellType.Common;
-
-        public object CellContainerId { get; }
-
-        public bool IfCompositionNotNull { get; set; } = false;
-
-        public object GetObj(IoCContainer container, out bool isComposed)
-        {
-            isComposed = false;
-            return container.ConstructObject(_type);
-        }
-
-        public ResolvingTypeCell(Type type, object cellContainerId)
-        {
-            _type = type;
-            CellContainerId = cellContainerId;
-        }
-
-        public override string ToString()
-        {
-            return $"Type:{_type.Name}";
-        }
-
-        public IResolvingCell Copy()
-        {
-            return new ResolvingTypeCell(_type, CellContainerId);
-        }
-    }
-
-    abstract class ResolvingSingletonCellBase<T> : IResolvingCellBase<T>
-    {
-        public abstract ResolvingCellType CellType { get; }
-
-        public object CellContainerId { get; }
-
-        protected T? _obj;
-
-        public bool IfCompositionNotNull { get; set; } = false;
-
-        // the object is composed on the configuration completion stage,
-        // so, isComposed is set to true. 
-        public T? GetObj(IoCContainer container, out bool isComposed)
-        {
-            isComposed = true;
-            return _obj;
-        }
-
-        public ResolvingSingletonCellBase(object cellContainerId)
-        {
-            CellContainerId = cellContainerId;
-        }
-    }
-
-    interface IResolvingSingletonCell : IResolvingCell
-    {
-        IList GetAllObjs();
-    }
-
-    class ResolvingSingletonCell : ResolvingSingletonCellBase<object>, IResolvingSingletonCell
-    {
-        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
-
-        public ResolvingSingletonCell(object? obj, object cellContainerId) : base(cellContainerId)
-        {
-            _obj = obj;
-        }
-
-        public IResolvingCell Copy()
-        {
-            return new ResolvingSingletonCell(_obj, CellContainerId);
-        }
-
-        public IList GetAllObjs()
-        {
-            return new[] { _obj };
-        }
-
-        public override string ToString()
-        {
-            return $"object:{_obj?.ToString()}";
-        }
-    }
-
-
-    class ResolvingSingletonMultiCell : ResolvingSingletonCellBase<IList>, IResolvingSingletonCell
-    {
-        public override ResolvingCellType CellType => ResolvingCellType.Multi;
-
-        Type _itemType;
-        public ResolvingSingletonMultiCell(Type itemType, object cellContainerId) : base(cellContainerId)
-        {
-            _itemType = itemType;
-            _obj = (IList)Activator.CreateInstance(typeof(List<>).MakeGenericType(_itemType))!;
-        }
-
-        public override string ToString()
-        {
-            return $"objects:{string.Join(",", _obj)}";
-        }
-
-        public void Add(object item)
-        {
-            _obj!.Add(item);
-        }
-
-        object IResolvingCellBase<object>.GetObj(IoCContainer container, out bool isComposed)
-        {
-            return GetObj(container, out isComposed)!;
-        }
-
-        public IList GetAllObjs()
-        {
-            return _obj!;
-        }
-
-        public IResolvingCell Copy()
-        {
-            ResolvingSingletonMultiCell result = new ResolvingSingletonMultiCell(_itemType, CellContainerId);
-
-            foreach (object item in _obj!)
-            {
-                result.Add(item);
-            }
-
-            return result;
-        }
-    }
-
-    class ResolvingFactoryMethodCell<T> : IResolvingCell
-    {
-        public ResolvingCellType CellType => ResolvingCellType.Common;
-
-        public object CellContainerId { get; }
-
-        public bool IfCompositionNotNull { get; set; } = false;
-
-        public Func<T> _factoryMethod;
-
-        public object? GetObj(IoCContainer container, out bool isComposed)
-        {
-            isComposed = false;
-            return _factoryMethod.Invoke();
-        }
-
-        public ResolvingFactoryMethodCell(Func<T> factoryMethod, object cellContainerId)
-        {
-            _factoryMethod = factoryMethod;
-
-            CellContainerId = cellContainerId;
-        }
-
-        public override string ToString()
-        {
-            return "FactoryMethod";
-        }
-
-        public IResolvingCell Copy()
-        {
-            return new ResolvingFactoryMethodCell<T>(_factoryMethod, CellContainerId);
-        }
-    }
-
-
-    class TypeToResolveKey
-    {
-        public Type TypeToResolve { get; }
-
-        // allows resolution by object 
-        // without this, a single type would always be 
-        // resolved in a single way. 
-        public object? KeyObject { get; }
-
-        public bool IsMulti { get; }
-
-        public TypeToResolveKey(Type typeToResolve, object? keyObject, bool isMulti = false)
-        {
-            this.IsMulti = isMulti;
-            this.TypeToResolve = typeToResolve;
-            this.KeyObject = keyObject;
-        }
-
-        public override bool Equals(object? obj)
-        {
-            if (obj is TypeToResolveKey target)
-            {
-                return this.TypeToResolve.ObjEquals(target.TypeToResolve) &&
-                       this.KeyObject.ObjEquals(target.KeyObject);
-            }
-            else
-            {
-                return false;
-            }
-        }
-
-        public override int GetHashCode()
-        {
-            return this.TypeToResolve.GetHashCode() ^ this.KeyObject.GetHashCodeExtension();
-        }
-
-        public override string ToString()
-        {
-            string result = $"{TypeToResolve.Name}";
-
-            if (KeyObject != null)
-            {
-                result += $": {KeyObject.ToStr()}";
-            }
-
-            return result;
-        }
-    }
-
     static class TypeToResolveKeyUtils
     {
-        public static TypeToResolveKey ToKey(this Type typeToResolve, object? resolutionKey, bool isMulti = false)
+        public static ContainerItemResolvingKey ToKey(this Type typeToResolve, object? resolutionKey, bool isMulti = false)
         {
-            TypeToResolveKey typeToResolveKey = new TypeToResolveKey(typeToResolve, resolutionKey, isMulti);
+            ContainerItemResolvingKey typeToResolveKey = new ContainerItemResolvingKey(typeToResolve, resolutionKey, isMulti);
 
             return typeToResolveKey;
         }
@@ -288,8 +50,8 @@ namespace NP.IoCy
 
         private IoCContainer? ParentContainer { get; set; }
 
-        Dictionary<TypeToResolveKey, IResolvingCell> _typeMap =
-            new Dictionary<TypeToResolveKey, IResolvingCell>();
+        Dictionary<ContainerItemResolvingKey, IResolvingCell> _typeMap =
+            new Dictionary<ContainerItemResolvingKey, IResolvingCell>();
 
         public bool ConfigurationCompleted { get; private set; } = false;
 
@@ -313,7 +75,7 @@ namespace NP.IoCy
             ContainerId = containerId ?? CurrentContainerId;
         }
 
-        private IResolvingCell? GetResolvingCellCurrentContainer(TypeToResolveKey typeToResolveKey)
+        private IResolvingCell? GetResolvingCellCurrentContainer(ContainerItemResolvingKey typeToResolveKey)
         {
             if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell? resolvingCell))
             {
@@ -323,7 +85,7 @@ namespace NP.IoCy
             return null;
         }
 
-        private IResolvingCell GetResolvingCell(TypeToResolveKey typeToResolveKey)
+        private IResolvingCell GetResolvingCell(ContainerItemResolvingKey typeToResolveKey)
         {
             IResolvingCell resolvingCell = GetResolvingCellCurrentContainer(typeToResolveKey)!;
 
@@ -343,7 +105,7 @@ namespace NP.IoCy
             return containerId.ObjEquals(ContainerId);
         }
 
-        IResolvingCell AddCellUnprotected(TypeToResolveKey typeToResolveKey, IResolvingCell resolvingCell)
+        IResolvingCell AddCellUnprotected(ContainerItemResolvingKey typeToResolveKey, IResolvingCell resolvingCell)
         {
             if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell? cell))
             {
@@ -362,7 +124,7 @@ namespace NP.IoCy
             return resolvingCell;
         }
 
-        IResolvingCell AddCellProtected(TypeToResolveKey typeToResolveKey, IResolvingCell resolvingCell)
+        IResolvingCell AddCellProtected(ContainerItemResolvingKey typeToResolveKey, IResolvingCell resolvingCell)
         {
             if (ConfigurationCompleted)
             {
@@ -375,7 +137,7 @@ namespace NP.IoCy
             }
         }
 
-        ResolvingSingletonMultiCell AddOrGetMultiCellBase(TypeToResolveKey typeToResolveKey, bool isProtected)
+        ResolvingSingletonMultiCell AddOrGetMultiCellBase(ContainerItemResolvingKey typeToResolveKey, bool isProtected)
         {
             if (_typeMap.TryGetValue(typeToResolveKey, out IResolvingCell? cell))
             {
@@ -402,12 +164,12 @@ namespace NP.IoCy
             }
         }
 
-        ResolvingSingletonMultiCell AddOrGetMultiCellUnprotected(TypeToResolveKey typeToResolveKey)
+        ResolvingSingletonMultiCell AddOrGetMultiCellUnprotected(ContainerItemResolvingKey typeToResolveKey)
         {
             return AddOrGetMultiCellBase(typeToResolveKey, false);
         }
 
-        ResolvingSingletonMultiCell AddOrGetMultiCellProtected(TypeToResolveKey typeToResolveKey)
+        ResolvingSingletonMultiCell AddOrGetMultiCellProtected(ContainerItemResolvingKey typeToResolveKey)
         {
             lock (_typeMap)
             {
@@ -415,7 +177,7 @@ namespace NP.IoCy
             }
         }
 
-        private IResolvingCell AddCell(TypeToResolveKey typeToResolveKey, IResolvingCell resolvingCell)
+        private IResolvingCell AddCell(ContainerItemResolvingKey typeToResolveKey, IResolvingCell resolvingCell)
         {
             if (_isProtected)
             {
@@ -427,7 +189,7 @@ namespace NP.IoCy
             }
         }
 
-        private (object, bool) ResolveCurrentObj(TypeToResolveKey typeToResolveKey, out bool isComposed)
+        private (object, bool) ResolveCurrentObj(ContainerItemResolvingKey typeToResolveKey, out bool isComposed)
         {
             IResolvingCell resolvingCell = GetResolvingCell(typeToResolveKey);
 
@@ -466,7 +228,7 @@ namespace NP.IoCy
 
         public void MapMultiPartObj(Type typeToResolve, object resolvingObj, object? resolutionKey = null)
         {
-            TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+            ContainerItemResolvingKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
 
             if (_isProtected && ConfigurationCompleted)
             {
@@ -592,7 +354,7 @@ namespace NP.IoCy
             MapFactory(typeof(TToResolve), resolvingFactory, resolutionKey);
         }
 
-        private TypeToResolveKey? GetTypeToResolveKey
+        private ContainerItemResolvingKey? GetTypeToResolveKey
         (
             ICustomAttributeProvider propOrParam,
             Type propOrParamType,
@@ -613,29 +375,37 @@ namespace NP.IoCy
                 }
             }
 
-            Type realPropOrParamType = partAttr.PartType ?? propOrParamType;
+            if (propOrParamType != null && partAttr.TypeToResolve != null)
+            {
+                if (!propOrParamType.IsAssignableFrom(partAttr.TypeToResolve))
+                {
+                    throw new ProgrammingError($"Actual type of a part should be a super-type of the type to resolve");
+                }
+            }
+
+            Type? realPropOrParamType = partAttr.TypeToResolve ?? propOrParamType;
 
             if (!partAttr.IsMulti)
             {
-                return propOrParamType.ToKey(partAttr.PartKey);
+                return realPropOrParamType?.ToKey(partAttr.PartKey);
             }
             else
             {
-                return propOrParamType.GetGenericArguments().First().ToKey(partAttr.PartKey, true);
+                return realPropOrParamType?.GetGenericArguments().First().ToKey(partAttr.PartKey, true);
             }
         }
 
-        private TypeToResolveKey? GetTypeToResolveKey(PropertyInfo propInfo)
+        private ContainerItemResolvingKey? GetTypeToResolveKey(PropertyInfo propInfo)
         {
             return GetTypeToResolveKey(propInfo, propInfo.PropertyType);
         }
 
-        private TypeToResolveKey? GetTypeToResolveKey(ParameterInfo paramInfo)
+        private ContainerItemResolvingKey? GetTypeToResolveKey(ParameterInfo paramInfo)
         {
             return GetTypeToResolveKey(paramInfo, paramInfo.ParameterType, false);
         }
 
-        private object? ResolveKey(TypeToResolveKey key)
+        private object? ResolveKey(ContainerItemResolvingKey key)
         {
             if (!key.IsMulti)
             {
@@ -661,7 +431,7 @@ namespace NP.IoCy
                 if (propInfo.SetMethod == null)
                     continue;
 
-                TypeToResolveKey? propTypeToResolveKey = GetTypeToResolveKey(propInfo);
+                ContainerItemResolvingKey? propTypeToResolveKey = GetTypeToResolveKey(propInfo);
 
                 if (propTypeToResolveKey == null)
                 {
@@ -681,7 +451,7 @@ namespace NP.IoCy
         {
             foreach(var paramInfo in constructorInfo.GetParameters())
             {
-                TypeToResolveKey? propTypeToResolveKey = GetTypeToResolveKey(paramInfo);
+                ContainerItemResolvingKey? propTypeToResolveKey = GetTypeToResolveKey(paramInfo);
 
                 if (propTypeToResolveKey == null)
                 {
@@ -706,7 +476,7 @@ namespace NP.IoCy
             return Activator.CreateInstance(type, GetConstructorParamValues(constructorInfo).ToArray())!;
         }
 
-        private object Resolve(TypeToResolveKey typeToResolveKey)
+        private object Resolve(ContainerItemResolvingKey typeToResolveKey)
         {
             bool isComposed;
             (object resolvingObj, bool ifCompositionNotNull) =
@@ -723,7 +493,7 @@ namespace NP.IoCy
             return resolvingObj;
         }
 
-        private object ResolveImpl(TypeToResolveKey typeToResolveKey)
+        private object ResolveImpl(ContainerItemResolvingKey typeToResolveKey)
         {
             if (_isProtected && (!ConfigurationCompleted))
             {
@@ -737,7 +507,7 @@ namespace NP.IoCy
 
         public object Resolve(Type typeToResolve, object? resolutionKey = null)
         {
-            TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+            ContainerItemResolvingKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
 
             return ResolveImpl(typeToResolveKey);
         }
@@ -754,7 +524,7 @@ namespace NP.IoCy
             return (TToResolve) ResolveImpl<TToResolve>(resolutionKey);
         }
 
-        private IEnumerable? MultiResolve(TypeToResolveKey typeToResolveKey)
+        private IEnumerable? MultiResolve(ContainerItemResolvingKey typeToResolveKey)
         {
             IEnumerable? result = ResolveImpl(typeToResolveKey) as IEnumerable;
 
@@ -837,7 +607,7 @@ namespace NP.IoCy
 
         public void Remove(Type typeToResolve, object resolutionKey)
         {
-            TypeToResolveKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+            ContainerItemResolvingKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
 
             string errorMessage =
                 $"IoCy Programming Error: cannot remove key '{typeToResolveKey.ToString()}' since configuration has already been completed.";
@@ -847,9 +617,9 @@ namespace NP.IoCy
 
         private void MergeInImpl(IoCContainer anotherIoCContainer)
         {
-            foreach (KeyValuePair<TypeToResolveKey, IResolvingCell> kvp in anotherIoCContainer._typeMap)
+            foreach (KeyValuePair<ContainerItemResolvingKey, IResolvingCell> kvp in anotherIoCContainer._typeMap)
             {
-                TypeToResolveKey typeToResolveKey = kvp.Key;
+                ContainerItemResolvingKey typeToResolveKey = kvp.Key;
 
                 IResolvingCell valCopy = kvp.Value.Copy();
 
