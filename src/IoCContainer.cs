@@ -371,7 +371,7 @@ namespace NP.IoCy
                 }
                 else
                 {
-                    partAttr = new PartAttribute();
+                    partAttr = new PartAttribute(propOrParamType);
                 }
             }
 
