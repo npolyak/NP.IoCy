@@ -2,36 +2,45 @@
 
 namespace NP.IoCy
 {
-    class ResolvingTypeCell : IResolvingCell
+    internal class ResolvingSingletonTypeCell : ResolvingCell
     {
-        Type _type;
+        Type _resolvingType;
 
-        public ResolvingCellType CellType => ResolvingCellType.Common;
+        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
 
-        public object CellContainerId { get; }
+        private object? _obj;
 
-        public bool IfCompositionNotNull { get; set; } = false;
-
-        public object GetObj(IoCContainer container, out bool isComposed)
+        public override object? GetObj(IoCContainer objectComposer)
         {
-            isComposed = false;
-            return container.ConstructObject(_type);
+            if (_obj == null)
+            {
+                // create object
+                _obj = objectComposer.CreateAndComposeObjFromType(_resolvingType);
+            }
+
+            return _obj;
         }
 
-        public ResolvingTypeCell(Type type, object cellContainerId)
+        public ResolvingSingletonTypeCell(Type resolvingType)
         {
-            _type = type;
-            CellContainerId = cellContainerId;
+            _resolvingType = resolvingType;
+        }
+    }
+
+    internal class ResolvingTypeCell : ResolvingCell
+    {
+        Type _resolvingType;
+
+        public override ResolvingCellType CellType => ResolvingCellType.Common;
+
+        public override object? GetObj(IoCContainer objectComposer)
+        {
+            return objectComposer.CreateAndComposeObjFromType(_resolvingType);
         }
 
-        public override string ToString()
+        public ResolvingTypeCell(Type resolvingType)
         {
-            return $"Type:{_type.Name}";
-        }
-
-        public IResolvingCell Copy()
-        {
-            return new ResolvingTypeCell(_type, CellContainerId);
+            _resolvingType = resolvingType;
         }
     }
 }

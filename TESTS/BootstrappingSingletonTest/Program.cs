@@ -29,7 +29,7 @@ namespace BootstrappingSingletonTest
             container.MapSingleton<IPerson, Person>();
             container.MapSingleton<IAddress, Address>();
             container.MapSingleton<IOrg, Org>();
-            container.MapSingleton<ILog, FileLog>();
+            container.MapSingleton<ILog, ConsoleLog>();
             #endregion BOOTSTRAPPING
 
             // after CompleteConfiguration
@@ -57,31 +57,6 @@ namespace BootstrappingSingletonTest
             // and write department store info in it;
             org.LogOrgInfo();
 
-
-            // replace mapping to ILog to ConsoleLog in the child container. 
-            IoCContainer childContainer = container.CreateChild();
-
-            // change the mapping of ILog to ConsoleLog (instead of FileLog)
-            childContainer.MapSingleton<ILog, ConsoleLog>(new ConsoleLog());
-
-            // complete child container configuration
-            childContainer.CompleteConfiguration();
-
-            // resolve org from the childContainer.
-            IOrg orgWithConsoleLog = childContainer.Resolve<IOrg>();
-
-
-            #region Set Child Org Data
-
-            orgWithConsoleLog.OrgName = "Nicks Department Store";
-            orgWithConsoleLog.Manager.PersonName = "Nick Polyak";
-            orgWithConsoleLog.Manager.Address.City = "Miami";
-            orgWithConsoleLog.Manager.Address.ZipCode = "33162";
-
-            #endregion Set Child Org Data
-
-            // send org data to console instead of a file.
-            orgWithConsoleLog.LogOrgInfo();
 
             Console.ReadKey();
         }

@@ -21,8 +21,13 @@ namespace BootstrappingSingletonTest.Implementations
         [Part]
         public IPerson Manager { get; set; }
 
-        [Part]
-        public ILog Log { get; set; }
+        public ILog Log { get; }
+
+        [CompositeConstructor]
+        public Org([Part] ILog log)
+        {
+            Log = log;
+        }
 
         public void LogOrgInfo()
         {

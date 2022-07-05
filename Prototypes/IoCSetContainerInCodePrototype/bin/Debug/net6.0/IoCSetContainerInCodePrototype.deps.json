@@ -1,0 +1,50 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "IoCSetContainerInCodePrototype/1.0.0": {
+        "dependencies": {
+          "NP.IoCy": "1.0.0",
+          "NP.Utilities": "1.0.0"
+        },
+        "runtime": {
+          "IoCSetContainerInCodePrototype.dll": {}
+        }
+      },
+      "NP.IoCy/1.0.0": {
+        "dependencies": {
+          "NP.Utilities": "1.0.0"
+        },
+        "runtime": {
+          "NP.IoCy.dll": {}
+        }
+      },
+      "NP.Utilities/1.0.0": {
+        "runtime": {
+          "NP.Utilities.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "IoCSetContainerInCodePrototype/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NP.IoCy/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NP.Utilities/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}

@@ -17,7 +17,7 @@ namespace BootstrappingSingletonTest.Interfaces
 
         IPerson Manager { get; set; }
 
-        ILog Log { get; set; }
+        ILog Log { get; }
 
         void LogOrgInfo();
     }

@@ -1,7 +1,17 @@
-﻿namespace NP.IoCy
+﻿using NP.Utilities.BasicInterfaces;
+
+namespace NP.IoCy
 {
-    interface IResolvingCell : IResolvingCellBase<object>
+    enum ResolvingCellType
     {
-        IResolvingCell Copy();
+        Common,
+        Singleton
+    }
+
+    internal interface IResolvingCell 
+    {
+        ResolvingCellType CellType { get; }
+
+        object? GetObj(IoCContainer objectComposer);
     }
 }

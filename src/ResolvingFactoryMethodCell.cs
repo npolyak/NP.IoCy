@@ -2,37 +2,41 @@
 
 namespace NP.IoCy
 {
-    class ResolvingFactoryMethodCell<T> : IResolvingCell
+    internal class ResolvingFactoryMethodSingletonCell<T> : ResolvingCell
     {
-        public ResolvingCellType CellType => ResolvingCellType.Common;
+        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
 
-        public object CellContainerId { get; }
+        private object _obj;
 
-        public bool IfCompositionNotNull { get; set; } = false;
+        Func<T> _func;
 
-        public Func<T> _factoryMethod;
-
-        public object? GetObj(IoCContainer container, out bool isComposed)
+        public override object? GetObj(IoCContainer objectComposer)
         {
-            isComposed = false;
-            return _factoryMethod.Invoke();
+            return _obj;
         }
 
-        public ResolvingFactoryMethodCell(Func<T> factoryMethod, object cellContainerId)
+        public ResolvingFactoryMethodSingletonCell(Func<T> func)
         {
-            _factoryMethod = factoryMethod;
+            _func = func;
 
-            CellContainerId = cellContainerId;
+            _obj = _func()!;
+        }
+    }
+
+    internal class ResolvingFactoryMethodCell<T> : ResolvingCell
+    {
+        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
+
+        Func<T> _func;
+
+        public override object? GetObj(IoCContainer objectComposer)
+        {
+            return _func();
         }
 
-        public override string ToString()
+        public ResolvingFactoryMethodCell(Func<T> func)
         {
-            return "FactoryMethod";
-        }
-
-        public IResolvingCell Copy()
-        {
-            return new ResolvingFactoryMethodCell<T>(_factoryMethod, CellContainerId);
+            _func = func;
         }
     }
 }

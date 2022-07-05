@@ -12,11 +12,9 @@ namespace NP.IoCy
         // resolved in a single way. 
         public object? KeyObject { get; }
 
-        public bool IsMulti { get; }
 
-        public ContainerItemResolvingKey(Type typeToResolve, object? keyObject, bool isMulti = false)
+        public ContainerItemResolvingKey(Type typeToResolve, object? keyObject)
         {
-            this.IsMulti = isMulti;
             this.TypeToResolve = typeToResolve;
             this.KeyObject = keyObject;
         }
