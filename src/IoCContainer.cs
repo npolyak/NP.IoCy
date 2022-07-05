@@ -186,6 +186,40 @@ namespace NP.IoCy
         }
 
 
+        public void MapSingletonFactoryMethodInfo<TToResolve>
+        (
+            MethodInfo factoryMethodInfo, 
+            object? resolutionKey = null)
+        {
+            Type typeToResolve = typeof(TToResolve);
+            Type resolvingType = factoryMethodInfo.ReturnType;
+
+            CheckTypeDerivation(typeToResolve, resolvingType);
+
+            AddCell
+            (
+                typeToResolve.ToKey(resolutionKey),
+                new ResolvingMethodInfoSingletonCell(factoryMethodInfo));
+        }
+
+
+        public void MapFactoryMethodInfo<TToResolve>
+        (
+            MethodInfo factoryMethodInfo,
+            object? resolutionKey = null)
+        {
+            Type typeToResolve = typeof(TToResolve);
+            Type resolvingType = factoryMethodInfo.ReturnType;
+
+            CheckTypeDerivation(typeToResolve, resolvingType);
+
+            AddCell
+            (
+                typeToResolve.ToKey(resolutionKey),
+                new ResolvingMethodInfoCell(factoryMethodInfo));
+        }
+
+
         private ContainerItemResolvingKey? GetTypeToResolveKey
         (
             ICustomAttributeProvider propOrParam,
@@ -265,7 +299,7 @@ namespace NP.IoCy
             }
         }
 
-        internal IEnumerable<object?> GetConstructorParamValues(ConstructorInfo constructorInfo)
+        internal IEnumerable<object?> GetMethodParamValues(MethodBase constructorInfo)
         {
             foreach(var paramInfo in constructorInfo.GetParameters())
             {
@@ -291,7 +325,7 @@ namespace NP.IoCy
                 return Activator.CreateInstance(type)!;
             }
 
-            return Activator.CreateInstance(type, GetConstructorParamValues(constructorInfo).ToArray())!;
+            return Activator.CreateInstance(type, GetMethodParamValues(constructorInfo).ToArray())!;
         }
 
         private object Resolve(ContainerItemResolvingKey typeToResolveKey)

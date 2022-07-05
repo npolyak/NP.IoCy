@@ -18,6 +18,11 @@ namespace BootstrappingSingletonTest
 {
     class Program
     {
+        public static IOrg CreateOrg(ILog log)
+        {
+            return new Org(log);
+        }
+
         static void Main(string[] args)
         {
             // create container
@@ -28,8 +33,10 @@ namespace BootstrappingSingletonTest
             // (map the types)
             container.MapSingleton<IPerson, Person>();
             container.MapSingleton<IAddress, Address>();
-            container.MapSingleton<IOrg, Org>();
+            //container.MapSingleton<IOrg, Org>();
             container.MapSingleton<ILog, ConsoleLog>();
+
+            container.MapSingletonFactoryMethodInfo<IOrg>(typeof(Program).GetMethod(nameof(CreateOrg)));
             #endregion BOOTSTRAPPING
 
             // after CompleteConfiguration

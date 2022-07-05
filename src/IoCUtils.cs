@@ -15,6 +15,17 @@ namespace NP.IoCy
             return typeToResolveKey;
         }
 
+        public static object CreateAndComposeObjFromMethod(this IoCContainer objectComposer, MethodInfo factoryMethodInfo)
+        {
+            object[] args = objectComposer.GetMethodParamValues(factoryMethodInfo).ToArray()!;
+
+            object obj = factoryMethodInfo.Invoke(null, args)!;
+
+            objectComposer.ComposeObject(obj);
+
+            return obj;
+        }
+
         public static object CreateAndComposeObjFromType(this IoCContainer objectComposer, Type resolvingType)
         {
             object? obj;
@@ -32,7 +43,7 @@ namespace NP.IoCy
                     Activator.CreateInstance
                     (
                         resolvingType,
-                        objectComposer.GetConstructorParamValues(constructorInfo).ToArray())!;
+                        objectComposer.GetMethodParamValues(constructorInfo).ToArray())!;
             }
 
             objectComposer.ComposeObject(obj);

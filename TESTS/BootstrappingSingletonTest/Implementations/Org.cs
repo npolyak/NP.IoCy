@@ -24,7 +24,7 @@ namespace BootstrappingSingletonTest.Implementations
         public ILog Log { get; }
 
         [CompositeConstructor]
-        public Org([Part] ILog log)
+        public Org(ILog log)
         {
             Log = log;
         }
