@@ -186,12 +186,12 @@ namespace NP.IoCy
         }
 
 
-        public void MapSingletonFactoryMethodInfo<TToResolve>
+        public void MapSingletonFactoryMethodInfo
         (
+            Type typeToResolve,
             MethodInfo factoryMethodInfo, 
             object? resolutionKey = null)
         {
-            Type typeToResolve = typeof(TToResolve);
             Type resolvingType = factoryMethodInfo.ReturnType;
 
             CheckTypeDerivation(typeToResolve, resolvingType);
@@ -202,13 +202,22 @@ namespace NP.IoCy
                 new ResolvingMethodInfoSingletonCell(factoryMethodInfo));
         }
 
-
-        public void MapFactoryMethodInfo<TToResolve>
+        public void MapSingletonFactoryMethodInfo<TToResolve>
         (
             MethodInfo factoryMethodInfo,
             object? resolutionKey = null)
         {
-            Type typeToResolve = typeof(TToResolve);
+            MapSingletonFactoryMethodInfo(typeof(TToResolve), factoryMethodInfo, resolutionKey);
+        }
+
+
+
+        public void MapFactoryMethodInfo
+        (
+            Type typeToResolve,
+            MethodInfo factoryMethodInfo,
+            object? resolutionKey = null)
+        {
             Type resolvingType = factoryMethodInfo.ReturnType;
 
             CheckTypeDerivation(typeToResolve, resolvingType);
@@ -219,6 +228,13 @@ namespace NP.IoCy
                 new ResolvingMethodInfoCell(factoryMethodInfo));
         }
 
+        public void MapFactoryMethodInfo<TToResolve>
+        (
+            MethodInfo factoryMethodInfo,
+            object? resolutionKey = null)
+        {
+            MapFactoryMethodInfo(typeof(TToResolve), factoryMethodInfo, resolutionKey);
+        }
 
         private ContainerItemResolvingKey? GetTypeToResolveKey
         (
@@ -443,26 +459,55 @@ namespace NP.IoCy
             ImplementsAttribute implementsAttribute =
                    resolvingType.GetCustomAttribute<ImplementsAttribute>()!;
 
-            if (implementsAttribute == null)
-                return;
-
-            if (implementsAttribute.TypeToResolve == null)
+            if (implementsAttribute != null)
             {
-                implementsAttribute.TypeToResolve =
-                    resolvingType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {resolvingType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
-            }
+                if (implementsAttribute.TypeToResolve == null)
+                {
+                    implementsAttribute.TypeToResolve =
+                        resolvingType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {resolvingType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
+                }
 
-            Type typeToResolve = implementsAttribute.TypeToResolve;
-            object partKeyObj = implementsAttribute.PartKey;
-            bool isSingleton = implementsAttribute.IsSingleton;
+                Type typeToResolve = implementsAttribute.TypeToResolve;
+                object partKeyObj = implementsAttribute.PartKey;
+                bool isSingleton = implementsAttribute.IsSingleton;
 
-            if (isSingleton)
-            {
-                this.MapSingletonType(typeToResolve, resolvingType, partKeyObj);
+                if (isSingleton)
+                {
+                    this.MapSingletonType(typeToResolve, resolvingType, partKeyObj);
+                }
+                else
+                {
+                    this.MapType(typeToResolve, resolvingType, partKeyObj);
+                }
             }
             else
             {
-                this.MapType(typeToResolve, resolvingType, partKeyObj);
+                HasFactoryMethodsAttribute? hasFactoryMethodAttribute = 
+                    resolvingType.GetCustomAttribute<HasFactoryMethodsAttribute>();
+
+                if (hasFactoryMethodAttribute != null)
+                {
+                    foreach(var methodInfo in resolvingType.GetMethods().Where(methodInfo => methodInfo.IsStatic))
+                    {
+                        FactoryMethodAttribute factoryMethodAttribute = methodInfo.GetAttr<FactoryMethodAttribute>();
+
+                        if (factoryMethodAttribute != null)
+                        {
+                            Type typeToResolve = factoryMethodAttribute.TypeToResolve ?? methodInfo.ReturnType;
+                            object partKeyObj = factoryMethodAttribute.PartKey;
+                            bool isSingleton = factoryMethodAttribute.IsSingleton;
+
+                            if (isSingleton)
+                            {
+                                this.MapSingletonFactoryMethodInfo(typeToResolve, methodInfo, partKeyObj);
+                            }
+                            else
+                            {
+                                this.MapFactoryMethodInfo(typeToResolve, methodInfo, partKeyObj);
+                            }
+                        }    
+                    }
+                }
             }
         }
 

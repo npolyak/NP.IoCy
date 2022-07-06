@@ -15,7 +15,6 @@ using System.IO;
 
 namespace DynamicAssemblyLoadingTest.Implementations
 {
-    [Implements]
     public class FileLog : ILog
     {
         const string FileName = "MyLogFile.txt";

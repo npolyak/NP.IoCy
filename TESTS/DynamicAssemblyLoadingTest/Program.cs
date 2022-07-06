@@ -60,32 +60,7 @@ namespace DynamicAssemblyLoadingTest
             org.LogOrgInfo();
 
 
-            // replace mapping to ILog to ConsoleLog in the child container. 
-            IoCContainer childContainer = container.CreateChild();
-
-            childContainer.Map<ILog, ConsoleLog>();
-            childContainer.CompleteConfiguration();
-
-            // for an uprotected child container, we do not need to call
-            // CompleteConfiguration
-
-            // resolve org from the childContainer.
-            IOrg orgWithConsoleLog = childContainer.Resolve<IOrg>();
-
-
-            #region Set Child Org Data
-
-            orgWithConsoleLog.OrgName = "Nicks Department Store";
-            orgWithConsoleLog.Manager.PersonName = "Nick Polyak";
-            orgWithConsoleLog.Manager.Address.City = "Miami";
-            orgWithConsoleLog.Manager.Address.ZipCode = "33162";
-
-            #endregion Set Child Org Data
-
-            // send org data to console instead of a file.
-            orgWithConsoleLog.LogOrgInfo();
-
-            Console.ReadKey();
+            //Console.ReadKey();
         }
     }
 }
