@@ -7,8 +7,8 @@ namespace Implementations
     [HasFactoryMethods]
     public static class ObjFactory
     {
-        [FactoryMethod(isSingleton:true)]
-        public static IOrg CreateOrg([Part] ILog log)
+        [FactoryMethod(isSingleton:true, partKey:"TheOrg")]
+        public static IOrg CreateOrg([Part(partKey: "TheConsoleLog")] ILog log)
         {
             return new Org(log);
         }

@@ -89,3 +89,4 @@
 /TESTS/MultyPartBootstrappingTest/.vs/MultyPartBootstrappingTest/project-colors.json
 /Prototypes/IoCSetContainerInCodePrototype/.vs
 /Prototypes/IoCSetContainerInCodePrototype/obj
+*.nupkg

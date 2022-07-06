@@ -22,7 +22,7 @@ namespace DynamicAssemblyLoadingTest.Implementations
         [Part]
         public IPerson Manager { get; set; }
 
-        //[Part]
+        [Part(partKey: "TheConsoleLog")]
         public ILog Log { get; private set; }
 
         public void LogOrgInfo()
@@ -32,9 +32,10 @@ namespace DynamicAssemblyLoadingTest.Implementations
             Log.WriteLog($"Manager's Address: {Manager.Address.City}, {Manager.Address.ZipCode}");
         }
 
-        public Org(ILog log)
+        //[CompositeConstructor]
+        public Org(/*[Part(partKey: "TheConsoleLog")]*/ILog log)
         {
-            Log = log;  
+            Log = log;
         }
     }
 }

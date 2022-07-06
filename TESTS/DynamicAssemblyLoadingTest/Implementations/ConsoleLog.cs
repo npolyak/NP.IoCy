@@ -4,7 +4,7 @@ using System;
 
 namespace OrganizationTest.Implementations
 {
-    [Implements]
+    [Implements(partKey:"TheConsoleLog")]
     public class ConsoleLog : ILog
     {
         public void WriteLog(string info)

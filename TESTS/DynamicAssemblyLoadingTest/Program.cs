@@ -43,7 +43,7 @@ namespace DynamicAssemblyLoadingTest
             // resolve and compose organization
             // all its 'Parts' will be added at
             // this stage. 
-            IOrg org = container.Resolve<IOrg>();
+            IOrg org = container.Resolve<IOrg>("TheOrg");
 
 
             #region Set Org Data
