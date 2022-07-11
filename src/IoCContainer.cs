@@ -93,7 +93,7 @@ namespace NP.IoCy
         {
             IResolvingCell resolvingCell = GetResolvingCell(typeToResolveKey);
 
-            return resolvingCell.GetObj(this)!;
+            return resolvingCell?.GetObj(this)!;
         }
 
         private object ResolveCurrentObj(Type typeToResolve, object? resolutionKey = null)
