@@ -90,3 +90,16 @@
 /Prototypes/IoCSetContainerInCodePrototype/.vs
 /Prototypes/IoCSetContainerInCodePrototype/obj
 *.nupkg
+/TESTS/DynamicAssemblyLoadingTest/.vs/ProjectEvaluation/dynamicassemblyloadingtest.projects.v5.2
+/TESTS/DynamicAssemblyLoadingTest/.vs/ProjectEvaluation/dynamicassemblyloadingtest.metadata.v5.2
+/TESTS/DynamicAssemblyLoadingTest/.vs/ProjectEvaluation
+/TESTS/BootstrappingTest/.vs/ProjectEvaluation/bootstrappingtest.projects.v5.2
+/TESTS/BootstrappingTest/.vs/ProjectEvaluation/bootstrappingtest.metadata.v5.2
+/TESTS/BootstrappingTest/.vs/ProjectEvaluation
+/TESTS/AssemblyLoadingTest/.vs/ProjectEvaluation/assemblyloadingtest.projects.v5.2
+/TESTS/AssemblyLoadingTest/.vs/ProjectEvaluation/assemblyloadingtest.metadata.v5.2
+/TESTS/AssemblyLoadingTest/.vs/ProjectEvaluation
+/src/Solution/.vs/ProjectEvaluation
+/TESTS/PluginsTest/.vs/Plugins/FileContentIndex
+/TESTS/PluginsTest/.vs/Plugins/v17
+/TESTS/PluginsTest/.vs/ProjectEvaluation
