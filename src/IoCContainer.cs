@@ -28,12 +28,16 @@ namespace NP.IoCy
 
         static IoCContainer()
         {
-            //AppDomain.CurrentDomain.ReflectionOnlyAssemblyResolve += CurrentDomain_ReflectionOnlyAssemblyResolve;
         }
 
-        private static Assembly CurrentDomain_ReflectionOnlyAssemblyResolve(object sender, ResolveEventArgs args)
+        private static Assembly ResolveReferencedAssembly(object sender, ResolveEventArgs args)
         {
-            return AppDomain.CurrentDomain.GetAssemblies().FirstOrDefault(assembly => assembly.FullName == args.Name)!;
+            AssemblyName? name =
+                args.RequestingAssembly
+                    ?.GetReferencedAssemblies()
+                    .FirstOrDefault(a => a.FullName == args.Name);
+
+            return name?.FindOrLoadAssembly()!;
         }
 
         private IoCContainer? ParentContainer { get; set; }
@@ -47,6 +51,11 @@ namespace NP.IoCy
 
         public IoCContainer ()
         {
+        }
+
+        protected virtual void SetAssemblyResolver()
+        {
+            AppDomain.CurrentDomain.AssemblyResolve += ResolveReferencedAssembly!;
         }
 
         private IResolvingCell? GetResolvingCellCurrentContainer(ContainerItemResolvingKey typeToResolveKey)
