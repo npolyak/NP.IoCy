@@ -18,7 +18,7 @@ namespace Implementations
     [HasFactoryMethods]
     public static class ObjFactory
     {
-        [FactoryMethod(isSingleton:false, partKey:"TheOrg")]
+        [FactoryMethod(partKey:"TheOrg")]
         public static IOrg CreateOrg([Part(partKey: "TheConsoleLog")] ILog log)
         {
             return new Org(log);
