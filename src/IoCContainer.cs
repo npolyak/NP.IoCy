@@ -40,8 +40,6 @@ namespace NP.IoCy
             return name?.FindOrLoadAssembly()!;
         }
 
-        private IoCContainer? ParentContainer { get; set; }
-
         Dictionary<ContainerItemResolvingKey, IResolvingCell> _cellMap =
             new Dictionary<ContainerItemResolvingKey, IResolvingCell>();
 
@@ -51,6 +49,7 @@ namespace NP.IoCy
 
         public IoCContainer ()
         {
+            SetAssemblyResolver();
         }
 
         protected virtual void SetAssemblyResolver()
