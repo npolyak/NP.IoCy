@@ -16,6 +16,6 @@
     <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
   </ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
-		<Exec Command="xcopy &quot;$(OutDir)DynamicAssemblyLoadingTest.$(ProjectName).dll&quot; &quot;$(SolutionDir)\bin\$(Configuration)\net5.0\Plugins\&quot; /R /Y /I" />
+		<Exec Command="xcopy &quot;$(OutDir)DynamicAssemblyLoadingTest.$(ProjectName).dll&quot; &quot;$(SolutionDir)\bin\$(Configuration)\net6.0\Plugins\&quot; /R /Y /I" />
 	</Target>
 </Project>

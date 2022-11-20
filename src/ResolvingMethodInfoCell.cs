@@ -53,7 +53,7 @@ namespace NP.IoCy
 
     internal class ResolvingMethodInfoCell : ResolvingCell
     {
-        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
+        public override ResolvingCellType CellType => ResolvingCellType.Common;
 
         private MethodInfo _factoryMethodInfo;
 
