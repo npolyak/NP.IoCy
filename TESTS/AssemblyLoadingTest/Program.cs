@@ -20,15 +20,12 @@ namespace AssemblyLoadingTest
         static void Main(string[] args)
         {
             // create container
-            IoCContainer container = new IoCContainer();
+            ContainerBuilder containerBuilder = new ContainerBuilder();
 
-            container.InjectAssembly(typeof(AssemblyLoadingTest.Implementations.Org).Assembly);
+            containerBuilder.RegisterAssembly(typeof(AssemblyLoadingTest.Implementations.Org).Assembly);
 
-            // after CompleteConfiguration
-            // you cannot bootstrap any new types in the container.
-            // before CompleteConfiguration call
-            // you cannot resolve container types. 
-            container.CompleteConfiguration();
+            Container container = containerBuilder.Build();
+
 
             // resolve and compose organization
             // all its 'Parts' will be added at
@@ -50,17 +47,13 @@ namespace AssemblyLoadingTest
             org.LogOrgInfo();
 
 
-            // replace mapping to ILog to ConsoleLog in the child container. 
-            IoCContainer childContainer = container.CreateChild();
+            // replace mapping to ILog to ConsoleLog in the new container. 
 
-            childContainer.Map<ILog, ConsoleLog>();
-            childContainer.CompleteConfiguration();
+            containerBuilder.Register<ILog, ConsoleLog>();
+            var anotherContainer = containerBuilder.Build();
 
-            // for an uprotected child container, we do not need to call
-            // CompleteConfiguration
-
-            // resolve org from the childContainer.
-            IOrg orgWithConsoleLog = childContainer.Resolve<IOrg>();
+            // resolve org from the anotherContainer.
+            IOrg orgWithConsoleLog = anotherContainer.Resolve<IOrg>();
 
 
             #region Set Child Org Data

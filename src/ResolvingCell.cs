@@ -17,6 +17,6 @@ namespace NP.IoCy
     {
         public abstract ResolvingCellType CellType { get; }
 
-        public abstract object? GetObj(IoCContainer objectComposer);
+        public abstract object? GetObj(Container objectComposer);
     }
 }

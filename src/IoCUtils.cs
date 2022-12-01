@@ -10,7 +10,7 @@
 // products that use it.
 
 using NP.Utilities;
-using NP.Utilities.Attributes;
+using NP.IoC.Attributes;
 using System;
 using System.Linq;
 using System.Reflection;
@@ -26,7 +26,7 @@ namespace NP.IoCy
             return typeToResolveKey;
         }
 
-        public static object CreateAndComposeObjFromMethod(this IoCContainer objectComposer, MethodInfo factoryMethodInfo)
+        public static object CreateAndComposeObjFromMethod(this Container objectComposer, MethodInfo factoryMethodInfo)
         {
             object[] args = objectComposer.GetMethodParamValues(factoryMethodInfo).ToArray()!;
 
@@ -37,7 +37,7 @@ namespace NP.IoCy
             return obj;
         }
 
-        public static object CreateAndComposeObjFromType(this IoCContainer objectComposer, Type resolvingType)
+        public static object CreateAndComposeObjFromType(this Container objectComposer, Type resolvingType)
         {
             object? obj;
             ConstructorInfo constructorInfo =

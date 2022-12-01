@@ -22,7 +22,7 @@ namespace NP.IoCy
 
         Func<T> _func;
 
-        public override object? GetObj(IoCContainer objectComposer)
+        public override object? GetObj(Container objectComposer)
         {
             return _obj;
         }
@@ -41,7 +41,7 @@ namespace NP.IoCy
 
         Func<T> _func;
 
-        public override object? GetObj(IoCContainer objectComposer)
+        public override object? GetObj(Container objectComposer)
         {
             return _func();
         }

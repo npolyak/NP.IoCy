@@ -105,3 +105,4 @@
 /TESTS/PluginsTest/.vs/ProjectEvaluation
 /TESTS/DynamicAssemblyLoadingTest/Implementations/bin/Debug/net6.0/DynamicAssemblyLoadingTest.Implementations.deps.json
 /src/bin/Debug/net6.0/NP.IoCy.deps.json
+/TESTS/AssemblyLoadingTest/Interfaces/bin/Debug/net6.0

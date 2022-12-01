@@ -23,6 +23,6 @@ namespace NP.IoCy
     {
         ResolvingCellType CellType { get; }
 
-        object? GetObj(IoCContainer objectComposer);
+        object? GetObj(Container objectComposer);
     }
 }

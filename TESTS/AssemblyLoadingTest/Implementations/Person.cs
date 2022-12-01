@@ -9,17 +9,17 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.Utilities.Attributes;
+using NP.IoC.Attributes;
 using AssemblyLoadingTest.Interfaces;
 
 namespace AssemblyLoadingTest.Implementations
 {
-    [Implements(typeof(IPerson))]
+    [RegisterType(typeof(IPerson))]
     public class Person : IPerson
     {
         public string PersonName { get; set; }
 
-        [Part]
+        [Inject]
         public IAddress Address { get; set; }
     }
 }

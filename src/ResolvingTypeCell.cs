@@ -21,7 +21,7 @@ namespace NP.IoCy
 
         private object? _obj;
 
-        public override object? GetObj(IoCContainer objectComposer)
+        public override object? GetObj(Container objectComposer)
         {
             if (_obj == null)
             {
@@ -44,7 +44,7 @@ namespace NP.IoCy
 
         public override ResolvingCellType CellType => ResolvingCellType.Common;
 
-        public override object? GetObj(IoCContainer objectComposer)
+        public override object? GetObj(Container objectComposer)
         {
             return objectComposer.CreateAndComposeObjFromType(_resolvingType);
         }

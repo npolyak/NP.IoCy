@@ -21,7 +21,7 @@ namespace NP.IoCy
 
         private object _obj;
 
-        public override object? GetObj(IoCContainer objectComposer)
+        public override object? GetObj(Container objectComposer)
         {
             if (!_isComposed)
             {

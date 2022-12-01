@@ -9,13 +9,13 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.Utilities.Attributes;
+using NP.IoC.Attributes;
 using AssemblyLoadingTest.Interfaces;
 using System.IO;
 
 namespace AssemblyLoadingTest.Implementations
 {
-    [Implements]
+    [RegisterType]
     public class FileLog : ILog
     {
         const string FileName = "MyLogFile.txt";

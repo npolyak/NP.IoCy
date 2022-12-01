@@ -9,12 +9,12 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.Utilities.Attributes;
 using AssemblyLoadingTest.Interfaces;
+using NP.IoC.Attributes;
 
 namespace AssemblyLoadingTest.Implementations
 {
-    [Implements]
+    [RegisterType]
     public class Address : IAddress
     {
         public string City { get; set; }

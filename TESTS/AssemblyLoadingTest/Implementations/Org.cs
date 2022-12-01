@@ -9,20 +9,20 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.Utilities.Attributes;
+using NP.IoC.Attributes;
 using AssemblyLoadingTest.Interfaces;
 
 namespace AssemblyLoadingTest.Implementations
 {
-    [Implements(typeof(IOrg))]
+    [RegisterType(typeof(IOrg))]
     public class Org : IOrg
     {
         public string OrgName { get; set; }
 
-        [Part]
+        [Inject]
         public IPerson Manager { get; set; }
 
-        [Part]
+        [Inject]
         public ILog Log { get; set; }
 
         public void LogOrgInfo()

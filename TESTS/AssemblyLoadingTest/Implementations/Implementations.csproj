@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
-    <TargetFramework>net5.0</TargetFramework>
+    <TargetFramework>net6.0</TargetFramework>
     <Version>0.90.00</Version>
     <Authors>Nick Polyak</Authors>
     <Company>AWebPros</Company>
@@ -11,7 +11,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
+    <ProjectReference Include="..\..\..\SubModules\NP.IoC.Attributes\src\NP.IoC.Attributes.csproj" />
     <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
   </ItemGroup>
 </Project>
