@@ -63,8 +63,7 @@ namespace DynamicAssemblyLoadingTest
 
             #endregion Set Org Data
 
-            // Create file MyLogFile.txt in the same folder as the executable
-            // and write department store info in it;
+            //use the propper logger to print the org info (Console log in our case).
             org.LogOrgInfo();
 
 
