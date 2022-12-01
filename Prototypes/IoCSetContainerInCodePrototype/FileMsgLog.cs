@@ -1,5 +1,5 @@
-﻿using NP.Utilities;
-using NP.Utilities.Attributes;
+﻿using NP.IoC.Attributes;
+using NP.Utilities;
 
 namespace IoCSetContainerInCodePrototype
 {
@@ -9,7 +9,7 @@ namespace IoCSetContainerInCodePrototype
 
         private StreamWriter? _stream;
 
-        [Inject(TypeToResolveBy = typeof(string), ResolutionKey = "LogFileName")]
+        [Inject(ResolvingType = typeof(string), ResolutionKey = "LogFileName")]
         public string? FileName
         {
             get => _fileName;
