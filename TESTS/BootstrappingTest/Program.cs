@@ -20,29 +20,25 @@ namespace BootstrappingTest
     {
         static void Main(string[] args)
         {
-            // create container
-            IoCContainer container = new IoCContainer();
+            // create container builder
+            ContainerBuilder containerBuilder = new ContainerBuilder();
 
             #region BOOTSTRAPPING
             // bootstrap container 
             // (map the types)
-            container.Map<IPerson, Person>();
-            container.Map<IAddress, Address>();
-            container.Map<IOrg, Org>();
-            container.MapSingleton<ILog, FileLog>();
+            containerBuilder.Register<IPerson, Person>();
+            containerBuilder.Register<IAddress, Address>();
+            containerBuilder.Register<IOrg, Org>();
+            containerBuilder.RegisterSingletonType<ILog, FileLog>();
             #endregion BOOTSTRAPPING
 
-            // after CompleteConfiguration
-            // you cannot bootstrap any new types in the container.
-            // before CompleteConfiguration call
-            // you cannot resolve container types. 
-            container.CompleteConfiguration();
+            // Create container
+            Container container = containerBuilder.Build();
 
             // resolve and compose organization
             // all its 'Parts' will be added at
             // this stage. 
             IOrg org = container.Resolve<IOrg>();
-
 
             #region Set Org Data
 
@@ -57,21 +53,15 @@ namespace BootstrappingTest
             // and write department store info in it;
             org.LogOrgInfo();
 
-
-            // replace mapping to ILog to ConsoleLog in the child container. 
-            IoCContainer childContainer = container.CreateChild();
-
             ConsoleLog consoleLog = new ConsoleLog();
-            // change the mapping of ILog to ConsoleLog (instead of FileLog)
-            childContainer.MapSingleton<ILog, ConsoleLog>(consoleLog);
+            containerBuilder.RegisterSingleton<ILog>(consoleLog);
 
-            // complete child container configuration
-            childContainer.CompleteConfiguration();
 
-            // resolve org from the childContainer.
-            IOrg orgWithConsoleLog = childContainer.Resolve<IOrg>();
-            orgWithConsoleLog = childContainer.Resolve<IOrg>();
+            // replace registration of ILog to ConsoleLog (instead of FileLog) in another container. 
+            Container anotherContainer = containerBuilder.Build();
 
+            // resolve org from another Container.
+            IOrg orgWithConsoleLog = anotherContainer.Resolve<IOrg>();
 
             #region Set Child Org Data
 

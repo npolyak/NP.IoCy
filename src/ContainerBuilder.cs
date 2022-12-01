@@ -49,15 +49,15 @@ namespace NP.IoCy
 
         private void RegisterSingletonObj
         (
-            Type typeToResolve,
+            Type resolvingType,
             object resolvingObj,
             object? resolutionKey = null)
         {
-            CheckTypeDerivation(typeToResolve, resolvingObj.GetType());
+            CheckTypeDerivation(resolvingType, resolvingObj.GetType());
 
             AddCell
             (
-                typeToResolve.ToKey(resolutionKey),
+                resolvingType.ToKey(resolutionKey),
                 new ResolvingObjSingletonCell(resolvingObj));
         }
 
@@ -76,14 +76,12 @@ namespace NP.IoCy
                 new ResolvingSingletonTypeCell(resolvingObjType));
         }
 
-
-
-        public void RegisterSingleton<TToResolve>(object resolvingOjb, object? resolutionKey = null)
+        public void RegisterSingleton<TResolving>(object resolvingObj, object? resolutionKey = null)
         {
-            RegisterSingletonObj(typeof(TToResolve), resolvingOjb, resolutionKey);
+            RegisterSingletonObj(typeof(TResolving), resolvingObj, resolutionKey);
         }
 
-        public void RegisterSingleton<TToResolve, TResolving>(object? resolutionKey = null)
+        public void RegisterSingletonType<TToResolve, TResolving>(object? resolutionKey = null)
         {
             RegisterSingletonType(typeof(TToResolve), typeof(TResolving), resolutionKey);
         }
