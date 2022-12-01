@@ -26,24 +26,22 @@ namespace BootstrappingSingletonTest
         static void Main(string[] args)
         {
             // create container
-            IoCContainer container = new IoCContainer();
+            ContainerBuilder containerBuilder = new ContainerBuilder();
 
             #region BOOTSTRAPPING
-            // bootstrap container 
-            // (map the types)
-            container.MapSingleton<IPerson, Person>();
-            container.MapSingleton<IAddress, Address>();
-            //container.MapSingleton<IOrg, Org>();
-            container.MapSingleton<ILog, ConsoleLog>();
+            // bootstrap container builder
+            // (register the types)
+            containerBuilder.RegisterSingleton<IPerson, Person>();
+            containerBuilder.RegisterSingleton<IAddress, Address>();
+            //container.RegisterSingleton<IOrg, Org>();
+            containerBuilder.RegisterSingleton<ILog, ConsoleLog>();
 
-            container.MapSingletonFactoryMethodInfo<IOrg>(typeof(Program).GetMethod(nameof(CreateOrg)));
+            // use a factory method Program.CreateOrg to create IOrg object
+            containerBuilder.RegisterSingletonFactoryMethodInfo<IOrg>(typeof(Program).GetMethod(nameof(CreateOrg)));
             #endregion BOOTSTRAPPING
 
-            // after CompleteConfiguration
-            // you cannot bootstrap any new types in the container.
-            // before CompleteConfiguration call
-            // you cannot resolve container types. 
-            container.CompleteConfiguration();
+            // create container
+            Container container = containerBuilder.Build();
 
             // resolve and compose organization
             // all its 'Parts' will be added at
@@ -60,8 +58,8 @@ namespace BootstrappingSingletonTest
 
             #endregion Set Org Data
 
-            // Create file MyLogFile.txt in the same folder as the executable
-            // and write department store info in it;
+            // use the propper Logger to log the message (currently it is ConsoleLog so the message will be 
+            // printed to console.
             org.LogOrgInfo();
 
 

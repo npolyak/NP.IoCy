@@ -9,7 +9,7 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.Utilities.Attributes;
+using NP.IoC.Attributes;
 using BootstrappingSingletonTest.Interfaces;
 
 namespace BootstrappingSingletonTest.Implementations
@@ -18,7 +18,7 @@ namespace BootstrappingSingletonTest.Implementations
     {
         public string PersonName { get; set; }
 
-        [Part]
+        [Inject]
         public IAddress Address { get; set; }
     }
 }

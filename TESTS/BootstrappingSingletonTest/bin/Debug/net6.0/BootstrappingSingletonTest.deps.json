@@ -1,0 +1,60 @@
+{
+  "runtimeTarget": {
+    "name": ".NETCoreApp,Version=v6.0",
+    "signature": ""
+  },
+  "compilationOptions": {},
+  "targets": {
+    ".NETCoreApp,Version=v6.0": {
+      "BootstrappingSingletonTest/0.90.00": {
+        "dependencies": {
+          "NP.IoCy": "1.0.0"
+        },
+        "runtime": {
+          "BootstrappingSingletonTest.dll": {}
+        }
+      },
+      "NP.IoC.Attributes/1.0.0": {
+        "runtime": {
+          "NP.IoC.Attributes.dll": {}
+        }
+      },
+      "NP.IoCy/1.0.0": {
+        "dependencies": {
+          "NP.IoC.Attributes": "1.0.0",
+          "NP.Utilities": "1.0.0"
+        },
+        "runtime": {
+          "NP.IoCy.dll": {}
+        }
+      },
+      "NP.Utilities/1.0.0": {
+        "runtime": {
+          "NP.Utilities.dll": {}
+        }
+      }
+    }
+  },
+  "libraries": {
+    "BootstrappingSingletonTest/0.90.00": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NP.IoC.Attributes/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NP.IoCy/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    },
+    "NP.Utilities/1.0.0": {
+      "type": "project",
+      "serviceable": false,
+      "sha512": ""
+    }
+  }
+}
