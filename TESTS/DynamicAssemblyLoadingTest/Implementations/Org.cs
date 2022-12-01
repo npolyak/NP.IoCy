@@ -9,7 +9,7 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.Utilities.Attributes;
+using NP.IoC.Attributes;
 using DynamicAssemblyLoadingTest.Interfaces;
 
 namespace DynamicAssemblyLoadingTest.Implementations
@@ -19,10 +19,10 @@ namespace DynamicAssemblyLoadingTest.Implementations
     {
         public string OrgName { get; set; }
 
-        [Part]
+        [Inject]
         public IPerson Manager { get; set; }
 
-        [Part(partKey: "TheConsoleLog")]
+        [Inject(resolutionKey: "TheConsoleLog")]
         public ILog Log { get; private set; }
 
         public void LogOrgInfo()

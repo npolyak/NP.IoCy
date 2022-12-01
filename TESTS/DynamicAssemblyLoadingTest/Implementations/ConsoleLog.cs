@@ -10,12 +10,12 @@
 // products that use it.
 
 using DynamicAssemblyLoadingTest.Interfaces;
-using NP.Utilities.Attributes;
+using NP.IoC.Attributes;
 using System;
 
 namespace OrganizationTest.Implementations
 {
-    [Implements(partKey:"TheConsoleLog")]
+    [RegisterType(resolutionKey:"TheConsoleLog")]
     public class ConsoleLog : ILog
     {
         public void WriteLog(string info)

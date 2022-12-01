@@ -11,15 +11,15 @@
 
 using DynamicAssemblyLoadingTest.Implementations;
 using DynamicAssemblyLoadingTest.Interfaces;
-using NP.Utilities.Attributes;
+using NP.IoC.Attributes;
 
 namespace Implementations
 {
-    [HasFactoryMethods]
+    [HasRegisterMethods]
     public static class ObjFactory
     {
-        [FactoryMethod(partKey:"TheOrg")]
-        public static IOrg CreateOrg([Part(partKey: "TheConsoleLog")] ILog log)
+        [RegisterMethod(resolutionKey:"TheOrg")]
+        public static IOrg CreateOrg([Inject(resolutionKey: "TheConsoleLog")] ILog log)
         {
             return new Org(log);
         }

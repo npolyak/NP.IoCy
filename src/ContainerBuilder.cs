@@ -177,13 +177,13 @@ namespace NP.IoCy
 
             if (implementsAttribute != null)
             {
-                if (implementsAttribute.TypeToResolveBy == null)
+                if (implementsAttribute.ResolvingType == null)
                 {
-                    implementsAttribute.TypeToResolveBy =
+                    implementsAttribute.ResolvingType =
                         resolvingType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {resolvingType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
                 }
 
-                Type typeToResolve = implementsAttribute.TypeToResolveBy;
+                Type typeToResolve = implementsAttribute.ResolvingType;
                 object? resolutionKeyObj = implementsAttribute.ResolutionKey;
                 bool isSingleton = implementsAttribute.IsSingleton;
 
@@ -209,7 +209,7 @@ namespace NP.IoCy
 
                         if (factoryMethodAttribute != null)
                         {
-                            Type typeToResolve = factoryMethodAttribute.TypeToResolveBy ?? methodInfo.ReturnType;
+                            Type typeToResolve = factoryMethodAttribute.ResolvingType ?? methodInfo.ReturnType;
                             object? partKeyObj = factoryMethodAttribute.ResolutionKey;
                             bool isSingleton = factoryMethodAttribute.IsSingleton;
 

@@ -34,22 +34,19 @@ namespace DynamicAssemblyLoadingTest
     {
         static void Main(string[] args)
         {
-            // create container
-            IoCContainer container = new IoCContainer();
+            // create container builder
+            ContainerBuilder builder = new ContainerBuilder();
 
-            container
-                .InjectDynamicAssemblyByFullPath
+            builder
+                .RegisterDynamicAssemblyByFullPath
                 (
                     Path.Combine
                     (
                         ReflectionUtils.GetCurrentExecutablePath(), 
                         "Plugins\\DynamicAssemblyLoadingTest.Implementations.dll"));
 
-            // after CompleteConfiguration
-            // you cannot bootstrap any new types in the container.
-            // before CompleteConfiguration call
-            // you cannot resolve container types. 
-            container.CompleteConfiguration();
+            // create container
+            Container container = builder.Build ();
 
             // resolve and compose organization
             // all its 'Parts' will be added at
