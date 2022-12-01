@@ -9,7 +9,7 @@ namespace IoCSetContainerInCodePrototype
 
         private StreamWriter? _stream;
 
-        [Part(TypeToResolve = typeof(string), PartKey = "LogFileName")]
+        [Inject(TypeToResolveBy = typeof(string), ResolutionKey = "LogFileName")]
         public string? FileName
         {
             get => _fileName;

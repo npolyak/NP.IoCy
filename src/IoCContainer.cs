@@ -250,8 +250,8 @@ namespace NP.IoCy
             Type propOrParamType,
             bool returnNullIfNoPartAttr = true)
         {
-            PartAttribute partAttr =
-                propOrParam.GetAttr<PartAttribute>();
+            InjectAttribute partAttr =
+                propOrParam.GetAttr<InjectAttribute>();
 
             if (partAttr == null)
             {
@@ -261,21 +261,21 @@ namespace NP.IoCy
                 }
                 else
                 {
-                    partAttr = new PartAttribute(propOrParamType);
+                    partAttr = new InjectAttribute(propOrParamType);
                 }
             }
 
-            if (propOrParamType != null && partAttr.TypeToResolve != null)
+            if (propOrParamType != null && partAttr.TypeToResolveBy != null)
             {
-                if (!propOrParamType.IsAssignableFrom(partAttr.TypeToResolve))
+                if (!propOrParamType.IsAssignableFrom(partAttr.TypeToResolveBy))
                 {
                     throw new ProgrammingError($"Actual type of a part should be a super-type of the type to resolve");
                 }
             }
 
-            Type? realPropOrParamType = partAttr.TypeToResolve ?? propOrParamType;
+            Type? realPropOrParamType = partAttr.TypeToResolveBy ?? propOrParamType;
 
-            return realPropOrParamType?.ToKey(partAttr.PartKey);
+            return realPropOrParamType?.ToKey(partAttr.ResolutionKey);
         }
 
         private ContainerItemResolvingKey? GetTypeToResolveKey(PropertyInfo propInfo)
@@ -464,45 +464,45 @@ namespace NP.IoCy
 
         public void InjectType(Type resolvingType)
         {
-            ImplementsAttribute implementsAttribute =
-                   resolvingType.GetCustomAttribute<ImplementsAttribute>()!;
+            RegisterTypeAttribute implementsAttribute =
+                   resolvingType.GetCustomAttribute<RegisterTypeAttribute>()!;
 
             if (implementsAttribute != null)
             {
-                if (implementsAttribute.TypeToResolve == null)
+                if (implementsAttribute.TypeToResolveBy == null)
                 {
-                    implementsAttribute.TypeToResolve =
+                    implementsAttribute.TypeToResolveBy =
                         resolvingType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {resolvingType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
                 }
 
-                Type typeToResolve = implementsAttribute.TypeToResolve;
-                object partKeyObj = implementsAttribute.PartKey;
+                Type typeToResolve = implementsAttribute.TypeToResolveBy;
+                object? resolutionKeyObj = implementsAttribute.ResolutionKey;
                 bool isSingleton = implementsAttribute.IsSingleton;
 
                 if (isSingleton)
                 {
-                    this.MapSingletonType(typeToResolve, resolvingType, partKeyObj);
+                    this.MapSingletonType(typeToResolve, resolvingType, resolutionKeyObj);
                 }
                 else
                 {
-                    this.MapType(typeToResolve, resolvingType, partKeyObj);
+                    this.MapType(typeToResolve, resolvingType, resolutionKeyObj);
                 }
             }
             else
             {
-                HasFactoryMethodsAttribute? hasFactoryMethodAttribute = 
-                    resolvingType.GetCustomAttribute<HasFactoryMethodsAttribute>();
+                HasRegisterMethodsAttribute? hasFactoryMethodAttribute = 
+                    resolvingType.GetCustomAttribute<HasRegisterMethodsAttribute>();
 
                 if (hasFactoryMethodAttribute != null)
                 {
                     foreach(var methodInfo in resolvingType.GetMethods().Where(methodInfo => methodInfo.IsStatic))
                     {
-                        FactoryMethodAttribute factoryMethodAttribute = methodInfo.GetAttr<FactoryMethodAttribute>();
+                        RegisterMethodAttribute factoryMethodAttribute = methodInfo.GetAttr<RegisterMethodAttribute>();
 
                         if (factoryMethodAttribute != null)
                         {
-                            Type typeToResolve = factoryMethodAttribute.TypeToResolve ?? methodInfo.ReturnType;
-                            object partKeyObj = factoryMethodAttribute.PartKey;
+                            Type typeToResolve = factoryMethodAttribute.TypeToResolveBy ?? methodInfo.ReturnType;
+                            object? partKeyObj = factoryMethodAttribute.ResolutionKey;
                             bool isSingleton = factoryMethodAttribute.IsSingleton;
 
                             if (isSingleton)

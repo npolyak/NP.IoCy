@@ -16,7 +16,7 @@ namespace NP.IoCy
 {
     class ContainerItemResolvingKey
     {
-        public Type TypeToResolve { get; }
+        public Type TypeToResolveBy { get; }
 
         // allows resolution by object 
         // without this, a single type would always be 
@@ -26,7 +26,7 @@ namespace NP.IoCy
 
         public ContainerItemResolvingKey(Type typeToResolve, object? keyObject)
         {
-            this.TypeToResolve = typeToResolve;
+            this.TypeToResolveBy = typeToResolve;
             this.KeyObject = keyObject;
         }
 
@@ -34,7 +34,7 @@ namespace NP.IoCy
         {
             if (obj is ContainerItemResolvingKey target)
             {
-                return this.TypeToResolve.ObjEquals(target.TypeToResolve) &&
+                return this.TypeToResolveBy.ObjEquals(target.TypeToResolveBy) &&
                        this.KeyObject.ObjEquals(target.KeyObject);
             }
             else
@@ -45,12 +45,12 @@ namespace NP.IoCy
 
         public override int GetHashCode()
         {
-            return this.TypeToResolve.GetHashCode() ^ this.KeyObject.GetHashCodeExtension();
+            return this.TypeToResolveBy.GetHashCode() ^ this.KeyObject.GetHashCodeExtension();
         }
 
         public override string ToString()
         {
-            string result = $"{TypeToResolve.Name}";
+            string result = $"{TypeToResolveBy.Name}";
 
             if (KeyObject != null)
             {
