@@ -15,7 +15,7 @@ namespace NP.IoCy
 {
     internal class ResolvingSingletonTypeCell : ResolvingCell
     {
-        Type _resolvingType;
+        Type _typeToResolve;
 
         public override ResolvingCellType CellType => ResolvingCellType.Singleton;
 
@@ -26,32 +26,32 @@ namespace NP.IoCy
             if (_obj == null)
             {
                 // create object
-                _obj = objectComposer.CreateAndComposeObjFromType(_resolvingType);
+                _obj = objectComposer.CreateAndComposeObjFromType(_typeToResolve);
             }
 
             return _obj;
         }
 
-        public ResolvingSingletonTypeCell(Type resolvingType)
+        public ResolvingSingletonTypeCell(Type typeToResolve)
         {
-            _resolvingType = resolvingType;
+            _typeToResolve = typeToResolve;
         }
     }
 
     internal class ResolvingTypeCell : ResolvingCell
     {
-        Type _resolvingType;
+        Type _typeToResolve;
 
         public override ResolvingCellType CellType => ResolvingCellType.Common;
 
         public override object? GetObj(Container objectComposer)
         {
-            return objectComposer.CreateAndComposeObjFromType(_resolvingType);
+            return objectComposer.CreateAndComposeObjFromType(_typeToResolve);
         }
 
-        public ResolvingTypeCell(Type resolvingType)
+        public ResolvingTypeCell(Type typeToResolve)
         {
-            _resolvingType = resolvingType;
+            _typeToResolve = typeToResolve;
         }
     }
 }

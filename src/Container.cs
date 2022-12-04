@@ -9,17 +9,17 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 //
-using NP.IoC.Attributes;
+using NP.DependencyInjection.Attributes;
+using NP.DependencyInjection.Interfaces;
 using NP.Utilities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using NP.Utilities.BasicInterfaces;
 
 namespace NP.IoCy
 {
-    public class Container : IObjectComposer
+    public class Container : IDependencyInjectionContainer
     {
         Dictionary<ContainerItemResolvingKey, IResolvingCell> _cellMap =
             new Dictionary<ContainerItemResolvingKey, IResolvingCell>();
@@ -27,11 +27,13 @@ namespace NP.IoCy
         internal Container (Dictionary<ContainerItemResolvingKey, IResolvingCell> cellMap)
         {
             _cellMap.AddAll(cellMap);
+
+            ComposeAllSingletonObjects();
         }
 
-        private IResolvingCell? GetResolvingCellCurrentContainer(ContainerItemResolvingKey typeToResolveKey)
+        private IResolvingCell? GetResolvingCellCurrentContainer(ContainerItemResolvingKey resolvingKey)
         {
-            if (_cellMap.TryGetValue(typeToResolveKey, out IResolvingCell? resolvingCell))
+            if (_cellMap.TryGetValue(resolvingKey, out IResolvingCell? resolvingCell))
             {
                 return resolvingCell;
             }
@@ -39,16 +41,16 @@ namespace NP.IoCy
             return null;
         }
 
-        private IResolvingCell GetResolvingCell(ContainerItemResolvingKey typeToResolveKey)
+        private IResolvingCell GetResolvingCell(ContainerItemResolvingKey resolvingKey)
         {
-            IResolvingCell resolvingCell = GetResolvingCellCurrentContainer(typeToResolveKey)!;
+            IResolvingCell resolvingCell = GetResolvingCellCurrentContainer(resolvingKey)!;
 
             return resolvingCell;
         }
 
-        private object ResolveCurrentObj(ContainerItemResolvingKey typeToResolveKey)
+        private object ResolveCurrentObj(ContainerItemResolvingKey resolvingKey)
         {
-            IResolvingCell resolvingCell = GetResolvingCell(typeToResolveKey);
+            IResolvingCell resolvingCell = GetResolvingCell(resolvingKey);
 
             return resolvingCell?.GetObj(this)!;
         }
@@ -169,32 +171,32 @@ namespace NP.IoCy
             return Activator.CreateInstance(type, GetMethodParamValues(constructorInfo).ToArray())!;
         }
 
-        private object Resolve(ContainerItemResolvingKey typeToResolveKey)
+        private object Resolve(ContainerItemResolvingKey resolvingKey)
         {
-            object resolvingObj = ResolveCurrentObj(typeToResolveKey);
+            object resolvingObj = ResolveCurrentObj(resolvingKey);
 
             return resolvingObj;
         }
 
-        private object ResolveImpl(ContainerItemResolvingKey typeToResolveKey)
+        private object ResolveImpl(ContainerItemResolvingKey resolvingKey)
         {
-            object result = Resolve(typeToResolveKey);
+            object result = Resolve(resolvingKey);
 
             return result;
         }
 
-        public object Resolve(Type typeToResolve, object? resolutionKey = null)
+        public object Resolve(Type resolvingType, object? resolutionKey = null)
         {
-            ContainerItemResolvingKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+            ContainerItemResolvingKey resolvingTypeKey = resolvingType.ToKey(resolutionKey);
 
-            return ResolveImpl(typeToResolveKey);
+            return ResolveImpl(resolvingTypeKey);
         }
 
-        private object ResolveImpl<TToResolve>(object? resolutionKey)
+        private object ResolveImpl<TResolving>(object? resolutionKey)
         {
-            Type typeToResolve = typeof(TToResolve);
+            Type resolvingType = typeof(TResolving);
 
-            return Resolve(typeToResolve, resolutionKey);
+            return Resolve(resolvingType, resolutionKey);
         }
 
         public TToResolve Resolve<TToResolve>(object? resolutionKey = null)
@@ -214,7 +216,5 @@ namespace NP.IoCy
                 ComposeObject(resolvingCell.GetObj(this)!);
             }
         }
-
-
     }
 }

@@ -1,4 +1,5 @@
-﻿using NP.IoC.Attributes;
+﻿using NP.DependencyInjection.Attributes;
+using NP.DependencyInjection.Interfaces;
 using NP.Utilities;
 using System;
 using System.Collections.Generic;
@@ -9,16 +10,16 @@ using System.Text.RegularExpressions;
 
 namespace NP.IoCy
 {
-    public class ContainerBuilder
+    public class ContainerBuilder : IContainerBuilder
     {
         private Dictionary<ContainerItemResolvingKey, IResolvingCell> _cellMap =
             new Dictionary<ContainerItemResolvingKey, IResolvingCell>();
 
-        void CheckTypeDerivation(Type typeToResolve, Type resolvingType)
+        void CheckTypeDerivation(Type resolvingType, Type typeToResolve)
         {
-            if (!typeToResolve.IsAssignableFrom(resolvingType))
+            if (!resolvingType.IsAssignableFrom(typeToResolve))
             {
-                throw new Exception($"Resolving type '{resolvingType.FullName}' does not derive from type to resolve '{typeToResolve.FullName}'");
+                throw new Exception($"Type to resolve '{typeToResolve.FullName}' does not derive from the resolving type: '{resolvingType.FullName}'");
             }
         }
 
@@ -34,88 +35,85 @@ namespace NP.IoCy
         }
 
 
-        public void RegisterType(Type typeToResolve, Type resolvingType, object? resolutionKey = null)
+        public void RegisterType(Type resolvingType, Type typeToResolve, object? resolutionKey = null)
         {
-            CheckTypeDerivation(typeToResolve, resolvingType);
-            AddCell(typeToResolve.ToKey(resolutionKey!), new ResolvingTypeCell(resolvingType));
+            CheckTypeDerivation(resolvingType, typeToResolve);
+            AddCell(resolvingType.ToKey(resolutionKey!), new ResolvingTypeCell(typeToResolve));
         }
 
-        public void Register<TToResolve, TResolving>(object? resolutionKey = null)
-            where TResolving : TToResolve
+        public void RegisterType<TResolving, TToResolve>(object? resolutionKey = null)
+            where TToResolve : TResolving
         {
-            RegisterType(typeof(TToResolve), typeof(TResolving), resolutionKey);
+            RegisterType(typeof(TResolving), typeof(TToResolve), resolutionKey);
         }
 
 
-        private void RegisterSingletonObj
+        public void RegisterSingletonInstance
         (
             Type resolvingType,
-            object resolvingObj,
+            object instance, 
             object? resolutionKey = null)
         {
-            CheckTypeDerivation(resolvingType, resolvingObj.GetType());
+            CheckTypeDerivation(resolvingType, instance.GetType());
 
             AddCell
             (
                 resolvingType.ToKey(resolutionKey),
-                new ResolvingObjSingletonCell(resolvingObj));
+                new ResolvingObjSingletonCell(instance));
         }
 
         private void RegisterSingletonType
         (
+            Type resolvingType,
             Type typeToResolve,
-            Type resolvingObjType,
             object? resolutionKey = null)
         {
 
-            CheckTypeDerivation(typeToResolve, resolvingObjType);
+            CheckTypeDerivation(resolvingType, typeToResolve);
 
             AddCell
             (
-                typeToResolve.ToKey(resolutionKey),
-                new ResolvingSingletonTypeCell(resolvingObjType));
+                resolvingType.ToKey(resolutionKey),
+                new ResolvingSingletonTypeCell(typeToResolve));
         }
 
-        public void RegisterSingleton<TResolving>(object resolvingObj, object? resolutionKey = null)
+        public void RegisterSingletonInstance<TResolving>(object instance, object? resolutionKey = null)
         {
-            RegisterSingletonObj(typeof(TResolving), resolvingObj, resolutionKey);
+            RegisterSingletonInstance(typeof(TResolving), instance, resolutionKey);
         }
 
-        public void RegisterSingletonType<TToResolve, TResolving>(object? resolutionKey = null)
+        public void RegisterSingletonType<TResolving, TToResolve>(object? resolutionKey = null)
+            where TToResolve : TResolving
         {
-            RegisterSingletonType(typeof(TToResolve), typeof(TResolving), resolutionKey);
+            RegisterSingletonType(typeof(TResolving), typeof(TToResolve), resolutionKey);
         }
 
-        public void RegisterSingletonFactoryMethod<TToResolve, TResolving>
+        public void RegisterSingletonFactoryMethod<TResolving>
         (
             Func<TResolving> resolvingFunc,
-            object? resolutionKey = null)
+            object? resolutionKey = null
+        )
         {
-            Type typeToResolve = typeof(TToResolve);
             Type resolvingType = typeof(TResolving);
-
-            CheckTypeDerivation(typeToResolve, resolvingType);
 
             AddCell
             (
-                typeToResolve.ToKey(resolutionKey),
-                new ResolvingSingletonTypeCell(resolvingType));
+                resolvingType.ToKey(resolutionKey),
+                new ResolvingFactoryMethodSingletonCell<TResolving>(resolvingFunc));
         }
 
-        public void RegisterFactoryMethod<TToResolve, TResolving>
+        public void RegisterFactoryMethod<TResolving>
         (
             Func<TResolving> resolvingFunc,
-            object? resolutionKey = null)
+            object? resolutionKey = null
+        )
         {
-            Type typeToResolve = typeof(TToResolve);
             Type resolvingType = typeof(TResolving);
-
-            CheckTypeDerivation(typeToResolve, resolvingType);
 
             AddCell
             (
-                typeToResolve.ToKey(resolutionKey),
-                new ResolvingTypeCell(resolvingType));
+                resolvingType.ToKey(resolutionKey),
+                new ResolvingFactoryMethodCell<TResolving>(resolvingFunc));
         }
 
 
@@ -127,7 +125,7 @@ namespace NP.IoCy
         {
             Type resolvingType = factoryMethodInfo.ReturnType;
 
-            CheckTypeDerivation(typeToResolve, resolvingType);
+            CheckTypeDerivation(resolvingType, typeToResolve);
 
             AddCell
             (
@@ -153,11 +151,11 @@ namespace NP.IoCy
         {
             Type resolvingType = factoryMethodInfo.ReturnType;
 
-            CheckTypeDerivation(typeToResolve, resolvingType);
+            CheckTypeDerivation(resolvingType, typeToResolve);
 
             AddCell
             (
-                typeToResolve.ToKey(resolutionKey),
+                resolvingType.ToKey(resolutionKey),
                 new ResolvingMethodInfoCell(factoryMethodInfo));
         }
 
@@ -189,11 +187,11 @@ namespace NP.IoCy
 
                 if (isSingleton)
                 {
-                    this.RegisterSingletonType(typeToResolve, resolvingType, resolutionKeyObj);
+                    this.RegisterSingletonType(resolvingType, typeToResolve, resolutionKeyObj);
                 }
                 else
                 {
-                    this.RegisterType(typeToResolve, resolvingType, resolutionKeyObj);
+                    this.RegisterType(resolvingType, typeToResolve, resolutionKeyObj);
                 }
             }
             else
@@ -317,14 +315,14 @@ namespace NP.IoCy
             }
         }
 
-        public void Remove(Type typeToResolve, object resolutionKey)
+        public void UnRegister(Type resolvingType, object resolutionKey)
         {
-            ContainerItemResolvingKey typeToResolveKey = typeToResolve.ToKey(resolutionKey);
+            ContainerItemResolvingKey resolvingTypeKey = resolvingType.ToKey(resolutionKey);
 
             string errorMessage =
-                $"IoCy Programming Error: cannot remove key '{typeToResolveKey.ToString()}' since configuration has already been completed.";
+                $"IoCy Programming Error: cannot remove key '{resolvingTypeKey}' since configuration has already been completed.";
 
-            ModifyContainerBuilder(() => _cellMap.Remove(typeToResolveKey), errorMessage);
+            ModifyContainerBuilder(() => _cellMap.Remove(resolvingTypeKey), errorMessage);
         }
 
         public ContainerBuilder()
@@ -332,7 +330,7 @@ namespace NP.IoCy
             SetAssemblyResolver();
         }
 
-        public virtual Container Build()
+        public virtual IDependencyInjectionContainer Build()
         {
             return new Container(_cellMap);
         }

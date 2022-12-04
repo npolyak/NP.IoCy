@@ -10,7 +10,7 @@
 // products that use it.
 
 using NP.Utilities;
-using NP.IoC.Attributes;
+using NP.DependencyInjection.Attributes;
 using System;
 using System.Linq;
 using System.Reflection;

@@ -14,20 +14,20 @@ using System;
 
 namespace NP.IoCy
 {
-    internal class ResolvingFactoryMethodSingletonCell<T> : ResolvingCell
+    internal class ResolvingFactoryMethodSingletonCell<TResolving> : ResolvingCell
     {
         public override ResolvingCellType CellType => ResolvingCellType.Singleton;
 
         private object _obj;
 
-        Func<T> _func;
+        Func<TResolving> _func;
 
         public override object? GetObj(Container objectComposer)
         {
             return _obj;
         }
 
-        public ResolvingFactoryMethodSingletonCell(Func<T> func)
+        public ResolvingFactoryMethodSingletonCell(Func<TResolving> func)
         {
             _func = func;
 
@@ -35,18 +35,18 @@ namespace NP.IoCy
         }
     }
 
-    internal class ResolvingFactoryMethodCell<T> : ResolvingCell
+    internal class ResolvingFactoryMethodCell<TResolving> : ResolvingCell
     {
         public override ResolvingCellType CellType => ResolvingCellType.Singleton;
 
-        Func<T> _func;
+        Func<TResolving> _func;
 
         public override object? GetObj(Container objectComposer)
         {
             return _func();
         }
 
-        public ResolvingFactoryMethodCell(Func<T> func)
+        public ResolvingFactoryMethodCell(Func<TResolving> func)
         {
             _func = func;
         }
