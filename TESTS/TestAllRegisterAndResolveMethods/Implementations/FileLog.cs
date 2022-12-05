@@ -9,10 +9,10 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using BootstrappingTest.Interfaces;
+using TestAllRegisterAndResolveMethods.Interfaces;
 using System.IO;
 
-namespace BootstrappingTest.Implementations
+namespace TestAllRegisterAndResolveMethods.Implementations
 {
     public class FileLog : ILog
     {

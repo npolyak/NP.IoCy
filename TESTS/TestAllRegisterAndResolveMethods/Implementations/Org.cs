@@ -10,9 +10,9 @@
 // products that use it.
 
 using NP.DependencyInjection.Attributes;
-using BootstrappingTest.Interfaces;
+using TestAllRegisterAndResolveMethods.Interfaces;
 
-namespace BootstrappingTest.Implementations
+namespace TestAllRegisterAndResolveMethods.Implementations
 {
     public class Org : IOrg
     {

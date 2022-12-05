@@ -11,14 +11,14 @@
 
 using FluentAssertions;
 using NP.IoCy;
-using BootstrappingTest.Implementations;
-using BootstrappingTest.Interfaces;
+using TestAllRegisterAndResolveMethods.Implementations;
+using TestAllRegisterAndResolveMethods.Interfaces;
 using System;
 using NP.DependencyInjection.Interfaces;
 using FluentAssertions.Equivalency;
 using System.Reflection;
 
-namespace BootstrappingTest
+namespace TestAllRegisterAndResolveMethods
 {
     static class Program
     {
