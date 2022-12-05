@@ -135,20 +135,20 @@ namespace BootstrappingTest
             // send org data to console instead of a file.
             orgWithConsoleLog.LogOrgInfo();
 
-            containerBuilder.RegisterFactoryMethod<IOrg>(CreateOrg);
+            containerBuilder.RegisterFactoryMethod(CreateOrg);
             IDependencyInjectionContainer container3 = containerBuilder.Build();
             container3.TestOrg(false);
 
 
-            containerBuilder.RegisterFactoryMethod<IOrg>(CreateOrg, "TheOrg");
+            containerBuilder.RegisterFactoryMethod(CreateOrg, "TheOrg");
             container3 = containerBuilder.Build();
             container3.TestOrg(false, "TheOrg");
 
-            containerBuilder.RegisterSingletonFactoryMethod<IOrg>(CreateOrg);
+            containerBuilder.RegisterSingletonFactoryMethod(CreateOrg);
             container3 = containerBuilder.Build();
             container3.TestOrg(true);
 
-            containerBuilder.RegisterSingletonFactoryMethod<IOrg>(CreateOrg, "TheOrg");
+            containerBuilder.RegisterSingletonFactoryMethod(CreateOrg, "TheOrg");
             container3 = containerBuilder.Build();
             container3.TestOrg(true, "TheOrg");
 
