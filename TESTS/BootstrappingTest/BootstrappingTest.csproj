@@ -11,6 +11,9 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="6.8.0" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\NP.IoCy.csproj" />
     <ProjectReference Include="..\..\SubModules\NP.DependencyInjection\src\NP.DependencyInjection.csproj" />
   </ItemGroup>

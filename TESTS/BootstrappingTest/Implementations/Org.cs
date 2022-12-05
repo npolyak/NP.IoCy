@@ -21,8 +21,13 @@ namespace BootstrappingTest.Implementations
         [Inject]
         public IPerson Manager { get; set; }
 
+        public IPerson ProjLead { get; set; }
+
         [Inject]
         public ILog Log { get; set; }
+
+        [Inject(resolutionKey:"MyLog")]
+        public ILog Log2 { get; set; }
 
         public void LogOrgInfo()
         {

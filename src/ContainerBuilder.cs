@@ -116,42 +116,55 @@ namespace NP.IoCy
                 new ResolvingFactoryMethodCell<TResolving>(resolvingFunc));
         }
 
+        public void RegisterSingletonFactoryMethodInfo<TResolving>
+        (
+            MethodInfo factoryMethodInfo,
+            object? resolutionKey = null)
+        {
+            RegisterSingletonFactoryMethodInfo(factoryMethodInfo, typeof(TResolving), resolutionKey);
+        }
+
 
         public void RegisterSingletonFactoryMethodInfo
         (
-            Type typeToResolve,
             MethodInfo factoryMethodInfo,
+            Type? resolvingType = null,
             object? resolutionKey = null)
         {
-            Type resolvingType = factoryMethodInfo.ReturnType;
+            Type typeToResolve = factoryMethodInfo.ReturnType;
 
-            CheckTypeDerivation(resolvingType, typeToResolve);
+            if (resolvingType == null)
+            {
+                resolvingType = factoryMethodInfo.ReturnType;
+            }
+            else
+            {
+                CheckTypeDerivation(resolvingType, typeToResolve);
+            }
 
             AddCell
             (
-                typeToResolve.ToKey(resolutionKey),
+                resolvingType.ToKey(resolutionKey),
                 new ResolvingMethodInfoSingletonCell(factoryMethodInfo));
         }
-
-        public void RegisterSingletonFactoryMethodInfo<TToResolve>
-        (
-            MethodInfo factoryMethodInfo,
-            object? resolutionKey = null)
-        {
-            RegisterSingletonFactoryMethodInfo(typeof(TToResolve), factoryMethodInfo, resolutionKey);
-        }
-
 
 
         public void RegisterFactoryMethodInfo
         (
-            Type typeToResolve,
             MethodInfo factoryMethodInfo,
+            Type? resolvingType = null,
             object? resolutionKey = null)
         {
-            Type resolvingType = factoryMethodInfo.ReturnType;
+            Type typeToResolve = factoryMethodInfo.ReturnType;
 
-            CheckTypeDerivation(resolvingType, typeToResolve);
+            if (resolvingType == null)
+            {
+                resolvingType = factoryMethodInfo.ReturnType;
+            }
+            else
+            {
+                CheckTypeDerivation(resolvingType, typeToResolve);
+            }
 
             AddCell
             (
@@ -159,12 +172,12 @@ namespace NP.IoCy
                 new ResolvingMethodInfoCell(factoryMethodInfo));
         }
 
-        public void RegisterFactoryMethodInfo<TToResolve>
+        public void RegisterFactoryMethodInfo<TResolving>
         (
             MethodInfo factoryMethodInfo,
             object? resolutionKey = null)
         {
-            RegisterFactoryMethodInfo(typeof(TToResolve), factoryMethodInfo, resolutionKey);
+            RegisterFactoryMethodInfo(factoryMethodInfo, typeof(TResolving), resolutionKey);
         }
 
 
@@ -207,17 +220,17 @@ namespace NP.IoCy
 
                         if (factoryMethodAttribute != null)
                         {
-                            Type typeToResolve = factoryMethodAttribute.ResolvingType ?? methodInfo.ReturnType;
+                            Type resType = factoryMethodAttribute.ResolvingType ?? methodInfo.ReturnType;
                             object? partKeyObj = factoryMethodAttribute.ResolutionKey;
                             bool isSingleton = factoryMethodAttribute.IsSingleton;
 
                             if (isSingleton)
                             {
-                                this.RegisterSingletonFactoryMethodInfo(typeToResolve, methodInfo, partKeyObj);
+                                this.RegisterSingletonFactoryMethodInfo(methodInfo, resType, partKeyObj);
                             }
                             else
                             {
-                                this.RegisterFactoryMethodInfo(typeToResolve, methodInfo, partKeyObj);
+                                this.RegisterFactoryMethodInfo(methodInfo, resType, partKeyObj);
                             }
                         }
                     }
@@ -315,7 +328,7 @@ namespace NP.IoCy
             }
         }
 
-        public void UnRegister(Type resolvingType, object resolutionKey)
+        public void UnRegister(Type resolvingType, object? resolutionKey)
         {
             ContainerItemResolvingKey resolvingTypeKey = resolvingType.ToKey(resolutionKey);
 

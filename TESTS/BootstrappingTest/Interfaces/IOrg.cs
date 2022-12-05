@@ -17,7 +17,11 @@ namespace BootstrappingTest.Interfaces
 
         IPerson Manager { get; set; }
 
+        IPerson ProjLead { get; set; }
+
         ILog Log { get; set; }
+
+        ILog Log2 { get; set; }
 
         void LogOrgInfo();
     }
