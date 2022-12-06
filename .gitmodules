@@ -1,10 +1,6 @@
 [submodule "SubModules/NP.Utilities"]
 	path = SubModules/NP.Utilities
 	url = https://github.com/npolyak/NP.Utilities.git
-[submodule "SubModules/NP.IoC.Attributes"]
-	path = SubModules/NP.IoC.Attributes
-	url = https://github.com/npolyak/NP.IoC.Attributes
-	branch = main
 [submodule "SubModules/NP.DependencyInjection"]
 	path = SubModules/NP.DependencyInjection
 	url = https://github.com/npolyak/NP.DependencyInjection

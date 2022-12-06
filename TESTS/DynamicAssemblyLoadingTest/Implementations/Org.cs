@@ -9,12 +9,12 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.IoC.Attributes;
+using NP.DependencyInjection.Attributes;
 using DynamicAssemblyLoadingTest.Interfaces;
 
 namespace DynamicAssemblyLoadingTest.Implementations
 {
-    //[Implements(typeof(IOrg))]
+    [RegisterType(typeof(IOrg))]
     public class Org : IOrg
     {
         public string OrgName { get; set; }
@@ -32,8 +32,8 @@ namespace DynamicAssemblyLoadingTest.Implementations
             Log.WriteLog($"Manager's Address: {Manager.Address.City}, {Manager.Address.ZipCode}");
         }
 
-        //[CompositeConstructor]
-        public Org(/*[Part(partKey: "TheConsoleLog")]*/ILog log)
+        [CompositeConstructor]
+        public Org([Inject(resolutionKey: "TheConsoleLog")]ILog log)
         {
             Log = log;
         }

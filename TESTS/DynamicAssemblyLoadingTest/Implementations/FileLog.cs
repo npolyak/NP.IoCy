@@ -9,7 +9,6 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.IoC.Attributes;
 using DynamicAssemblyLoadingTest.Interfaces;
 using System.IO;
 

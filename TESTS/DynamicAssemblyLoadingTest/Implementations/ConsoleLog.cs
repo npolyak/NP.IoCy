@@ -10,7 +10,7 @@
 // products that use it.
 
 using DynamicAssemblyLoadingTest.Interfaces;
-using NP.IoC.Attributes;
+using NP.DependencyInjection.Attributes;
 using System;
 
 namespace OrganizationTest.Implementations

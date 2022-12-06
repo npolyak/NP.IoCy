@@ -27,6 +27,7 @@ using System;
 using System.IO;
 
 using ILog = DynamicAssemblyLoadingTest.Interfaces.ILog;
+using NP.DependencyInjection.Interfaces;
 
 namespace DynamicAssemblyLoadingTest
 {
@@ -35,7 +36,7 @@ namespace DynamicAssemblyLoadingTest
         static void Main(string[] args)
         {
             // create container builder
-            ContainerBuilder builder = new ContainerBuilder();
+            IContainerBuilder builder = new ContainerBuilder();
 
             builder
                 .RegisterDynamicAssemblyByFullPath
@@ -46,7 +47,7 @@ namespace DynamicAssemblyLoadingTest
                         "Plugins\\DynamicAssemblyLoadingTest.Implementations.dll"));
 
             // create container
-            Container container = builder.Build ();
+            IDependencyInjectionContainer container = builder.Build ();
 
             // resolve and compose organization
             // all its 'Parts' will be added at

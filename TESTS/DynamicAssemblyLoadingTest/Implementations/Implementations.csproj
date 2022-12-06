@@ -12,7 +12,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\SubModules\NP.IoC.Attributes\src\NP.IoC.Attributes.csproj" />
+    <ProjectReference Include="..\..\..\SubModules\NP.DependencyInjection\src\NP.DependencyInjection.csproj" />
     <ProjectReference Include="..\Interfaces\Interfaces.csproj" />
   </ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">

@@ -9,9 +9,9 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
+using NP.DependencyInjection.Attributes;
 using DynamicAssemblyLoadingTest.Implementations;
 using DynamicAssemblyLoadingTest.Interfaces;
-using NP.IoC.Attributes;
 
 namespace Implementations
 {

@@ -23,7 +23,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\NP.IoCy.csproj" />
-    <ProjectReference Include="..\..\SubModules\NP.IoC.Attributes\src\NP.IoC.Attributes.csproj" />
     <ProjectReference Include="..\..\SubModules\NP.Utilities\src\NP.Utilities.csproj" />
     <ProjectReference Include="Interfaces\Interfaces.csproj" />
   </ItemGroup>
