@@ -181,17 +181,17 @@ namespace NP.IoCy
         }
 
 
-        public void RegisterAttributedType(Type typeToResolve)
+        public void RegisterAttributedType(Type attributedType)
         {
             RegisterTypeAttribute implementsAttribute =
-                   typeToResolve.GetCustomAttribute<RegisterTypeAttribute>()!;
+                   attributedType.GetCustomAttribute<RegisterTypeAttribute>()!;
 
             if (implementsAttribute != null)
             {
                 if (implementsAttribute.ResolvingType == null)
                 {
                     implementsAttribute.ResolvingType =
-                        typeToResolve.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {typeToResolve.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
+                        attributedType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {attributedType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
                 }
 
                 Type resolvingType = implementsAttribute.ResolvingType;
@@ -200,21 +200,21 @@ namespace NP.IoCy
 
                 if (isSingleton)
                 {
-                    this.RegisterSingletonType(resolvingType, typeToResolve, resolutionKeyObj);
+                    this.RegisterSingletonType(resolvingType, attributedType, resolutionKeyObj);
                 }
                 else
                 {
-                    this.RegisterType(resolvingType, typeToResolve, resolutionKeyObj);
+                    this.RegisterType(resolvingType, attributedType, resolutionKeyObj);
                 }
             }
             else
             {
                 HasRegisterMethodsAttribute? hasRegisterMethodAttribute =
-                    typeToResolve.GetCustomAttribute<HasRegisterMethodsAttribute>();
+                    attributedType.GetCustomAttribute<HasRegisterMethodsAttribute>();
 
                 if (hasRegisterMethodAttribute != null)
                 {
-                    foreach (var methodInfo in typeToResolve.GetMethods().Where(methodInfo => methodInfo.IsStatic))
+                    foreach (var methodInfo in attributedType.GetMethods().Where(methodInfo => methodInfo.IsStatic))
                     {
                         RegisterMethodAttribute factoryMethodAttribute = methodInfo.GetAttr<RegisterMethodAttribute>();
 
