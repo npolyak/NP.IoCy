@@ -22,7 +22,11 @@ namespace TestAllRegisterAndResolveMethods
 {
     static class Program
     {
-        public static bool IsSingleton<T>(this IDependencyInjectionContainer container, object key = null)
+        public static bool IsSingleton<T>
+        (
+            this IDependencyInjectionContainer container, 
+            object key = null
+        )
         {
             T obj1 = container.Resolve<T>(key);
 
@@ -173,7 +177,22 @@ namespace TestAllRegisterAndResolveMethods
             container3 = containerBuilder.Build();
             container3.TestOrg(false, "TheOrg");
 
+            IContainerBuilder containerBuilder4 = new ContainerBuilder();
 
+            containerBuilder4.RegisterAttributedType(typeof(AnotherOrg));
+            containerBuilder4.RegisterAttributedType(typeof(AnotherPerson));
+            containerBuilder4.RegisterAttributedType(typeof(ConsoleLog));
+            containerBuilder4.RegisterType<IAddress, Address>();
+
+            var container4 = containerBuilder4.Build();
+
+            IOrgGettersOnly orgGettersOnly = 
+                container4.Resolve<IOrgGettersOnly>();
+
+            orgGettersOnly.Manager.Address.Should().NotBeNull();
+
+            // make sure ILog is a singleton.
+            container4.IsSingleton<ILog>().Should().BeTrue();
 
             Console.ReadKey();
         }

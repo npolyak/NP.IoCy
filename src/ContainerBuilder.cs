@@ -181,20 +181,20 @@ namespace NP.IoCy
         }
 
 
-        public void RegisterAttributedType(Type resolvingType)
+        public void RegisterAttributedType(Type typeToResolve)
         {
             RegisterTypeAttribute implementsAttribute =
-                   resolvingType.GetCustomAttribute<RegisterTypeAttribute>()!;
+                   typeToResolve.GetCustomAttribute<RegisterTypeAttribute>()!;
 
             if (implementsAttribute != null)
             {
                 if (implementsAttribute.ResolvingType == null)
                 {
                     implementsAttribute.ResolvingType =
-                        resolvingType.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {resolvingType.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
+                        typeToResolve.GetBaseTypeOrFirstInterface() ?? throw new Exception($"IoCy Programming Error: Type {typeToResolve.FullName} has an 'Implements' attribute, but does not have any base type and does not implement any interfaces");
                 }
 
-                Type typeToResolve = implementsAttribute.ResolvingType;
+                Type resolvingType = implementsAttribute.ResolvingType;
                 object? resolutionKeyObj = implementsAttribute.ResolutionKey;
                 bool isSingleton = implementsAttribute.IsSingleton;
 
@@ -210,27 +210,27 @@ namespace NP.IoCy
             else
             {
                 HasRegisterMethodsAttribute? hasRegisterMethodAttribute =
-                    resolvingType.GetCustomAttribute<HasRegisterMethodsAttribute>();
+                    typeToResolve.GetCustomAttribute<HasRegisterMethodsAttribute>();
 
                 if (hasRegisterMethodAttribute != null)
                 {
-                    foreach (var methodInfo in resolvingType.GetMethods().Where(methodInfo => methodInfo.IsStatic))
+                    foreach (var methodInfo in typeToResolve.GetMethods().Where(methodInfo => methodInfo.IsStatic))
                     {
                         RegisterMethodAttribute factoryMethodAttribute = methodInfo.GetAttr<RegisterMethodAttribute>();
 
                         if (factoryMethodAttribute != null)
                         {
-                            Type resType = factoryMethodAttribute.ResolvingType ?? methodInfo.ReturnType;
+                            Type resolvingType = factoryMethodAttribute.ResolvingType ?? methodInfo.ReturnType;
                             object? partKeyObj = factoryMethodAttribute.ResolutionKey;
                             bool isSingleton = factoryMethodAttribute.IsSingleton;
 
                             if (isSingleton)
                             {
-                                this.RegisterSingletonFactoryMethodInfo(methodInfo, resType, partKeyObj);
+                                this.RegisterSingletonFactoryMethodInfo(methodInfo, resolvingType, partKeyObj);
                             }
                             else
                             {
-                                this.RegisterFactoryMethodInfo(methodInfo, resType, partKeyObj);
+                                this.RegisterFactoryMethodInfo(methodInfo, resolvingType, partKeyObj);
                             }
                         }
                     }

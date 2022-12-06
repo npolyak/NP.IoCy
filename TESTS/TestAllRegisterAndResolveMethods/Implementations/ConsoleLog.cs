@@ -11,9 +11,11 @@
 
 using TestAllRegisterAndResolveMethods.Interfaces;
 using System;
+using NP.DependencyInjection.Attributes;
 
 namespace TestAllRegisterAndResolveMethods.Implementations
 {
+    [RegisterType(isSingleton: true)]
     public class ConsoleLog : ILog
     {
         public ConsoleLog()
