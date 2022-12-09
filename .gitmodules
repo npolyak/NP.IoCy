@@ -5,3 +5,6 @@
 	path = SubModules/NP.DependencyInjection
 	url = https://github.com/npolyak/NP.DependencyInjection
 	branch = main
+[submodule "SubModules/NP.IoC.CommonImplementations"]
+	path = SubModules/NP.IoC.CommonImplementations
+	url = https://github.com/npolyak/NP.IoC.CommonImplementations.git

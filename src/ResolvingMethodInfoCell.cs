@@ -9,9 +9,9 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
-using NP.Utilities.BasicInterfaces;
 using NP.Utilities;
 using System.Reflection;
+using NP.IoC.CommonImplementations;
 
 namespace NP.IoCy
 {
