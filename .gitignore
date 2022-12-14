@@ -109,3 +109,5 @@
 /TESTS/TestAllRegisterAndResolveMethods/.vs
 /TESTS/TestAllRegisterAndResolveMethods/bin/Debug/net6.0
 /TESTS/TestAllRegisterAndResolveMethods/obj
+/src/bin/Release/net6.0
+/TESTS/TestAllRegisterAndResolveMethods/bin/Release/net6.0
