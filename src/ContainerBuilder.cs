@@ -62,6 +62,43 @@ namespace NP.IoCy
                 new ResolvingSingletonTypeCell(typeToResolve));
         }
 
+
+        private void RegisterMethodInfoCell
+        (
+            MethodBase factoryMethodInfo,
+            bool isSingleton,
+            Type? resolvingType = null,
+            object? resolutionKey = null)
+        {
+            IResolvingCell cell = 
+                isSingleton ? 
+                    new ResolvingMethodInfoSingletonCell(factoryMethodInfo) : 
+                    new ResolvingMethodInfoCell(factoryMethodInfo);
+            resolvingType = factoryMethodInfo.GetAndCheckResolvingType(resolvingType);
+            FullContainerItemResolvingKey key = 
+                new FullContainerItemResolvingKey(resolvingType, resolutionKey);
+            RegisterSingletonInstance(typeof(IResolvingCell), cell, key);
+        }
+
+
+        protected override void RegisterAttributedType
+        (
+            Type resolvingType, 
+            Type typeToResolve, 
+            object? resolutionKey = null)
+        {
+            RegisterType(resolvingType, typeToResolve, resolutionKey);
+        }
+
+        protected override void RegisterAttributedSingletonType
+        (
+            Type resolvingType, 
+            Type typeToResolve, 
+            object? resolutionKey = null)
+        {
+            RegisterSingletonType(resolvingType, typeToResolve, resolutionKey);
+        }
+
         public void RegisterSingletonFactoryMethod<TResolving>
         (
             Func<TResolving> resolvingFunc,
@@ -92,7 +129,7 @@ namespace NP.IoCy
 
         public override void RegisterSingletonFactoryMethodInfo
         (
-            MethodInfo factoryMethodInfo,
+            MethodBase factoryMethodInfo,
             Type? resolvingType = null,
             object? resolutionKey = null)
         {
@@ -107,7 +144,7 @@ namespace NP.IoCy
 
         public override void RegisterFactoryMethodInfo
         (
-            MethodInfo factoryMethodInfo,
+            MethodBase factoryMethodInfo,
             Type? resolvingType = null,
             object? resolutionKey = null)
         {

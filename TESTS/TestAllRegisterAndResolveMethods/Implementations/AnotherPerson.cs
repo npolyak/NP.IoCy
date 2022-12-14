@@ -4,14 +4,15 @@ using TestAllRegisterAndResolveMethods.Interfaces;
 namespace TestAllRegisterAndResolveMethods.Implementations
 {
 
-    [RegisterType(resolutionKey:"AnotherPerson")]
+    [RegisterType(resolutionKey: "AnotherPerson", IsSingleton = true)]
     public class AnotherPerson : IPersonGettersOnly
     {
-        [Inject]
+        public string PersonName { get; set; }
+
         public IAddress Address { get; }
 
         [CompositeConstructor]
-        public AnotherPerson([Inject] IAddress address)
+        public AnotherPerson([Inject(resolutionKey: "TheAddress")] IAddress address)
         {
             this.Address = address;
         }

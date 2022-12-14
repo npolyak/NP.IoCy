@@ -19,7 +19,7 @@ namespace NP.IoCy
     {
         public override ResolvingCellType CellType => ResolvingCellType.Singleton;
 
-        private MethodInfo _factoryMethodInfo;
+        private MethodBase _factoryMethod;
 
         private object? _obj;
         
@@ -28,25 +28,25 @@ namespace NP.IoCy
             if (_obj == null)
             {
                 // create object
-                _obj = objectComposer.CreateAndComposeObjFromMethod(_factoryMethodInfo);
+                _obj = objectComposer.CreateAndComposeObjFromMethod(_factoryMethod);
             }
 
             return _obj;
         }
 
 
-        public ResolvingMethodInfoSingletonCell(MethodInfo factoryMethodInfo)
+        public ResolvingMethodInfoSingletonCell(MethodBase factoryMethod)
         {
-            _factoryMethodInfo = factoryMethodInfo;
+            _factoryMethod = factoryMethod;
 
-            if (!_factoryMethodInfo.IsStatic)
+            if (!_factoryMethod.IsStatic)
             {
-                $"Cannot use instance Method {factoryMethodInfo.Name.Sq()} for Object Creation".ThrowProgError();
+                $"Cannot use instance Method {factoryMethod.Name.Sq()} for Object Creation".ThrowProgError();
             }
 
-            if (_factoryMethodInfo.ReturnType == null)
+            if (factoryMethod is MethodInfo factoryMethodInfo && factoryMethodInfo.ReturnType == null)
             {
-                $"Cannot use Void Method {factoryMethodInfo.Name.Sq()} for Object Creation".ThrowProgError();
+                $"Cannot use Void Method {factoryMethod.Name.Sq()} for Object Creation".ThrowProgError();
             }
         }
     }
@@ -55,7 +55,7 @@ namespace NP.IoCy
     {
         public override ResolvingCellType CellType => ResolvingCellType.Common;
 
-        private MethodInfo _factoryMethodInfo;
+        private MethodBase _factoryMethodInfo;
 
         private object? _obj;
 
@@ -65,18 +65,18 @@ namespace NP.IoCy
         }
 
 
-        public ResolvingMethodInfoCell(MethodInfo factoryMethodInfo)
+        public ResolvingMethodInfoCell(MethodBase factoryMethod)
         {
-            _factoryMethodInfo = factoryMethodInfo;
+            _factoryMethodInfo = factoryMethod;
 
             if (!_factoryMethodInfo.IsStatic)
             {
-                $"Cannot use instance Method {factoryMethodInfo.Name.Sq()} for Object Creation".ThrowProgError();
+                $"Cannot use instance Method {factoryMethod.Name.Sq()} for Object Creation".ThrowProgError();
             }
 
-            if (_factoryMethodInfo.ReturnType == null)
+            if (factoryMethod is MethodInfo factoryMethodInfo && factoryMethodInfo.ReturnType == null)
             {
-                $"Cannot use Void Method {factoryMethodInfo.Name.Sq()} for Object Creation".ThrowProgError();
+                $"Cannot use Void Method {factoryMethod.Name.Sq()} for Object Creation".ThrowProgError();
             }
         }
     }

@@ -20,11 +20,11 @@ using System.Reflection;
 
 namespace TestAllRegisterAndResolveMethods
 {
-    static class Program
+    public static class Program
     {
         public static bool IsSingleton<T>
         (
-            this IDependencyInjectionContainer container, 
+            this IDependencyInjectionContainer container,
             object key = null
         )
         {
@@ -56,7 +56,16 @@ namespace TestAllRegisterAndResolveMethods
             return org;
         }
 
-        static void Main(string[] args)
+
+        public static void TestOrg(this IDependencyInjectionContainer container, bool isSingleton, object key = null)
+        {
+            container.IsSingleton<IOrg>(key).Should().Be(isSingleton);
+            IOrg org = container.Resolve<IOrg>(key);
+            org.OrgName.Should().Be("Other Department Store");
+
+        }
+
+        public static void Main(string[] args)
         {
             // create container builder
             IContainerBuilder containerBuilder = new ContainerBuilder();
@@ -86,7 +95,7 @@ namespace TestAllRegisterAndResolveMethods
 
             org.Manager.Should().NotBeNull();
 
-            IPerson person = container.Resolve<IPerson>();  
+            IPerson person = container.Resolve<IPerson>();
 
             person.Should().NotBeSameAs(org.Manager);
 
@@ -182,12 +191,23 @@ namespace TestAllRegisterAndResolveMethods
             containerBuilder4.RegisterAttributedType(typeof(AnotherOrg));
             containerBuilder4.RegisterAttributedType(typeof(AnotherPerson));
             containerBuilder4.RegisterAttributedType(typeof(ConsoleLog));
-            containerBuilder4.RegisterType<IAddress, Address>();
+            containerBuilder4.RegisterType<IAddress, Address>("TheAddress");
 
             var container4 = containerBuilder4.Build();
 
-            IOrgGettersOnly orgGettersOnly = 
-                container4.Resolve<IOrgGettersOnly>();
+            IOrgGettersOnly orgGettersOnly =
+                container4.Resolve<IOrgGettersOnly>("TheOrg");
+
+            IOrgGettersOnly orgGettersOnly1 =
+                container4.Resolve<IOrgGettersOnly>("TheOrg");
+
+            object.ReferenceEquals(orgGettersOnly, orgGettersOnly1).Should().NotBe(true);
+
+            object.ReferenceEquals(orgGettersOnly1.Manager, orgGettersOnly1.Manager).Should().Be(true);
+
+            container4.IsSingleton<IOrgGettersOnly>("TheOrg").Should().NotBe(true);
+
+
 
             orgGettersOnly.Manager.Address.Should().NotBeNull();
 
@@ -196,14 +216,5 @@ namespace TestAllRegisterAndResolveMethods
 
             Console.ReadKey();
         }
-
-        public static void TestOrg(this IDependencyInjectionContainer container, bool isSingleton, object key = null)
-        {
-            container.IsSingleton<IOrg>(key).Should().Be(isSingleton);
-            IOrg org = container.Resolve<IOrg>(key);
-            org.OrgName.Should().Be("Other Department Store");
-
-        }
-
     }
 }

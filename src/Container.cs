@@ -9,14 +9,10 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 //
-using NP.DependencyInjection.Attributes;
 using NP.DependencyInjection.Interfaces;
 using NP.IoC.CommonImplementations;
 using NP.Utilities;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Reflection;
 
 namespace NP.IoCy
 {
@@ -55,27 +51,6 @@ namespace NP.IoCy
 
             return resolvingCell?.GetObj(this)!;
         }
-
-        private object ResolveKey(Type typeToResolve, object? resolutionKey = null)
-        {
-            return ResolveKey(typeToResolve.ToKey(resolutionKey));
-        }
-
-
-        internal object ConstructObject(Type type)
-        {
-            ConstructorInfo constructorInfo =
-                type.GetConstructors()
-                    .FirstOrDefault(constr => constr.ContainsAttr<CompositeConstructorAttribute>())!;
-
-            if (constructorInfo == null)
-            {
-                return Activator.CreateInstance(type)!;
-            }
-
-            return Activator.CreateInstance(type, GetMethodParamValues(constructorInfo).ToArray())!;
-        }
-
 
         private void ComposeAllSingletonObjects()
         {

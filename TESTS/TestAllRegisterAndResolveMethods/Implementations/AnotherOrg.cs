@@ -3,9 +3,11 @@ using TestAllRegisterAndResolveMethods.Interfaces;
 
 namespace TestAllRegisterAndResolveMethods.Implementations
 {
-    [RegisterType()]
+    [RegisterType(resolutionKey: "TheOrg")]
     public class AnotherOrg : IOrgGettersOnly
     {
+        public string OrgName { get; set; }
+
         public IPersonGettersOnly Manager { get; }
 
         public ILog Log { get; }
@@ -15,6 +17,13 @@ namespace TestAllRegisterAndResolveMethods.Implementations
         {
             Manager = manager;
             Log = log;
+        }
+
+        public void LogOrgInfo()
+        {
+            Log?.WriteLog($"OrgName: {OrgName}");
+            Log?.WriteLog($"Manager: {Manager!.PersonName}");
+            Log?.WriteLog($"Manager's Address: {Manager!.Address.City}, {Manager.Address.ZipCode}");
         }
     }
 }
