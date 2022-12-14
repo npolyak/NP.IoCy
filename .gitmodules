@@ -1,6 +1,3 @@
-[submodule "SubModules/NP.Utilities"]
-	path = SubModules/NP.Utilities
-	url = https://github.com/npolyak/NP.Utilities.git
 [submodule "SubModules/NP.DependencyInjection"]
 	path = SubModules/NP.DependencyInjection
 	url = https://github.com/npolyak/NP.DependencyInjection
