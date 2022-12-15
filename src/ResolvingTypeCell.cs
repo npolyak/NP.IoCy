@@ -43,7 +43,7 @@ namespace NP.IoCy
     {
         Type _typeToResolve;
 
-        public override ResolvingCellType CellType => ResolvingCellType.Common;
+        public override ResolvingCellType CellType => ResolvingCellType.Transient;
 
         public override object? GetObj(Container objectComposer)
         {

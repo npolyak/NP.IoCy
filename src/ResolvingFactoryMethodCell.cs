@@ -36,7 +36,7 @@ namespace NP.IoCy
 
     internal class ResolvingFactoryMethodCell<TResolving> : ResolvingCell
     {
-        public override ResolvingCellType CellType => ResolvingCellType.Common;
+        public override ResolvingCellType CellType => ResolvingCellType.Transient;
 
         Func<TResolving> _func;
 

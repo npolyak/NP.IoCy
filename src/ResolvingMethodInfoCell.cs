@@ -52,7 +52,7 @@ namespace NP.IoCy
 
     internal class ResolvingMethodInfoCell : ResolvingCell
     {
-        public override ResolvingCellType CellType => ResolvingCellType.Common;
+        public override ResolvingCellType CellType => ResolvingCellType.Transient;
 
         private MethodBase _factoryMethodInfo;
 

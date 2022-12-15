@@ -14,7 +14,7 @@ namespace NP.IoCy
 {
     enum ResolvingCellType
     {
-        Common,
+        Transient,
         Singleton
     }
 
