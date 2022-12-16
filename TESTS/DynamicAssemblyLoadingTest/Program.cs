@@ -10,7 +10,6 @@
 // products that use it.
 
 using NP.IoCy;
-using NP.Utilities;
 using DynamicAssemblyLoadingTest.Interfaces;
 using System;
 // (c) Nick Polyak 2022 - http://awebpros.com/
@@ -43,7 +42,7 @@ namespace DynamicAssemblyLoadingTest
                 (
                     Path.Combine
                     (
-                        ReflectionUtils.GetCurrentExecutablePath(), 
+                        System.AppDomain.CurrentDomain.BaseDirectory, 
                         "Plugins\\DynamicAssemblyLoadingTest.Implementations.dll"));
 
             // create container
