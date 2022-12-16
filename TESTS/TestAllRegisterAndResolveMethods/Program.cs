@@ -188,9 +188,9 @@ namespace TestAllRegisterAndResolveMethods
 
             IContainerBuilder containerBuilder4 = new ContainerBuilder();
 
-            containerBuilder4.RegisterAttributedType(typeof(AnotherOrg));
-            containerBuilder4.RegisterAttributedType(typeof(AnotherPerson));
-            containerBuilder4.RegisterAttributedType(typeof(ConsoleLog));
+            containerBuilder4.RegisterAttributedClass(typeof(AnotherOrg));
+            containerBuilder4.RegisterAttributedClass(typeof(AnotherPerson));
+            containerBuilder4.RegisterAttributedClass(typeof(ConsoleLog));
             containerBuilder4.RegisterType<IAddress, Address>("TheAddress");
 
             var container4 = containerBuilder4.Build();
@@ -206,7 +206,6 @@ namespace TestAllRegisterAndResolveMethods
             object.ReferenceEquals(orgGettersOnly1.Manager, orgGettersOnly1.Manager).Should().Be(true);
 
             container4.IsSingleton<IOrgGettersOnly>("TheOrg").Should().NotBe(true);
-
 
 
             orgGettersOnly.Manager.Address.Should().NotBeNull();
