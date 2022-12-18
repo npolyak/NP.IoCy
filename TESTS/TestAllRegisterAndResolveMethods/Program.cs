@@ -213,6 +213,29 @@ namespace TestAllRegisterAndResolveMethods
             // make sure ILog is a singleton.
             container4.IsSingleton<ILog>().Should().BeTrue();
 
+            IContainerBuilder containerBuilder5 = new ContainerBuilder();
+
+            containerBuilder5.RegisterAttributedStaticFactoryMethodsFromClass(typeof(FactoryMethods)); 
+
+            var container5 = containerBuilder5.Build();
+
+            IOrg org5 = container5.Resolve<IOrg>("TheOrg");
+
+            org5.OrgName.Should().Be("Other Department Store");
+            org5.Manager.PersonName.Should().Be("Joe Doe");
+            org5.Manager.Address.City.Should().Be("Providence");
+
+            IOrg anotherOrg5 = container5.Resolve<IOrg>("TheOrg");
+
+            org5.Should().NotBeSameAs(anotherOrg5);
+            org5.Manager.Should().BeSameAs(anotherOrg5.Manager);
+
+            IAddress address5 = container5.Resolve<IAddress>("TheAddress");
+
+            address5.Should().NotBeSameAs(org5.Manager.Address);
+
+            Console.WriteLine("THE END");
+
             Console.ReadKey();
         }
     }
