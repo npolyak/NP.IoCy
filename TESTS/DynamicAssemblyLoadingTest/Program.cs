@@ -11,21 +11,7 @@
 
 using NP.IoCy;
 using DynamicAssemblyLoadingTest.Interfaces;
-using System;
-// (c) Nick Polyak 2022 - http://awebpros.com/
-// License: MIT License (https://opensource.org/licenses/MIT)
-//
-// short overview of copyright rules:
-// 1. you can use this framework in any commercial or non-commercial 
-//    product as long as you retain this copyright message
-// 2. Do not blame the author of this software if something goes wrong. 
-// 
-// Also, please, mention this software in any documentation for the 
-// products that use it.
-
 using System.IO;
-
-using ILog = DynamicAssemblyLoadingTest.Interfaces.ILog;
 using NP.DependencyInjection.Interfaces;
 
 namespace DynamicAssemblyLoadingTest
@@ -35,7 +21,7 @@ namespace DynamicAssemblyLoadingTest
         static void Main(string[] args)
         {
             // create container builder
-            IContainerBuilder builder = new ContainerBuilder();
+            var builder = new ContainerBuilder<string>();
 
             builder
                 .RegisterDynamicAssemblyByFullPath
@@ -46,7 +32,7 @@ namespace DynamicAssemblyLoadingTest
                         "Plugins\\DynamicAssemblyLoadingTest.Implementations.dll"));
 
             // create container
-            IDependencyInjectionContainer container = builder.Build ();
+            var container = builder.Build ();
 
             // resolve and compose organization
             // all its 'Parts' will be added at

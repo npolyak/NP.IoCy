@@ -15,7 +15,6 @@ using TestAllRegisterAndResolveMethods.Implementations;
 using TestAllRegisterAndResolveMethods.Interfaces;
 using System;
 using NP.DependencyInjection.Interfaces;
-using FluentAssertions.Equivalency;
 using System.Reflection;
 
 namespace TestAllRegisterAndResolveMethods
@@ -24,8 +23,8 @@ namespace TestAllRegisterAndResolveMethods
     {
         public static bool IsSingleton<T>
         (
-            this IDependencyInjectionContainer container,
-            object key = null
+            this IDependencyInjectionContainer<string?> container,
+            string? key = null
         )
         {
             T obj1 = container.Resolve<T>(key);
@@ -57,7 +56,11 @@ namespace TestAllRegisterAndResolveMethods
         }
 
 
-        public static void TestOrg(this IDependencyInjectionContainer container, bool isSingleton, object key = null)
+        public static void TestOrg
+        (
+            this IDependencyInjectionContainer<string?> container, 
+            bool isSingleton, 
+            string? key = null)
         {
             container.IsSingleton<IOrg>(key).Should().Be(isSingleton);
             IOrg org = container.Resolve<IOrg>(key);
@@ -68,7 +71,7 @@ namespace TestAllRegisterAndResolveMethods
         public static void Main(string[] args)
         {
             // create container builder
-            IContainerBuilder containerBuilder = new ContainerBuilder();
+            IContainerBuilder<string?> containerBuilder = new ContainerBuilder<string?>();
 
             #region BOOTSTRAPPING
             // bootstrap container 
@@ -82,7 +85,7 @@ namespace TestAllRegisterAndResolveMethods
             #endregion BOOTSTRAPPING
 
             // Create container
-            IDependencyInjectionContainer container = containerBuilder.Build();
+            IDependencyInjectionContainer<string?> container = containerBuilder.Build();
 
             // resolve and compose organization
             // all its 'Parts' will be added at
@@ -128,7 +131,7 @@ namespace TestAllRegisterAndResolveMethods
             containerBuilder.RegisterSingletonInstance<ILog>(consoleLog);
 
             // replace registration of ILog to ConsoleLog (instead of FileLog) in another container. 
-            IDependencyInjectionContainer anotherContainer = containerBuilder.Build();
+            var anotherContainer = containerBuilder.Build();
 
             // resolve org from another Container.
             IOrg orgWithConsoleLog = anotherContainer.Resolve<IOrg>();
@@ -149,7 +152,7 @@ namespace TestAllRegisterAndResolveMethods
             orgWithConsoleLog.LogOrgInfo();
 
             containerBuilder.RegisterFactoryMethod(CreateOrg);
-            IDependencyInjectionContainer container3 = containerBuilder.Build();
+            var container3 = containerBuilder.Build();
             container3.TestOrg(false);
 
 
@@ -186,7 +189,7 @@ namespace TestAllRegisterAndResolveMethods
             container3 = containerBuilder.Build();
             container3.TestOrg(false, "TheOrg");
 
-            IContainerBuilder containerBuilder4 = new ContainerBuilder();
+            var containerBuilder4 = new ContainerBuilder<string?>();
 
             containerBuilder4.RegisterAttributedClass(typeof(AnotherOrg));
             containerBuilder4.RegisterAttributedClass(typeof(AnotherPerson));
@@ -213,7 +216,7 @@ namespace TestAllRegisterAndResolveMethods
             // make sure ILog is a singleton.
             container4.IsSingleton<ILog>().Should().BeTrue();
 
-            IContainerBuilder containerBuilder5 = new ContainerBuilder();
+            var containerBuilder5 = new ContainerBuilder<string>();
 
             containerBuilder5.RegisterAttributedStaticFactoryMethodsFromClass(typeof(FactoryMethods)); 
 

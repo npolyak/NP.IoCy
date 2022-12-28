@@ -10,6 +10,8 @@
 // products that use it.
 
 
+using NP.IoC.CommonImplementations;
+
 namespace NP.IoCy
 {
     enum ResolvingCellType
@@ -18,10 +20,10 @@ namespace NP.IoCy
         Singleton
     }
 
-    internal interface IResolvingCell 
+    internal interface IResolvingCell
     {
         ResolvingCellType CellType { get; }
 
-        object? GetObj(Container objectComposer);
+        object? GetObj(IObjComposer objectComposer);
     }
 }

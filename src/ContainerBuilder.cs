@@ -6,12 +6,15 @@ using System.Reflection;
 
 namespace NP.IoCy
 {
-    public class ContainerBuilder : AbstractContainerBuilder, IContainerBuilder
+    public class ContainerBuilder<TKey> : AbstractContainerBuilder<TKey>, IContainerBuilder<TKey>
     {
-        private Dictionary<FullContainerItemResolvingKey, IResolvingCell> _cellMap =
-            new Dictionary<FullContainerItemResolvingKey, IResolvingCell>();
+        internal IDictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell> _cellMap =
+            new Dictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell>();
 
-        private IResolvingCell AddCell(FullContainerItemResolvingKey typeToResolveKey, IResolvingCell resolvingCell)
+        private IResolvingCell AddCell
+        (
+            FullContainerItemResolvingKey<TKey> typeToResolveKey, 
+            IResolvingCell resolvingCell)
         {
             lock (_cellMap)
             {
@@ -26,7 +29,7 @@ namespace NP.IoCy
         (
             Type resolvingType, 
             Type typeToResolve, 
-            object? resolutionKey = null)
+            TKey resolutionKey = default)
         {
             resolvingType.CheckTypeDerivation(typeToResolve);
             AddCell(resolvingType.ToKey(resolutionKey!), new ResolvingTypeCell(typeToResolve));
@@ -37,7 +40,7 @@ namespace NP.IoCy
         (
             Type resolvingType,
             object instance, 
-            object? resolutionKey = null)
+            TKey resolutionKey = default)
         {
             resolvingType.CheckTypeDerivation(instance.GetType());
 
@@ -51,7 +54,7 @@ namespace NP.IoCy
         (
             Type resolvingType,
             Type typeToResolve,
-            object? resolutionKey = null)
+            TKey resolutionKey = default)
         {
 
             resolvingType.CheckTypeDerivation(typeToResolve);
@@ -63,29 +66,29 @@ namespace NP.IoCy
         }
 
 
-        private void RegisterMethodInfoCell
-        (
-            MethodBase factoryMethodInfo,
-            bool isSingleton,
-            Type? resolvingType = null,
-            object? resolutionKey = null)
-        {
-            IResolvingCell cell = 
-                isSingleton ? 
-                    new ResolvingMethodInfoSingletonCell(factoryMethodInfo) : 
-                    new ResolvingMethodInfoCell(factoryMethodInfo);
-            resolvingType = factoryMethodInfo.GetAndCheckResolvingType(resolvingType);
-            FullContainerItemResolvingKey key = 
-                new FullContainerItemResolvingKey(resolvingType, resolutionKey);
-            RegisterSingletonInstance(typeof(IResolvingCell), cell, key);
-        }
+        //private void RegisterMethodInfoCell
+        //(
+        //    MethodBase factoryMethodInfo,
+        //    bool isSingleton,
+        //    Type? resolvingType = null,
+        //    object? resolutionKey = default)
+        //{
+        //    IResolvingCell cell = 
+        //        isSingleton ? 
+        //            new ResolvingMethodInfoSingletonCell(factoryMethodInfo) : 
+        //            new ResolvingMethodInfoCell(factoryMethodInfo);
+        //    resolvingType = factoryMethodInfo.GetAndCheckResolvingType(resolvingType);
+        //    FullContainerItemResolvingKey<TKey> key = 
+        //        new FullContainerItemResolvingKey<TKey>(resolvingType, resolutionKey);
+        //    RegisterSingletonInstance(typeof(IResolvingCell), cell, key);
+        //}
 
 
         protected override void RegisterAttributedType
         (
             Type resolvingType, 
             Type typeToResolve, 
-            object? resolutionKey = null)
+            TKey resolutionKey = default)
         {
             RegisterType(resolvingType, typeToResolve, resolutionKey);
         }
@@ -94,7 +97,7 @@ namespace NP.IoCy
         (
             Type resolvingType, 
             Type typeToResolve, 
-            object? resolutionKey = null)
+            TKey resolutionKey = default)
         {
             RegisterSingletonType(resolvingType, typeToResolve, resolutionKey);
         }
@@ -102,7 +105,7 @@ namespace NP.IoCy
         public void RegisterSingletonFactoryMethod<TResolving>
         (
             Func<TResolving> resolvingFunc,
-            object? resolutionKey = null
+            TKey resolutionKey = default
         )
         {
             Type resolvingType = typeof(TResolving);
@@ -116,7 +119,7 @@ namespace NP.IoCy
         public void RegisterFactoryMethod<TResolving>
         (
             Func<TResolving> resolvingFunc,
-            object? resolutionKey = null
+            TKey resolutionKey = default
         )
         {
             Type resolvingType = typeof(TResolving);
@@ -131,7 +134,7 @@ namespace NP.IoCy
         (
             MethodBase factoryMethodInfo,
             Type? resolvingType = null,
-            object? resolutionKey = null)
+            TKey resolutionKey = default)
         {
             resolvingType = factoryMethodInfo.GetAndCheckResolvingType(resolvingType);
 
@@ -146,7 +149,7 @@ namespace NP.IoCy
         (
             MethodBase factoryMethodInfo,
             Type? resolvingType = null,
-            object? resolutionKey = null)
+            TKey resolutionKey = default)
         {
             resolvingType = factoryMethodInfo.GetAndCheckResolvingType(resolvingType);
 
@@ -165,9 +168,9 @@ namespace NP.IoCy
             }
         }
 
-        public void UnRegister(Type resolvingType, object? resolutionKey)
+        public void UnRegister(Type resolvingType, TKey resolutionKey)
         {
-            FullContainerItemResolvingKey resolvingTypeKey = resolvingType.ToKey(resolutionKey);
+            FullContainerItemResolvingKey<TKey> resolvingTypeKey = resolvingType.ToKey(resolutionKey);
 
             string errorMessage =
                 $"IoCy Programming Error: cannot remove key '{resolvingTypeKey}' since configuration has already been completed.";
@@ -175,7 +178,15 @@ namespace NP.IoCy
             ModifyContainerBuilder(() => _cellMap.Remove(resolvingTypeKey), errorMessage);
         }
 
-        public virtual IDependencyInjectionContainer Build()
+        public virtual IDependencyInjectionContainer<TKey> Build()
+        {
+            return new Container<TKey>(_cellMap);
+        }
+    }
+
+    public class ContainerBuilder : ContainerBuilder<object?>, IContainerBuilder
+    {
+        public override IDependencyInjectionContainer<object?> Build()
         {
             return new Container(_cellMap);
         }

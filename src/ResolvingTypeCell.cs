@@ -22,7 +22,7 @@ namespace NP.IoCy
 
         private object? _obj;
 
-        public override object? GetObj(Container objectComposer)
+        public override object? GetObj(IObjComposer objectComposer)
         {
             if (_obj == null)
             {
@@ -45,7 +45,7 @@ namespace NP.IoCy
 
         public override ResolvingCellType CellType => ResolvingCellType.Transient;
 
-        public override object? GetObj(Container objectComposer)
+        public override object? GetObj(IObjComposer objectComposer)
         {
             return objectComposer.CreateAndComposeObjFromType(_typeToResolve);
         }

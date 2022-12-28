@@ -9,25 +9,28 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 //
+
 using NP.DependencyInjection.Interfaces;
 using NP.IoC.CommonImplementations;
 using System.Collections.Generic;
 
 namespace NP.IoCy
 {
-    public class Container : AbstractContainer, IDependencyInjectionContainer
+    public class Container<TKey> : AbstractContainer<TKey>, IDependencyInjectionContainer<TKey>
     {
-        Dictionary<FullContainerItemResolvingKey, IResolvingCell> _cellMap =
-            new Dictionary<FullContainerItemResolvingKey, IResolvingCell>();
+        Dictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell> _cellMap =
+            new Dictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell>();
 
-        internal Container (Dictionary<FullContainerItemResolvingKey, IResolvingCell> cellMap)
+        internal Container (IDictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell> cellMap)
         {
             _cellMap.AddAll(cellMap);
 
             ComposeAllSingletonObjects();
         }
 
-        private IResolvingCell? GetResolvingCellCurrentContainer(FullContainerItemResolvingKey resolvingKey)
+        private IResolvingCell? GetResolvingCellCurrentContainer
+        (
+            FullContainerItemResolvingKey<TKey> resolvingKey)
         {
             if (_cellMap.TryGetValue(resolvingKey, out IResolvingCell? resolvingCell))
             {
@@ -37,14 +40,14 @@ namespace NP.IoCy
             return null;
         }
 
-        private IResolvingCell GetResolvingCell(FullContainerItemResolvingKey resolvingKey)
+        private IResolvingCell GetResolvingCell(FullContainerItemResolvingKey<TKey> resolvingKey)
         {
             IResolvingCell resolvingCell = GetResolvingCellCurrentContainer(resolvingKey)!;
 
             return resolvingCell;
         }
 
-        protected override object ResolveKey(FullContainerItemResolvingKey fullResolvingKey)
+        protected override object ResolveKey(FullContainerItemResolvingKey<TKey> fullResolvingKey)
         {
             IResolvingCell resolvingCell = GetResolvingCell(fullResolvingKey);
 
@@ -62,6 +65,16 @@ namespace NP.IoCy
 
                 ComposeObject(resolvingCell.GetObj(this)!);
             }
+        }
+    }
+
+    public class Container : Container<object?>
+    {
+        internal Container(IDictionary<FullContainerItemResolvingKey<object?>, IResolvingCell> cellMap) 
+        : 
+        base(cellMap)
+        {
+            
         }
     }
 }

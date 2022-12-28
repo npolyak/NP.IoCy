@@ -22,7 +22,7 @@ namespace NP.IoCy
 
         private object? _obj;
         
-        public override object? GetObj(Container objectComposer)
+        public override object? GetObj(IObjComposer objectComposer)
         {
             if (_obj == null)
             {
@@ -58,7 +58,7 @@ namespace NP.IoCy
 
         private object? _obj;
 
-        public override object? GetObj(Container objectComposer)
+        public override object? GetObj(IObjComposer objectComposer)
         {
             return objectComposer.CreateAndComposeObjFromMethod(_factoryMethodInfo);
         }

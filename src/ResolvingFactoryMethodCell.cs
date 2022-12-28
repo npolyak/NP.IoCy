@@ -9,6 +9,7 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
+using NP.IoC.CommonImplementations;
 using System;
 
 namespace NP.IoCy
@@ -21,7 +22,7 @@ namespace NP.IoCy
 
         Func<TResolving> _func;
 
-        public override object? GetObj(Container objectComposer)
+        public override object? GetObj(IObjComposer objectComposer)
         {
             return _obj;
         }
@@ -40,7 +41,7 @@ namespace NP.IoCy
 
         Func<TResolving> _func;
 
-        public override object? GetObj(Container objectComposer)
+        public override object? GetObj(IObjComposer objectComposer)
         {
             return _func();
         }

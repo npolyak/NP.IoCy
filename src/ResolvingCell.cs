@@ -9,12 +9,14 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
+using NP.IoC.CommonImplementations;
+
 namespace NP.IoCy
 {
     internal abstract class ResolvingCell : IResolvingCell
     {
         public abstract ResolvingCellType CellType { get; }
 
-        public abstract object? GetObj(Container objectComposer);
+        public abstract object? GetObj(IObjComposer objectComposer);
     }
 }

@@ -9,6 +9,8 @@
 // Also, please, mention this software in any documentation for the 
 // products that use it.
 
+using NP.IoC.CommonImplementations;
+
 namespace NP.IoCy
 {
     class ResolvingObjSingletonCell : ResolvingCell
@@ -19,7 +21,7 @@ namespace NP.IoCy
 
         private object _obj;
 
-        public override object? GetObj(Container objectComposer)
+        public override object? GetObj(IObjComposer objectComposer)
         {
             if (!_isComposed)
             {
