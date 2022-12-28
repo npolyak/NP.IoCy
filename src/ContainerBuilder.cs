@@ -168,7 +168,7 @@ namespace NP.IoCy
             }
         }
 
-        public void UnRegister(Type resolvingType, TKey resolutionKey)
+        public void UnRegister(Type resolvingType, TKey resolutionKey = default)
         {
             FullContainerItemResolvingKey<TKey> resolvingTypeKey = resolvingType.ToKey(resolutionKey);
 
