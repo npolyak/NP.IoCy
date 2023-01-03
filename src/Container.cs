@@ -14,6 +14,7 @@ using NP.DependencyInjection.Interfaces;
 using NP.IoC.CommonImplementations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace NP.IoCy
 {
@@ -74,7 +75,7 @@ namespace NP.IoCy
         {
             object result = ResolveKey(typeof(TResolving).ToKey(resolutionKey));
 
-            return (IEnumerable<TResolving>)result;
+            return (result as IEnumerable<object>)?.Cast<TResolving>(); ;
         }
     }
 

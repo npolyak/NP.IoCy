@@ -79,13 +79,18 @@ namespace TestAllRegisterAndResolveMethods
             containerBuilder.RegisterType<IPerson, Person>();
             containerBuilder.RegisterType<IAddress, Address>();
             containerBuilder.RegisterType<IOrg, Org>();
+
+
             containerBuilder.RegisterSingletonType<ILog, FileLog>();
 
+            containerBuilder.RegisterMultiCell(typeof(ILog), "MyLog");
             containerBuilder.RegisterType<ILog, ConsoleLog>("MyLog");
             #endregion BOOTSTRAPPING
 
             // Create container
             IDependencyInjectionContainer<string?> container = containerBuilder.Build();
+
+            container.ResolveMultiCell<ILog>("MyLog");
 
             // resolve and compose organization
             // all its 'Parts' will be added at
