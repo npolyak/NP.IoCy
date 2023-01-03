@@ -19,15 +19,20 @@ namespace NP.IoCy
             Type resolvingType = typeToResolveKey.ResolvingType;
             lock (_cellMap)
             {
+                bool addedCell = false;
                 _cellMap.TryGetValue(typeToResolveKey, out var currentCell);
                 {
                     if (currentCell is ResolvingMultiObjCell multiObjCell)
                     {
-                        multiObjCell.
+                        addedCell = true;
+                        multiObjCell.AddCell(resolvingCell, resolvingType);
                     }
                 }
 
-                _cellMap[typeToResolveKey] = resolvingCell;
+                if (!addedCell)
+                {
+                    _cellMap[typeToResolveKey] = resolvingCell;
+                }
 
                 return resolvingCell;
             }
