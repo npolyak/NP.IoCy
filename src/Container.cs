@@ -12,6 +12,7 @@
 
 using NP.DependencyInjection.Interfaces;
 using NP.IoC.CommonImplementations;
+using System;
 using System.Collections.Generic;
 
 namespace NP.IoCy
@@ -65,6 +66,16 @@ namespace NP.IoCy
 
                 ComposeObject(resolvingCell.GetObj(this)!);
             }
+        }
+
+        public IEnumerable<TResolving> ResolveMultiCell<TResolving>
+        (
+            Type resolvingType, 
+            TKey resolutionKey = default)
+        {
+            object result = ResolveKey(resolvingType.ToKey(resolutionKey));
+
+            return (IEnumerable<TResolving>)result;
         }
     }
 
