@@ -16,6 +16,7 @@ using TestAllRegisterAndResolveMethods.Interfaces;
 using System;
 using NP.DependencyInjection.Interfaces;
 using System.Reflection;
+using System.Linq;
 
 namespace TestAllRegisterAndResolveMethods
 {
@@ -83,14 +84,20 @@ namespace TestAllRegisterAndResolveMethods
 
             containerBuilder.RegisterSingletonType<ILog, FileLog>();
 
-            containerBuilder.RegisterMultiCell(typeof(ILog), "MyLog");
+
             containerBuilder.RegisterType<ILog, ConsoleLog>("MyLog");
+
+            containerBuilder.RegisterMultiCell(typeof(ILog), "MyLog1");
+            containerBuilder.RegisterType<ILog, ConsoleLog>("MyLog1");
+            containerBuilder.RegisterType<ILog, FileLog>("MyLog1");
             #endregion BOOTSTRAPPING
 
             // Create container
             IDependencyInjectionContainer<string?> container = containerBuilder.Build();
 
-            container.ResolveMultiCell<ILog>("MyLog");
+            var result = container.ResolveMultiCell<ILog>("MyLog1");
+
+            result.Count().Should().Be(2);  
 
             // resolve and compose organization
             // all its 'Parts' will be added at
