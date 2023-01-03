@@ -16,14 +16,31 @@ namespace NP.IoCy
             FullContainerItemResolvingKey<TKey> typeToResolveKey, 
             IResolvingCell resolvingCell)
         {
+            Type resolvingType = typeToResolveKey.ResolvingType;
             lock (_cellMap)
             {
+                _cellMap.TryGetValue(typeToResolveKey, out var currentCell);
+                {
+                    if (currentCell is ResolvingMultiObjCell multiObjCell)
+                    {
+                        multiObjCell.
+                    }
+                }
+
                 _cellMap[typeToResolveKey] = resolvingCell;
 
                 return resolvingCell;
             }
         }
 
+        public void RegisterMultiCell
+        (
+            Type resolvingType, 
+            TKey resolutionKey = default
+        )
+        {
+            AddCell(resolvingType.ToKey(resolutionKey!), new ResolvingMultiObjCell(resolvingType));
+        }
 
         public override void RegisterType
         (
@@ -32,7 +49,7 @@ namespace NP.IoCy
             TKey resolutionKey = default)
         {
             resolvingType.CheckTypeDerivation(typeToResolve);
-            AddCell(resolvingType.ToKey(resolutionKey!), new ResolvingTypeCell(typeToResolve));
+            AddCell(resolvingType.ToKey(resolutionKey!), new ResolvingTypeCell(false, typeToResolve));
         }
 
 
@@ -62,26 +79,8 @@ namespace NP.IoCy
             AddCell
             (
                 resolvingType.ToKey(resolutionKey),
-                new ResolvingSingletonTypeCell(typeToResolve));
+                new ResolvingTypeCell(true, typeToResolve));
         }
-
-
-        //private void RegisterMethodInfoCell
-        //(
-        //    MethodBase factoryMethodInfo,
-        //    bool isSingleton,
-        //    Type? resolvingType = null,
-        //    object? resolutionKey = default)
-        //{
-        //    IResolvingCell cell = 
-        //        isSingleton ? 
-        //            new ResolvingMethodInfoSingletonCell(factoryMethodInfo) : 
-        //            new ResolvingMethodInfoCell(factoryMethodInfo);
-        //    resolvingType = factoryMethodInfo.GetAndCheckResolvingType(resolvingType);
-        //    FullContainerItemResolvingKey<TKey> key = 
-        //        new FullContainerItemResolvingKey<TKey>(resolvingType, resolutionKey);
-        //    RegisterSingletonInstance(typeof(IResolvingCell), cell, key);
-        //}
 
 
         protected override void RegisterAttributedType
@@ -113,7 +112,7 @@ namespace NP.IoCy
             AddCell
             (
                 resolvingType.ToKey(resolutionKey),
-                new ResolvingFactoryMethodSingletonCell<TResolving>(resolvingFunc));
+                new ResolvingFactoryMethodCell<TResolving>(true, resolvingFunc));
         }
 
         public void RegisterFactoryMethod<TResolving>
@@ -127,7 +126,7 @@ namespace NP.IoCy
             AddCell
             (
                 resolvingType.ToKey(resolutionKey),
-                new ResolvingFactoryMethodCell<TResolving>(resolvingFunc));
+                new ResolvingFactoryMethodCell<TResolving>(false, resolvingFunc));
         }
 
         public override void RegisterSingletonFactoryMethodInfo
@@ -141,7 +140,7 @@ namespace NP.IoCy
             AddCell
             (
                 resolvingType.ToKey(resolutionKey),
-                new ResolvingMethodInfoSingletonCell(factoryMethodInfo));
+                new ResolvingMethodInfoCell(true, factoryMethodInfo));
         }
 
 
@@ -156,7 +155,7 @@ namespace NP.IoCy
             AddCell
             (
                 resolvingType.ToKey(resolutionKey),
-                new ResolvingMethodInfoCell(factoryMethodInfo));
+                new ResolvingMethodInfoCell(false, factoryMethodInfo));
         }
 
 

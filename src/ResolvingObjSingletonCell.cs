@@ -10,15 +10,13 @@
 // products that use it.
 
 using NP.IoC.CommonImplementations;
+using System.Collections.Generic;
 
 namespace NP.IoCy
 {
-    class ResolvingObjSingletonCell : ResolvingCell
+    internal class ResolvingObjSingletonCell : ResolvingCell
     {
         private bool _isComposed = false;
-
-        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
-
         private object _obj;
 
         public override object? GetObj(IObjComposer objectComposer)
@@ -32,7 +30,14 @@ namespace NP.IoCy
             return _obj;
         }
 
-        public ResolvingObjSingletonCell(object obj)
+        protected override object? CreateObject(IObjComposer objComposer)
+        {
+            return null;
+        }
+
+        public ResolvingObjSingletonCell(object obj) 
+            :
+            base(true)
         {
             _obj = obj;
         }

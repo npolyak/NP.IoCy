@@ -14,57 +14,19 @@ using NP.IoC.CommonImplementations;
 
 namespace NP.IoCy
 {
-    internal class ResolvingMethodInfoSingletonCell : ResolvingCell
-    {
-        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
-
-        private MethodBase _factoryMethod;
-
-        private object? _obj;
-        
-        public override object? GetObj(IObjComposer objectComposer)
-        {
-            if (_obj == null)
-            {
-                // create object
-                _obj = objectComposer.CreateAndComposeObjFromMethod(_factoryMethod);
-            }
-
-            return _obj;
-        }
-
-
-        public ResolvingMethodInfoSingletonCell(MethodBase factoryMethod)
-        {
-            _factoryMethod = factoryMethod;
-
-            if (!_factoryMethod.IsStatic)
-            {
-                $"Cannot use instance Method {factoryMethod.Name.Sq()} for Object Creation".ThrowProgError();
-            }
-
-            if (factoryMethod is MethodInfo factoryMethodInfo && factoryMethodInfo.ReturnType == null)
-            {
-                $"Cannot use Void Method {factoryMethod.Name.Sq()} for Object Creation".ThrowProgError();
-            }
-        }
-    }
-
     internal class ResolvingMethodInfoCell : ResolvingCell
     {
-        public override ResolvingCellType CellType => ResolvingCellType.Transient;
-
         private MethodBase _factoryMethodInfo;
 
-        private object? _obj;
-
-        public override object? GetObj(IObjComposer objectComposer)
+        protected override object? CreateObject(IObjComposer objComposer)
         {
-            return objectComposer.CreateAndComposeObjFromMethod(_factoryMethodInfo);
+            return 
+                objComposer.CreateAndComposeObjFromMethod(_factoryMethodInfo);
         }
 
-
-        public ResolvingMethodInfoCell(MethodBase factoryMethod)
+        public ResolvingMethodInfoCell(bool isSingleton, MethodBase factoryMethod)
+            :
+            base(isSingleton)
         {
             _factoryMethodInfo = factoryMethod;
 

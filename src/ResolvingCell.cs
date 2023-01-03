@@ -10,13 +10,39 @@
 // products that use it.
 
 using NP.IoC.CommonImplementations;
+using System;
+using System.Collections.Generic;
 
 namespace NP.IoCy
 {
     internal abstract class ResolvingCell : IResolvingCell
     {
-        public abstract ResolvingCellType CellType { get; }
+        internal protected bool IsSingleton { get; }
+        public ResolvingCellType CellType =>
+            IsSingleton ? ResolvingCellType.Singleton : ResolvingCellType.Transient;
 
-        public abstract object? GetObj(IObjComposer objectComposer);
+        public ResolvingCell(bool isSingleton)
+        {
+            IsSingleton = isSingleton;
+        }
+
+        public object? TheObj { get; private set; }
+
+        private bool _hasCreated = false;
+
+        public virtual object? GetObj(IObjComposer objectComposer)
+        {
+            if ((!IsSingleton) || (!_hasCreated))
+            {
+                // create object
+                TheObj = CreateObject(objectComposer);
+
+                _hasCreated = true;
+            }
+
+            return TheObj;
+        }
+
+        protected abstract object? CreateObject(IObjComposer objComposer);
     }
 }

@@ -11,46 +11,22 @@
 
 using NP.IoC.CommonImplementations;
 using System;
+using System.Threading;
 
 namespace NP.IoCy
 {
-    internal class ResolvingSingletonTypeCell : ResolvingCell
-    {
-        Type _typeToResolve;
-
-        public override ResolvingCellType CellType => ResolvingCellType.Singleton;
-
-        private object? _obj;
-
-        public override object? GetObj(IObjComposer objectComposer)
-        {
-            if (_obj == null)
-            {
-                // create object
-                _obj = objectComposer.CreateAndComposeObjFromType(_typeToResolve);
-            }
-
-            return _obj;
-        }
-
-        public ResolvingSingletonTypeCell(Type typeToResolve)
-        {
-            _typeToResolve = typeToResolve;
-        }
-    }
-
     internal class ResolvingTypeCell : ResolvingCell
     {
         Type _typeToResolve;
 
-        public override ResolvingCellType CellType => ResolvingCellType.Transient;
-
-        public override object? GetObj(IObjComposer objectComposer)
+        protected override object? CreateObject(IObjComposer objComposer)
         {
-            return objectComposer.CreateAndComposeObjFromType(_typeToResolve);
+            return objComposer.CreateAndComposeObjFromType(_typeToResolve);
         }
 
-        public ResolvingTypeCell(Type typeToResolve)
+        public ResolvingTypeCell(bool isSingleton, Type typeToResolve)
+            :
+            base(isSingleton)
         {
             _typeToResolve = typeToResolve;
         }
