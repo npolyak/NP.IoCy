@@ -72,7 +72,7 @@ namespace TestAllRegisterAndResolveMethods
         public static void Main(string[] args)
         {
             // create container builder
-            IContainerBuilder<string?> containerBuilder = new ContainerBuilder<string?>();
+            IContainerBuilder<string?> containerBuilder = new ContainerBuilder<string?>(true);
 
             #region BOOTSTRAPPING
             // bootstrap container 
@@ -201,7 +201,7 @@ namespace TestAllRegisterAndResolveMethods
             container3 = containerBuilder.Build();
             container3.TestOrg(false, "TheOrg");
 
-            var containerBuilder4 = new ContainerBuilder<string?>();
+            var containerBuilder4 = new ContainerBuilder<string?>(true);
 
             containerBuilder4.RegisterAttributedClass(typeof(AnotherOrg));
             containerBuilder4.RegisterAttributedClass(typeof(AnotherPerson));
@@ -228,7 +228,7 @@ namespace TestAllRegisterAndResolveMethods
             // make sure ILog is a singleton.
             container4.IsSingleton<ILog>().Should().BeTrue();
 
-            var containerBuilder5 = new ContainerBuilder<string>();
+            var containerBuilder5 = new ContainerBuilder<string>(true);
 
             containerBuilder5.RegisterAttributedStaticFactoryMethodsFromClass(typeof(FactoryMethods)); 
 

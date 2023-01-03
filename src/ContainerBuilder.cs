@@ -2,12 +2,17 @@
 using NP.IoC.CommonImplementations;
 using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Reflection;
 
 namespace NP.IoCy
 {
     public class ContainerBuilder<TKey> : AbstractContainerBuilder<TKey>, IContainerBuilder<TKey>
     {
+        public bool AllowOverrides { get; }
+
+        private Dictionary<TKey, object> KeyContainer { get; } = new Dictionary<TKey, object>();
+
         internal IDictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell> _cellMap =
             new Dictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell>();
 
@@ -20,12 +25,16 @@ namespace NP.IoCy
             lock (_cellMap)
             {
                 bool addedCell = false;
-                _cellMap.TryGetValue(typeToResolveKey, out var currentCell);
+                if (_cellMap.TryGetValue(typeToResolveKey, out var currentCell))
                 {
                     if (currentCell is ResolvingMultiObjCell multiObjCell)
                     {
                         addedCell = true;
                         multiObjCell.AddCell(resolvingCell, resolvingType);
+                    }
+                    else if (!AllowOverrides)
+                    {
+                        throw new Exception($"ERROR: Trying to override already existing key '{typeToResolveKey.ToStr()}'. Unregister the old key first!");
                     }
                 }
 
@@ -36,6 +45,11 @@ namespace NP.IoCy
 
                 return resolvingCell;
             }
+        }
+
+        public ContainerBuilder(bool allowOverrides = false)
+        {
+            AllowOverrides = allowOverrides;
         }
 
         public void RegisterMultiCell
@@ -162,7 +176,6 @@ namespace NP.IoCy
                 resolvingType.ToKey(resolutionKey),
                 new ResolvingMethodInfoCell(false, factoryMethodInfo));
         }
-
 
         private void ModifyContainerBuilder(Action modificationAction, string errorMessage)
         {
