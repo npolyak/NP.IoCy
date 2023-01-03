@@ -70,10 +70,9 @@ namespace NP.IoCy
 
         public IEnumerable<TResolving> ResolveMultiCell<TResolving>
         (
-            Type resolvingType, 
             TKey resolutionKey = default)
         {
-            object result = ResolveKey(resolvingType.ToKey(resolutionKey));
+            object result = ResolveKey(typeof(TResolving).ToKey(resolutionKey));
 
             return (IEnumerable<TResolving>)result;
         }
