@@ -167,6 +167,8 @@ namespace TestAllRegisterAndResolveMethods
             var container3 = containerBuilder.Build();
             container3.TestOrg(false);
 
+            // test that double keys (even with different ResolvingTypes) are prevented
+            //containerBuilder.RegisterFactoryMethod(CreateOrg, "MyLog");
 
             containerBuilder.RegisterFactoryMethod(CreateOrg, "TheOrg");
             container3 = containerBuilder.Build();
@@ -193,7 +195,6 @@ namespace TestAllRegisterAndResolveMethods
             MethodInfo createOrgMethodInfo =
                 typeof(Program).GetMethod(nameof(CreateOrg));
 
-            containerBuilder.UnRegister(typeof(IOrg), "TheOrg");
             containerBuilder.RegisterSingletonFactoryMethodInfo<IOrg>(createOrgMethodInfo, "TheOrg");
             container3 = containerBuilder.Build();
             container3.TestOrg(true, "TheOrg");
