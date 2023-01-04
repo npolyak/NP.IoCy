@@ -11,7 +11,7 @@ namespace NP.IoCy
     {
         public bool AllowOverrides { get; }
 
-        private Dictionary<TKey, object> KeyContainer { get; } = new Dictionary<TKey, object>();
+        private Dictionary<TKey, object?> ResolutionKeys { get; } = new Dictionary<TKey, object?>();
 
         internal IDictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell> _cellMap =
             new Dictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell>();
@@ -27,6 +27,7 @@ namespace NP.IoCy
                 bool addedCell = false;
                 if (_cellMap.TryGetValue(typeToResolveKey, out var currentCell))
                 {
+                    // found an existing (ResolvingType, ResolutionKey) combination
                     if (currentCell is ResolvingMultiObjCell multiObjCell)
                     {
                         addedCell = true;
@@ -35,6 +36,24 @@ namespace NP.IoCy
                     else if (!AllowOverrides)
                     {
                         throw new Exception($"ERROR: Trying to override already existing key '{typeToResolveKey.ToStr()}'. Unregister the old key first!");
+                    }
+                }
+                else // did NOT find an existing (ResolvingType, ResolutionKey) combination
+                {
+                    // if the resolution key is not null (default) check that such key has not been already used. 
+
+                    TKey resolutionKey = typeToResolveKey.KeyObject;
+
+                    if (!resolutionKey.ObjEquals(default(TKey)))
+                    {
+                        if (ResolutionKeys.ContainsKey(resolutionKey))
+                        {
+                            throw new Exception($"Non default ResolutionKey {resolutionKey} has already been used");
+                        }
+                        else
+                        {
+                            ResolutionKeys.Add(resolutionKey, null);
+                        }
                     }
                 }
 
@@ -189,10 +208,20 @@ namespace NP.IoCy
         {
             FullContainerItemResolvingKey<TKey> resolvingTypeKey = resolvingType.ToKey(resolutionKey);
 
+            if (!resolutionKey.ObjEquals(default(TKey)))
+            {
+                ResolutionKeys.Remove(resolutionKey);
+            }
+
             string errorMessage =
                 $"IoCy Programming Error: cannot remove key '{resolvingTypeKey}' since configuration has already been completed.";
 
             ModifyContainerBuilder(() => _cellMap.Remove(resolvingTypeKey), errorMessage);
+        }
+
+        public void UnRegister<TResolving>(TKey resolutionKey = default)
+        {
+            UnRegister(typeof(TResolving), resolutionKey);
         }
 
         public virtual IDependencyInjectionContainer<TKey> Build()

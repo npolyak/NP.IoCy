@@ -193,6 +193,7 @@ namespace TestAllRegisterAndResolveMethods
             MethodInfo createOrgMethodInfo =
                 typeof(Program).GetMethod(nameof(CreateOrg));
 
+            containerBuilder.UnRegister(typeof(IOrg), "TheOrg");
             containerBuilder.RegisterSingletonFactoryMethodInfo<IOrg>(createOrgMethodInfo, "TheOrg");
             container3 = containerBuilder.Build();
             container3.TestOrg(true, "TheOrg");
