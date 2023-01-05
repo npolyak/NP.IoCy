@@ -9,9 +9,11 @@ namespace NP.IoCy
     {
         public ResolvingCellType CellType => ResolvingCellType.Singleton;
 
+        public Type BasicResolvingType {get;}
         public Type ResolvingType { get; }
+        public Type LoseResolvingType { get; }
 
-        public IList<object> Objects { get; } = new List<object>();
+        public IList Objects { get; }
 
         private IList<IResolvingCell> Cells { get; } = new List<IResolvingCell>();
 
@@ -51,13 +53,19 @@ namespace NP.IoCy
 
         public ResolvingMultiObjCell(Type resolvingType)
         {
-            ResolvingType = resolvingType;
+            BasicResolvingType = resolvingType;
+
+            ResolvingType = typeof(List<>).MakeGenericType(BasicResolvingType);
+
+            LoseResolvingType = typeof(IEnumerable<>).MakeGenericType(BasicResolvingType);
+
+            Objects = (IList) Activator.CreateInstance(ResolvingType)!;
         }
 
         public void AddCell(IResolvingCell cell, Type resolvingType)
         {
             bool canAddCell = false;
-            if (this.ResolvingType.IsAssignableFrom(resolvingType))
+            if (this.LoseResolvingType.IsAssignableFrom(resolvingType))
             {
                 canAddCell = true;
             }

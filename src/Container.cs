@@ -14,6 +14,7 @@ using NP.DependencyInjection.Interfaces;
 using NP.IoC.CommonImplementations;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Metrics;
 using System.Linq;
 
 namespace NP.IoCy
@@ -65,7 +66,22 @@ namespace NP.IoCy
                     continue;
                 }
 
-                ComposeObject(resolvingCell.GetObj(this)!);
+                if (resolvingCell is ResolvingMultiObjCell)
+                {
+                    IEnumerable<object> result = (IEnumerable<object>)resolvingCell.GetObj(this)!;
+
+                    if (result != null)
+                    {
+                        foreach(object obj in result)
+                        {
+                            ComposeObject(obj);
+                        }
+                    }
+                }
+                else
+                {
+                    ComposeObject(resolvingCell.GetObj(this)!);
+                }
             }
         }
 
@@ -73,7 +89,7 @@ namespace NP.IoCy
         (
             TKey resolutionKey = default)
         {
-            object result = ResolveKey(typeof(TResolving).ToKey(resolutionKey));
+            object result = ResolveKey(typeof(IEnumerable<TResolving>).ToKey(resolutionKey));
 
             return (result as IEnumerable<object>)?.Cast<TResolving>(); ;
         }

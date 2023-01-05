@@ -11,7 +11,8 @@ namespace NP.IoCy
     {
         public bool AllowOverrides { get; }
 
-        private Dictionary<TKey, object?> ResolutionKeys { get; } = new Dictionary<TKey, object?>();
+        private Dictionary<TKey, object?> ResolutionKeys { get; } =
+            new Dictionary<TKey, object?>();
 
         internal IDictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell> _cellMap =
             new Dictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell>();
@@ -77,7 +78,8 @@ namespace NP.IoCy
             TKey resolutionKey = default
         )
         {
-            AddCell(resolvingType.ToKey(resolutionKey!), new ResolvingMultiObjCell(resolvingType));
+            Type fullResolvingType = typeof(IEnumerable<>).MakeGenericType(resolvingType);
+            AddCell(fullResolvingType.ToKey(resolutionKey!), new ResolvingMultiObjCell(resolvingType));
         }
 
         public override void RegisterType
