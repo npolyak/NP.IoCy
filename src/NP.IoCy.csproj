@@ -1,20 +1,31 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup>
-    <TargetFramework>net6.0</TargetFramework>
-    <PackageId>NP.IoCy</PackageId>
-    <Authors>Nick Polyak</Authors>
-    <Company>AWebPros</Company>
-    <Nullable>enable</Nullable>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>net6.0</TargetFramework>
+		<PackageId>NP.IoCy</PackageId>
+		<Authors>Nick Polyak</Authors>
+		<Company>AWebPros</Company>
+		<Nullable>enable</Nullable>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<Title>NP.DependencyInjection</Title>
+		<Authors>Nick Polyak, Ph. D.</Authors>
+		<Version>1.0.31</Version>
+		<Copyright>Nick Polyak 2023</Copyright>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<Description>DependencyInjection attributes and interfaces</Description>
+		<PackageTags>DependencyInjection, IoC, DI</PackageTags>
+	</PropertyGroup>
   <ItemGroup>
       <None Remove="LICENSE" />
       <None Remove="*.nupkg" />
       <None Remove="*.nuspec" />
       <None Remove="README.md" />
   </ItemGroup>
-  <ItemGroup>
+  <ItemGroup Condition="'$(Configuration)'=='Debug'">
     <ProjectReference Include="$(SolutionDir)..\..\SubModules\NP.DependencyInjection\src\NP.DependencyInjection.csproj" />
     <ProjectReference Include="$(SolutionDir)..\..\SubModules\NP.IoC.CommonImplementations\src\NP.IoC.CommonImplementations.csproj" />
   </ItemGroup>
+
+	<ItemGroup Condition="'$(Configuration)'=='Release'">
+		<PackageReference Include="NP.IoC.CommonImplementations" Version="1.0.8" />
+	</ItemGroup>
 </Project>

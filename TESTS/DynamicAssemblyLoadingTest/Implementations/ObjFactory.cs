@@ -12,6 +12,7 @@
 using NP.DependencyInjection.Attributes;
 using DynamicAssemblyLoadingTest.Implementations;
 using DynamicAssemblyLoadingTest.Interfaces;
+using System.Collections.Generic;
 
 namespace Implementations
 {
@@ -22,6 +23,27 @@ namespace Implementations
         public static IOrg CreateOrg([Inject(resolutionKey: "TheConsoleLog")] ILog log)
         {
             return new Org(log);
+        }
+
+
+        [RegisterMethod(isSingleton:true, isMultiCell:true, resolutionKey:"MyStrs")]
+        public static IEnumerable<string> GetStrs()
+        {
+            return new []
+            {
+                "Str1",
+                "Str2"
+            };
+        }
+
+        [RegisterMethod(isSingleton: true, isMultiCell: true, resolutionKey: "MyStrs")]
+        public static IEnumerable<string> GetOtherStrs()
+        {
+            return new[]
+            {
+                "Str3",
+                "Str4"
+            };
         }
     }
 }

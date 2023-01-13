@@ -12,7 +12,8 @@
 using NP.IoCy;
 using DynamicAssemblyLoadingTest.Interfaces;
 using System.IO;
-using NP.DependencyInjection.Interfaces;
+using System.Collections.Generic;
+using System;
 
 namespace DynamicAssemblyLoadingTest
 {
@@ -52,8 +53,14 @@ namespace DynamicAssemblyLoadingTest
             //use the propper logger to print the org info (Console log in our case).
             org.LogOrgInfo();
 
+            IEnumerable<string> strs = container.Resolve<IEnumerable<string>>("MyStrs");
 
-            //Console.ReadKey();
+            foreach(string str in strs)
+            {
+                Console.WriteLine(str);
+            }
+
+            Console.ReadKey();
         }
     }
 }

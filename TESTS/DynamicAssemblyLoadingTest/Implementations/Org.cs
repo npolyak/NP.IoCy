@@ -11,6 +11,7 @@
 
 using NP.DependencyInjection.Attributes;
 using DynamicAssemblyLoadingTest.Interfaces;
+using System.Collections;
 
 namespace DynamicAssemblyLoadingTest.Implementations
 {

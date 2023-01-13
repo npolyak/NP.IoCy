@@ -2,6 +2,7 @@
 using NP.IoC.CommonImplementations;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
 using System.Reflection;
 
@@ -17,7 +18,22 @@ namespace NP.IoCy
         internal IDictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell> _cellMap =
             new Dictionary<FullContainerItemResolvingKey<TKey>, IResolvingCell>();
 
-        private IResolvingCell AddCell
+        private IResolvingCell? GetCurrentCell(FullContainerItemResolvingKey<TKey> key)
+        {
+            if (_cellMap.TryGetValue(key, out var currentCell))
+            {
+                return currentCell;
+            }
+
+            return null;
+        }
+
+        private IResolvingCell? GetCurrentCell(Type resolvingType, TKey resolutionKey = default)
+        {
+            return GetCurrentCell(resolvingType.ToKey<TKey>(resolutionKey));
+        }
+
+        private void AddCell
         (
             FullContainerItemResolvingKey<TKey> typeToResolveKey, 
             IResolvingCell resolvingCell)
@@ -26,7 +42,8 @@ namespace NP.IoCy
             lock (_cellMap)
             {
                 bool addedCell = false;
-                if (_cellMap.TryGetValue(typeToResolveKey, out var currentCell))
+                IResolvingCell? currentCell = GetCurrentCell(typeToResolveKey);
+                if (currentCell != null)
                 {
                     // found an existing (ResolvingType, ResolutionKey) combination
                     if (currentCell is ResolvingMultiObjCell multiObjCell)
@@ -38,6 +55,10 @@ namespace NP.IoCy
                     {
                         throw new Exception($"ERROR: Trying to override already existing key '{typeToResolveKey.ToStr()}'. Unregister the old key first!");
                     }
+                    else if (resolvingCell is ResolvingMultiObjCell)
+                    {
+                        throw new Exception($"ERROR: Trying to override a normal cell with a multicell for key '{typeToResolveKey.ToStr()}'");
+                    }
                 }
                 else // did NOT find an existing (ResolvingType, ResolutionKey) combination
                 {
@@ -47,13 +68,13 @@ namespace NP.IoCy
 
                     if (!resolutionKey.ObjEquals(default(TKey)))
                     {
-                        if (ResolutionKeys.ContainsKey(resolutionKey))
+                        if (ResolutionKeys.ContainsKey(resolutionKey!))
                         {
                             throw new Exception($"Non default ResolutionKey {resolutionKey} has already been used");
                         }
                         else
                         {
-                            ResolutionKeys.Add(resolutionKey, null);
+                            ResolutionKeys.Add(resolutionKey!, null);
                         }
                     }
                 }
@@ -62,8 +83,6 @@ namespace NP.IoCy
                 {
                     _cellMap[typeToResolveKey] = resolvingCell;
                 }
-
-                return resolvingCell;
             }
         }
 
@@ -136,8 +155,13 @@ namespace NP.IoCy
         (
             Type resolvingType, 
             Type typeToResolve, 
-            TKey resolutionKey = default)
+            TKey resolutionKey = default,
+            bool isMultiCell = false)
         {
+            if (isMultiCell)
+            {
+                CreateOrTestMultiCell(resolvingType, resolutionKey);
+            }
             RegisterSingletonType(resolvingType, typeToResolve, resolutionKey);
         }
 
@@ -169,13 +193,33 @@ namespace NP.IoCy
                 new ResolvingFactoryMethodCell<TResolving>(false, resolvingFunc));
         }
 
+        private void CreateOrTestMultiCell(Type resolvingType, TKey resolutionKey = default)
+        {
+            IResolvingCell? currentCell = GetCurrentCell(resolvingType, resolutionKey);
+
+            if (currentCell == null) // new multi cell
+            {
+                this.RegisterMultiCell(resolvingType.GenericTypeArguments.First(), resolutionKey);
+            }
+            else if (currentCell is not ResolvingMultiObjCell)
+            {
+                throw new ProgrammingError($"current cell already exists for key '{resolutionKey}' and it is not a MULTIcell");
+            }
+        }
+
         public override void RegisterSingletonFactoryMethodInfo
         (
             MethodBase factoryMethodInfo,
             Type? resolvingType = null,
-            TKey resolutionKey = default)
+            TKey resolutionKey = default,
+            bool isMultiCell = false)
         {
             resolvingType = factoryMethodInfo.GetAndCheckResolvingType(resolvingType);
+
+            if (isMultiCell)
+            {
+                CreateOrTestMultiCell(resolvingType, resolutionKey);
+            }
 
             AddCell
             (
