@@ -1,4 +1,5 @@
-﻿using NP.DependencyInjection.Interfaces;
+﻿using Microsoft.VisualBasic;
+using NP.DependencyInjection.Interfaces;
 using NP.IoC.CommonImplementations;
 using System;
 using System.Collections.Generic;
@@ -8,7 +9,7 @@ using System.Reflection;
 
 namespace NP.IoCy
 {
-    public class ContainerBuilder<TKey> : AbstractContainerBuilder<TKey>, IContainerBuilder<TKey>
+    public class ContainerBuilder<TKey> : AbstractContainerBuilder<TKey>, IContainerBuilderWithMultiCells<TKey>
     {
         public bool AllowOverrides { get; }
 
@@ -35,21 +36,31 @@ namespace NP.IoCy
 
         private void AddCell
         (
-            FullContainerItemResolvingKey<TKey> typeToResolveKey, 
+            FullContainerItemResolvingKey<TKey> typeToResolveKey,
             IResolvingCell resolvingCell)
         {
-            Type resolvingType = typeToResolveKey.ResolvingType;
+            if (resolvingCell is ResolvingMultiObjCell)
+            {
+                throw new ProgrammingError($"MultiCells cannot be handled by this method (key = '{typeToResolveKey.ToStr()}'");
+            }
+
             lock (_cellMap)
             {
-                bool addedCell = false;
                 IResolvingCell? currentCell = GetCurrentCell(typeToResolveKey);
                 if (currentCell != null)
                 {
                     // found an existing (ResolvingType, ResolutionKey) combination
                     if (currentCell is ResolvingMultiObjCell multiObjCell)
                     {
-                        addedCell = true;
-                        multiObjCell.AddCell(resolvingCell, resolvingType);
+                        throw new 
+                            ProgrammingError($"This method cannot add a cell to a MultiCell (key = '{typeToResolveKey.ToStr()}'");
+                        //if (!isMulti)
+                        //{
+                        //    throw new ProgrammingError($"Cannot add to a multicell for within this workflow. The key is '{typeToResolveKey.ToStr()}'");
+                        //}
+
+                        //addedCell = true;
+                        //multiObjCell.AddCell(resolvingCell, resolvingType);
                     }
                     else if (!AllowOverrides)
                     {
@@ -79,26 +90,13 @@ namespace NP.IoCy
                     }
                 }
 
-                if (!addedCell)
-                {
-                    _cellMap[typeToResolveKey] = resolvingCell;
-                }
+                _cellMap[typeToResolveKey] = resolvingCell;
             }
         }
 
         public ContainerBuilder(bool allowOverrides = false)
         {
             AllowOverrides = allowOverrides;
-        }
-
-        public void RegisterMultiCell
-        (
-            Type resolvingType, 
-            TKey resolutionKey = default
-        )
-        {
-            Type fullResolvingType = typeof(IEnumerable<>).MakeGenericType(resolvingType);
-            AddCell(fullResolvingType.ToKey(resolutionKey!), new ResolvingMultiObjCell(resolvingType));
         }
 
         public override void RegisterType
@@ -110,7 +108,6 @@ namespace NP.IoCy
             resolvingType.CheckTypeDerivation(typeToResolve);
             AddCell(resolvingType.ToKey(resolutionKey!), new ResolvingTypeCell(false, typeToResolve));
         }
-
 
         public override void RegisterSingletonInstance
         (
@@ -155,13 +152,8 @@ namespace NP.IoCy
         (
             Type resolvingType, 
             Type typeToResolve, 
-            TKey resolutionKey = default,
-            bool isMultiCell = false)
+            TKey resolutionKey = default)
         {
-            if (isMultiCell)
-            {
-                CreateOrTestMultiCell(resolvingType, resolutionKey);
-            }
             RegisterSingletonType(resolvingType, typeToResolve, resolutionKey);
         }
 
@@ -193,33 +185,13 @@ namespace NP.IoCy
                 new ResolvingFactoryMethodCell<TResolving>(false, resolvingFunc));
         }
 
-        private void CreateOrTestMultiCell(Type resolvingType, TKey resolutionKey = default)
-        {
-            IResolvingCell? currentCell = GetCurrentCell(resolvingType, resolutionKey);
-
-            if (currentCell == null) // new multi cell
-            {
-                this.RegisterMultiCell(resolvingType.GenericTypeArguments.First(), resolutionKey);
-            }
-            else if (currentCell is not ResolvingMultiObjCell)
-            {
-                throw new ProgrammingError($"current cell already exists for key '{resolutionKey}' and it is not a MULTIcell");
-            }
-        }
-
         public override void RegisterSingletonFactoryMethodInfo
         (
             MethodBase factoryMethodInfo,
             Type? resolvingType = null,
-            TKey resolutionKey = default,
-            bool isMultiCell = false)
+            TKey resolutionKey = default)
         {
             resolvingType = factoryMethodInfo.GetAndCheckResolvingType(resolvingType);
-
-            if (isMultiCell)
-            {
-                CreateOrTestMultiCell(resolvingType, resolutionKey);
-            }
 
             AddCell
             (
@@ -273,6 +245,131 @@ namespace NP.IoCy
         public virtual IDependencyInjectionContainer<TKey> Build()
         {
             return new Container<TKey>(_cellMap);
+        }
+
+
+        private ResolvingMultiObjCell AddEmptyMultiCell(Type cellType, TKey resolutionKey = default)
+        {
+            ResolvingMultiObjCell multiCellToAdd = new ResolvingMultiObjCell(cellType);
+
+            Type resolvingType = multiCellToAdd.ResolvingType;
+
+            FullContainerItemResolvingKey<TKey> fullResolvingKey = resolvingType.ToKey(resolutionKey);
+
+            var multiCellToReturn = multiCellToAdd;
+
+            lock (_cellMap)
+            {
+                IResolvingCell? currentCell = GetCurrentCell(resolvingType, resolutionKey);
+
+                if (currentCell == null) // new multi cell
+                {
+                    _cellMap[fullResolvingKey] = multiCellToAdd;
+                    ResolutionKeys.Add(resolutionKey!, null);
+                }
+                else if (currentCell is ResolvingMultiObjCell currentMultiCell)
+                {
+                    multiCellToReturn = currentMultiCell;
+                }
+                else
+                {
+                    throw new ProgrammingError($"current cell already exists for key '{resolutionKey}' and it is not a MULTIcell");
+                }
+            }
+
+            return multiCellToReturn;
+        }
+
+        public void RegisterMultiCell
+        (
+            Type cellType,
+            TKey resolutionKey = default
+        )
+        {
+            AddEmptyMultiCell(cellType, resolutionKey);
+        }
+
+        public void RegisterMultiCell<TCell>(TKey resolutionKey = default)
+        {
+            AddEmptyMultiCell(typeof(TCell), resolutionKey);
+        }
+
+        public void RegisterMultiCellObjInstance
+        (
+            Type cellType,  
+            object instance, 
+            TKey resolutionKey = default)
+        {
+            var multiCell = 
+                AddEmptyMultiCell(cellType, resolutionKey);
+
+            multiCell.AddCell(new ResolvingObjSingletonCell(instance), instance.GetType());
+        }
+
+        public void RegisterMultiCellObjInstance<TCell>(object instance, TKey resolutionKey = default)
+        {
+            RegisterMultiCellObjInstance(typeof(TCell), instance, resolutionKey);
+        }
+
+        public void RegisterMultiCellType
+        (
+            Type cellType,
+            Type typeToResolve,
+            TKey resolutionKey = default)
+        {
+            var multiCell = AddEmptyMultiCell(cellType, resolutionKey);
+
+            multiCell.AddCell(new ResolvingTypeCell(true, typeToResolve), typeToResolve);
+        }
+
+        public void RegisterMultiCellType<TCell, TToResolve>(TKey resolutionKey = default)
+        {
+            RegisterMultiCellType(typeof(TCell), typeof(TToResolve), resolutionKey);
+        }
+
+        protected override void RegisterAttributedMultiCellType
+        (
+            Type cellType,
+            Type typeToResolve,
+            TKey resolutionKey = default)
+        {
+            RegisterMultiCellType(cellType, typeToResolve, resolutionKey);
+        }
+
+        public void RegisterMultiCellFactoryMethod<TCell>(Func<TCell> resolvingFunc, TKey resolutionKey = default)
+        {
+            var multiCell = AddEmptyMultiCell(typeof(TCell), resolutionKey);
+
+            multiCell.AddCell(new ResolvingFactoryMethodCell<TCell>(true, resolvingFunc), typeof(TCell));
+        }
+
+
+        public void RegisterMultiCellFactoryMethod<TCell>(Func<IEnumerable<TCell>> resolvingFunc, TKey resolutionKey = default)
+        {
+            var multiCell = AddEmptyMultiCell(typeof(TCell), resolutionKey);
+
+            multiCell.AddCell(new ResolvingFactoryMethodCell<IEnumerable<TCell>>(true, resolvingFunc), typeof(IEnumerable<TCell>));
+        }
+
+        public override void RegisterMultiCellFactoryMethodInfo
+        (
+            MethodBase factoryMethodInfo, 
+            Type cellType, 
+            TKey resolutionKey = default)
+        {
+            var multiCell = AddEmptyMultiCell(cellType, resolutionKey);
+
+            var resolvingType = factoryMethodInfo.GetMethodType();
+
+            multiCell.AddCell(new ResolvingMethodInfoCell(true, factoryMethodInfo), resolvingType);
+        }
+
+        public void RegisterMultiCellFactoryMethodInfo<TCell>
+        (
+            MethodBase factoryMethodInfo, 
+            TKey resolutionKey = default)
+        {
+            RegisterFactoryMethodInfo(factoryMethodInfo, typeof(TCell), resolutionKey);
         }
     }
 

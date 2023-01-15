@@ -14,7 +14,7 @@ using NP.IoC.CommonImplementations;
 
 namespace NP.IoCy
 {
-    enum ResolvingCellType
+    enum ResolvingCellKind
     {
         Transient,
         Singleton
@@ -22,7 +22,7 @@ namespace NP.IoCy
 
     internal interface IResolvingCell
     {
-        ResolvingCellType CellType { get; }
+        ResolvingCellKind CellKind { get; }
 
         object? GetObj(IObjComposer objectComposer);
     }

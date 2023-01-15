@@ -4,7 +4,7 @@ using TestAllRegisterAndResolveMethods.Interfaces;
 namespace TestAllRegisterAndResolveMethods.Implementations
 {
 
-    [RegisterType(resolutionKey: "AnotherPerson", IsSingleton = true)]
+    [RegisterType(resolutionKey: "AnotherPerson", isSingleton:true)]
     public class AnotherPerson : IPersonGettersOnly
     {
         public string PersonName { get; set; }

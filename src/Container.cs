@@ -61,7 +61,7 @@ namespace NP.IoCy
         {
             foreach(IResolvingCell resolvingCell in this._cellMap.Values)
             {
-                if (resolvingCell.CellType != ResolvingCellType.Singleton)
+                if (resolvingCell.CellKind != ResolvingCellKind.Singleton)
                 {
                     continue;
                 }

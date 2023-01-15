@@ -17,6 +17,7 @@ using System;
 using NP.DependencyInjection.Interfaces;
 using System.Reflection;
 using System.Linq;
+using System.Collections.Generic;
 
 namespace TestAllRegisterAndResolveMethods
 {
@@ -72,7 +73,7 @@ namespace TestAllRegisterAndResolveMethods
         public static void Main(string[] args)
         {
             // create container builder
-            IContainerBuilder<string?> containerBuilder = new ContainerBuilder<string?>(true);
+            IContainerBuilderWithMultiCells<string?> containerBuilder = new ContainerBuilder<string?>(true);
 
             #region BOOTSTRAPPING
             // bootstrap container 
@@ -81,23 +82,13 @@ namespace TestAllRegisterAndResolveMethods
             containerBuilder.RegisterType<IAddress, Address>();
             containerBuilder.RegisterType<IOrg, Org>();
 
-
             containerBuilder.RegisterSingletonType<ILog, FileLog>();
 
-
             containerBuilder.RegisterType<ILog, ConsoleLog>("MyLog");
-
-            containerBuilder.RegisterMultiCell(typeof(ILog), "MyLog1");
-            containerBuilder.RegisterType<ILog, ConsoleLog>("MyLog1");
-            containerBuilder.RegisterType<ILog, FileLog>("MyLog1");
             #endregion BOOTSTRAPPING
 
             // Create container
             IDependencyInjectionContainer<string?> container = containerBuilder.Build();
-
-            var result = container.ResolveMultiCell<ILog>("MyLog1");
-
-            result.Count().Should().Be(2);  
 
             // resolve and compose organization
             // all its 'Parts' will be added at
@@ -250,6 +241,9 @@ namespace TestAllRegisterAndResolveMethods
             IAddress address5 = container5.Resolve<IAddress>("TheAddress");
 
             address5.Should().NotBeSameAs(org5.Manager.Address);
+
+            // test multi cells (IoCy only)
+
 
             Console.WriteLine("THE END");
 

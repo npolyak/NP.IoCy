@@ -18,8 +18,8 @@ namespace NP.IoCy
     internal abstract class ResolvingCell : IResolvingCell
     {
         internal protected bool IsSingleton { get; }
-        public ResolvingCellType CellType =>
-            IsSingleton ? ResolvingCellType.Singleton : ResolvingCellType.Transient;
+        public ResolvingCellKind CellKind =>
+            IsSingleton ? ResolvingCellKind.Singleton : ResolvingCellKind.Transient;
 
         public ResolvingCell(bool isSingleton)
         {

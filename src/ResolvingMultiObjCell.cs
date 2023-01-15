@@ -7,11 +7,12 @@ namespace NP.IoCy
 {
     internal class ResolvingMultiObjCell : IResolvingCell
     {
-        public ResolvingCellType CellType => ResolvingCellType.Singleton;
+        public ResolvingCellKind CellKind => ResolvingCellKind.Singleton;
 
-        public Type BasicResolvingType {get;}
-        public Type ResolvingType { get; }
-        public Type LoseResolvingType { get; }
+        public Type CellType { get; }
+
+        internal Type ResolvingType { get; }
+
 
         public IList Objects { get; }
 
@@ -51,30 +52,27 @@ namespace NP.IoCy
             return Objects;
         }
 
-        public ResolvingMultiObjCell(Type resolvingType)
+        public ResolvingMultiObjCell(Type cellType)
         {
-            BasicResolvingType = resolvingType;
+            CellType = cellType;
 
-            ResolvingType = typeof(List<>).MakeGenericType(BasicResolvingType);
+            var listResolvingType = typeof(List<>).MakeGenericType(CellType);
 
-            LoseResolvingType = typeof(IEnumerable<>).MakeGenericType(BasicResolvingType);
+            ResolvingType = typeof(IEnumerable<>).MakeGenericType(CellType);
 
-            Objects = (IList) Activator.CreateInstance(ResolvingType)!;
+            Objects = (IList) Activator.CreateInstance(listResolvingType)!;
         }
 
-        public void AddCell(IResolvingCell cell, Type resolvingType)
+        public void AddCell(IResolvingCell newCell, Type newCellResolvingType)
         {
             bool canAddCell = false;
-            if (this.LoseResolvingType.IsAssignableFrom(resolvingType))
+            if (this.CellType.IsAssignableFrom(newCellResolvingType))
             {
                 canAddCell = true;
             }
             else 
             {
-                Type realType = 
-                    typeof(IEnumerable<>).MakeGenericType(ResolvingType);
-
-                if (realType.IsAssignableFrom(resolvingType))
+                if (ResolvingType.IsAssignableFrom(newCellResolvingType))
                 {
                     canAddCell = true;
                 }
@@ -82,11 +80,11 @@ namespace NP.IoCy
 
             if (canAddCell)
             {
-                Cells.Add(cell);
+                Cells.Add(newCell);
             }
             else
             {
-                throw new Exception($"Cannot add a cell with resolving type '{resolvingType.Name}' to a multicell with resolvingType '{ResolvingType}' because of the type mismatch");
+                throw new Exception($"Cannot add a cell with resolving type '{newCellResolvingType.Name}' to a multicell with cellType '{ResolvingType}' because of the type mismatch");
             }
         }
     }
