@@ -26,6 +26,6 @@
   </ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Release'">
-		<PackageReference Include="NP.IoC.CommonImplementations" Version="1.0.8" />
+		<PackageReference Include="NP.IoC.CommonImplementations" Version="1.0.9" />
 	</ItemGroup>
 </Project>
