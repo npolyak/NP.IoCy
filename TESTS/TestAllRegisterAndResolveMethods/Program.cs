@@ -243,7 +243,43 @@ namespace TestAllRegisterAndResolveMethods
             address5.Should().NotBeSameAs(org5.Manager.Address);
 
             // test multi cells (IoCy only)
+            var containerBuilder6 = new ContainerBuilder<string>(true);
 
+            containerBuilder6.RegisterMultiCellObjInstance(typeof(string), "Str1", "MyStrings");
+            containerBuilder6.RegisterMultiCellObjInstance(typeof(string), new[] { "Str2", "Str3" }, "MyStrings");
+
+            var container6 = containerBuilder6.Build();
+
+            IEnumerable<string> myStrings = container6.Resolve<IEnumerable<string>>("MyStrings");
+
+            myStrings.Should().BeEquivalentTo(new[] { "Str1", "Str2", "Str3" });
+
+            var containerBuilder7 = new ContainerBuilder<string>(true);
+
+            containerBuilder7.RegisterMultiCellType<ILog, ConsoleLog>("MyLogs");
+            containerBuilder7.RegisterMultiCellType<ILog, FileLog>("MyLogs");
+
+            var container7 = containerBuilder7.Build();
+
+            IEnumerable<ILog> logs = container7.Resolve<IEnumerable<ILog>>("MyLogs");
+
+            logs.Count().Should().Be(2);
+            logs.First().Should().BeOfType<ConsoleLog>();
+            logs.Skip(1).First().Should().BeOfType<FileLog>();
+
+            var containerBuilder8 = new ContainerBuilder<string>(true);
+
+            containerBuilder8.RegisterAttributedClass(typeof(MyOrg));
+            containerBuilder8.RegisterAttributedStaticFactoryMethodsFromClass(typeof(OrgFactory));
+            containerBuilder8.RegisterType<OrgsContainer, OrgsContainer>();
+
+            var container8 = containerBuilder8.Build();
+
+            var orgsContainer = container8.Resolve<OrgsContainer>();
+
+            var orgNames = orgsContainer.Orgs.Select(org => org.OrgName).ToList();
+
+            orgNames.Should().BeEquivalentTo(new[] { "MyOrg1", "MyOrg2", "MyOrg3", "MyOrg4" });
 
             Console.WriteLine("THE END");
 

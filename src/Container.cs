@@ -84,15 +84,6 @@ namespace NP.IoCy
                 }
             }
         }
-
-        public IEnumerable<TResolving> ResolveMultiCell<TResolving>
-        (
-            TKey resolutionKey = default)
-        {
-            object result = ResolveKey(typeof(IEnumerable<TResolving>).ToKey(resolutionKey));
-
-            return (result as IEnumerable<object>)?.Cast<TResolving>(); ;
-        }
     }
 
     public class Container : Container<object?>

@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace NP.IoCy
 {
@@ -30,8 +31,10 @@ namespace NP.IoCy
                     if (subObj == null)
                         continue;
 
-                    if (subObj is IEnumerable enumerable)
+                    if (ResolvingType.IsAssignableFrom(subObj.GetType()))
                     {
+                        IEnumerable enumerable = (subObj as IEnumerable)!;
+
                         foreach (object? obj in enumerable)
                         {
                             if (obj != null)
