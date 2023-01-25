@@ -21,7 +21,6 @@
       <None Remove="README.md" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)'=='Debug'">
-    <ProjectReference Include="$(SolutionDir)..\..\SubModules\NP.DependencyInjection\src\NP.DependencyInjection.csproj" />
     <ProjectReference Include="$(SolutionDir)..\..\SubModules\NP.IoC.CommonImplementations\src\NP.IoC.CommonImplementations.csproj" />
   </ItemGroup>
 
