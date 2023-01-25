@@ -6,7 +6,6 @@
 		<Company>AWebPros</Company>
 		<Nullable>enable</Nullable>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
-		<Title>NP.DependencyInjection</Title>
 		<Authors>Nick Polyak, Ph. D.</Authors>
 		<Version>1.0.32</Version>
 		<Copyright>Nick Polyak 2023</Copyright>
