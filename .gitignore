@@ -115,3 +115,6 @@
 /TESTS/DynamicAssemblyLoadingTest/bin/Release/net6.0
 /TESTS/DynamicAssemblyLoadingTest/Implementations/bin/Release/net6.0
 /TESTS/DynamicAssemblyLoadingTest/Interfaces/bin/Release/net6.0
+/TESTS/ConstructorTest/.vs
+/TESTS/ConstructorTest/bin/Debug/net5.0
+/TESTS/ConstructorTest
