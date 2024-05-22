@@ -5,3 +5,6 @@
 [submodule "SubModules/NP.IoC.CommonImplementations"]
 	path = SubModules/NP.IoC.CommonImplementations
 	url = https://github.com/npolyak/NP.IoC.CommonImplementations.git
+[submodule "SubModules/NP.Utilities"]
+	path = SubModules/NP.Utilities
+	url = https://github.com/npolyak/NP.Utilities.git

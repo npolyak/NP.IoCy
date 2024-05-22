@@ -118,3 +118,4 @@
 /TESTS/ConstructorTest/.vs
 /TESTS/ConstructorTest/bin/Debug/net5.0
 /TESTS/ConstructorTest
+/Prototypes/IoCSetContainerInCodePrototype/bin/Release/net8.0

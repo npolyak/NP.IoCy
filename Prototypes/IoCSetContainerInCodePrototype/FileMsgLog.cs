@@ -1,4 +1,4 @@
-﻿using NP.IoC.Attributes;
+﻿using NP.DependencyInjection.Attributes;
 using NP.Utilities;
 
 namespace IoCSetContainerInCodePrototype
