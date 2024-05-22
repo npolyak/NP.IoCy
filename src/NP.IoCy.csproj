@@ -1,13 +1,11 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
 		<PackageId>NP.IoCy</PackageId>
 		<Authors>Nick Polyak</Authors>
 		<Company>AWebPros</Company>
-		<Nullable>enable</Nullable>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Authors>Nick Polyak, Ph. D.</Authors>
-		<Version>1.0.32</Version>
+		<Version>1.0.33</Version>
 		<Copyright>Nick Polyak 2023</Copyright>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>DependencyInjection attributes and interfaces</Description>
