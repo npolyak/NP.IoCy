@@ -5,7 +5,7 @@
 		<Company>AWebPros</Company>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<Authors>Nick Polyak, Ph. D.</Authors>
-		<Version>1.0.33</Version>
+		<Version>1.0.34</Version>
 		<Copyright>Nick Polyak 2023</Copyright>
 		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
 		<Description>DependencyInjection attributes and interfaces</Description>
@@ -22,6 +22,6 @@
   </ItemGroup>
 
 	<ItemGroup Condition="'$(Configuration)'=='Release'">
-		<PackageReference Include="NP.IoC.CommonImplementations" Version="1.0.9" />
+		<PackageReference Include="NP.IoC.CommonImplementations" Version="1.0.10" />
 	</ItemGroup>
 </Project>
