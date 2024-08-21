@@ -120,3 +120,4 @@
 /TESTS/ConstructorTest
 /Prototypes/IoCSetContainerInCodePrototype/bin/Release/net8.0
 *.json
+/TESTS/TestAllRegisterAndResolveMethods/bin/Debug/net8.0
